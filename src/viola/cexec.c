@@ -289,8 +289,7 @@ void freeArgListForDestroyed()
 
 }
 
-void freeArgList(self)
-	VObj *self;
+void freeArgList(VObj *self)
 {
 	int argAttrStackIdx_end = argAttrStackIdx;
 	Attr *argAttr, *attrp;
@@ -404,11 +403,7 @@ void dumpVarList(varlist)
 /*
  * XXX reduce redundant code...
  */
-Packet *codeExec(self, pcode, pcode_end, varVectorp)
-	register VObj *self;
-	union PCode *pcode;
-	union PCode *pcode_end;
-	Attr **varVectorp[];
+Packet *codeExec(VObj *self, union PCode *pcode, union PCode *pcode_end, Attr **varVectorp[])
 {
 	register int currBaseIdx = stackBaseIdx;
 	union PCode *pcode_start = pcode;
@@ -2190,9 +2185,7 @@ Packet *execObjScript(obj)
 	return &reg1;
 }
 
-Packet *execObjClassScript(obj, result)
-	VObj *obj;
-	Packet *result;
+Packet *execObjClassScript(VObj *obj, Packet *result)
 {
         union PCode *pcode = GET__classScript(obj);
 
@@ -2542,11 +2535,7 @@ long sendMessagePackets_result(self, packets, packetc, result)
 	return 1;
 }
 
-long sendMessageAndInts(self, messg, intArray, intCount)
-	VObj *self;
-	char *messg;
-	int *intArray;
-	int intCount;
+long sendMessageAndInts(VObj *self, char *messg, int *intArray, int intCount)
 {
 	int i;
 	int save_stackExecIdx = stackExecIdx;
@@ -2579,11 +2568,7 @@ long sendMessageAndInts(self, messg, intArray, intCount)
 	return 1;
 }
 
-long sendTokenMessageAndInts(self, tok, intArray, intCount)
-	VObj *self;
-	int tok;
-	int *intArray;
-	int intCount;
+long sendTokenMessageAndInts(VObj *self, int tok, int *intArray, int intCount)
 {
 	int i;
 	int save_stackExecIdx = stackExecIdx;
@@ -3042,10 +3027,7 @@ long sendMessage1N2str_result(self, messg, s1, s2, result)
 }
 
 
-int getVariable(varlist, name, result)
-	Attr *varlist;
-	char *name;
-	Packet *result;
+int getVariable(Attr *varlist, char *name, Packet *result)
 {
 	HashEntry *entry;
 	int varid;
@@ -3091,19 +3073,12 @@ long getVariable_id(varlist, varid)
 	return 0;
 }
 
-int setVariable(varlist, name, valp)
-	Attr *varlist;
-	char *name;
-	char *valp;
+int setVariable(Attr *varlist, char *name, char *valp)
 {
 	return 0;
 }
 
-Attr *setVariable_STR(varlist, name, valp, canFree)
-	Attr *varlist;
-	char *name;
-	char *valp;
-	int canFree;
+Attr *setVariable_STR(Attr *varlist, char *name, char *valp, int canFree)
 {
 	Attr *head = varlist;
 	HashEntry *entry;
@@ -3131,11 +3106,7 @@ Attr *setVariable_STR(varlist, name, valp, canFree)
 	return head;
 }
 
-Attr *setVariable_id_STR(attrp, varid, valp, canFree)
-	Attr *attrp;
-	int varid;
-	char *valp;
-	int canFree;
+Attr *setVariable_id_STR(Attr *attrp, int varid, char *valp, int canFree)
 {
 	Attr *head = attrp;
 	Packet *pk;
@@ -3189,9 +3160,7 @@ Attr *setVariable(varlistp, name, resultp)
 }
 */
 
-int destroyVariable(varlist, name, retp)
-	Attr *varlist;
-	char *name;
+int destroyVariable(Attr *varlist, char *name, int retp)
 {
 	return 0;
 }
