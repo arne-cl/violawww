@@ -1,4 +1,6 @@
 *.o
 *.a
+*.d
 src/viola/viola
 src/vw/vw
+.vscode/

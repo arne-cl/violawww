@@ -1,191 +1,128 @@
-# ViolaWWW Build Instructions
+# ViolaWWW Build System
 
-This is a modernized build system for ViolaWWW, one of the first graphical web browsers from the early 1990s.
+## Overview
+This document describes the build system for ViolaWWW browser on macOS (Darwin).
 
-## Prerequisites
+## Build System Features
 
-### macOS (Darwin)
+### Automatic Dependency Tracking
+The build system now includes **automatic header dependency tracking** using GCC's `-MMD -MP` flags.
 
-Install the required dependencies using Homebrew:
+#### How it works:
+1. During compilation, the compiler generates `.d` files alongside `.o` files
+2. These `.d` files contain dependency information for all `#include` headers
+3. The Makefile automatically includes these `.d` files
+4. When any header file changes, only the files that depend on it are recompiled
 
+#### Example:
+```makefile
+# Automatic dependency generation
+DEPFLAGS = -MMD -MP
+
+# Compile rule generates both .o and .d files
+$(VIOLA_DIR)/%.o: $(VIOLA_DIR)/%.c
+	$(CC) $(CFLAGS) $(DEPFLAGS) $(INCLUDES) -I$(VIOLA_DIR) -I$(LIBWWW_DIR) -c $< -o $@
+
+# Include generated dependencies
+-include $(VIOLA_OBJS:.o=.d)
+```
+
+### Special Cases
+
+#### gram.c Generation
+`gram.c` is generated from `gram.y` using yacc:
+```makefile
+$(VIOLA_DIR)/gram.c: $(VIOLA_DIR)/gram.y
+	@echo "=== Generating gram.c from gram.y ==="
+	cd $(VIOLA_DIR) && $(YACC) gram.y && mv y.tab.c gram.c
+```
+
+**Dependency chain:**
+```
+gram.y  →  gram.c  →  gram.o
+   ↓         ↓
+#include   #include
+"ast.h"    "ast.h"
+```
+
+When `ast.h` changes:
+- ✅ `gram.o` is recompiled (tracked via `gram.d`)
+- ✅ `gram.c` is NOT regenerated (only depends on `gram.y`)
+
+## Build Commands
+
+### Basic build
 ```bash
-brew install openmotif
+make              # Build everything (viola + vw)
+make viola        # Build viola browser only
+make vw           # Build VW (Motif interface)
 ```
 
-Make sure you have Xcode Command Line Tools installed:
-
+### Clean builds
 ```bash
-xcode-select --install
+make clean        # Remove object files and dependencies
+make distclean    # Complete clean including libraries
+make rebuild      # distclean + all
 ```
 
-## Quick Start
-
-### Build Everything
-
+### Partial builds
 ```bash
-make
-```
-
-This will build all libraries and both browser executables (`viola` and `vw`).
-
-### Build Specific Targets
-
-```bash
-# Build only VW (Motif interface browser)
-make vw
-
-# Build only Viola (Xt interface browser)
-make viola
-
-# Build only libraries
-make libs
-```
-
-### Clean Build Artifacts
-
-```bash
-# Remove object files only
-make clean
-
-# Remove all build artifacts including executables and libraries
-make distclean
-
-# Rebuild everything from scratch
-make rebuild
-```
-
-## Installation
-
-To install the binaries to your home directory:
-
-```bash
-make install
-```
-
-This will copy `viola` and `vw` to `~/bin/`.
-
-## Running the Browser
-
-After building, you can run either:
-
-```bash
-# Run VW (Motif interface - recommended)
-./src/vw/vw
-
-# Run Viola (Xt interface)
-./src/viola/viola
-```
-
-Or after installation:
-
-```bash
-vw
-# or
-viola
-```
-
-## Project Structure
-
-```
-violawww2/
-├── Makefile           # Main build system
-├── BUILD.md           # This file
-├── src/
-│   ├── libWWW/        # HTTP/HTML library
-│   ├── libXPM/        # XPM image support
-│   ├── libXPA/        # X Pixmap Allocator
-│   ├── libIMG/        # Image loading library
-│   ├── libStyle/      # Style library
-│   ├── viola/         # Viola browser (Xt interface)
-│   └── vw/            # VW browser (Motif interface)
-└── res/               # Resource files
+make libs         # Build all libraries only
+make libs-clean   # Clean libraries only
 ```
 
 ## Build Configuration
 
-The build system uses the following configuration:
+### Compiler Flags
+- `ARCH_FLAGS = -arch arm64` - Target ARM64 architecture
+- `CFLAGS` - Standard C compilation flags
+- `DEPFLAGS = -MMD -MP` - Dependency generation
 
-- **Compiler**: cc (clang on macOS)
-- **Architecture**: arm64 (Apple Silicon)
-- **C Standard**: gnu89 (for compatibility with 1990s code)
-- **Optimization**: -Os (size optimization)
-- **GUI Toolkit**: Motif (OpenMotif)
-- **Auto-detection**: Homebrew and OpenMotif paths are automatically detected
+### Directory Structure
+```
+src/
+  ├── libWWW/        # HTTP/HTML library
+  ├── libXPM/        # XPM image support
+  ├── libXPA/        # X Pixmap Allocator
+  ├── libIMG/        # Image loading
+  ├── libStyle/      # Style library
+  ├── viola/         # Viola browser core
+  └── vw/            # VW Motif interface
+```
 
-### Customizing the Build
+## Dependency Files
 
-The Makefile automatically detects Homebrew and OpenMotif installation paths. You can override build variables by editing the `Makefile` or passing them on the command line:
+Dependency files (`.d`) are automatically generated during compilation:
+- Located next to their corresponding `.o` files
+- Format: Make-compatible dependency lists
+- Automatically included by the Makefile
+- Cleaned with `make clean`
 
-```bash
-# Build with debugging symbols
-make CFLAGS="-g -arch arm64 -std=gnu89 -Wno-everything -D__DARWIN__"
-
-# Use a different compiler
-make CC=gcc-13
-
-# Change optimization level
-make CFLAGS="-O0 -arch arm64 -std=gnu89 -Wno-everything -D__DARWIN__"
-
-# Override Homebrew prefix (if installed in non-standard location)
-make BREW_PREFIX=/usr/local
+### Example gram.d:
+```make
+src/viola/gram.o: src/viola/gram.c src/viola/ast.h src/viola/cgen.h
+src/viola/ast.h:
+src/viola/cgen.h:
 ```
 
 ## Troubleshooting
 
-### Build Fails with Missing Headers
+### Headers not triggering rebuild
+If changes to header files don't trigger recompilation:
+1. Run `make clean` to remove old `.d` files
+2. Run `make` to rebuild and regenerate dependencies
 
-Make sure OpenMotif is properly installed:
-
-```bash
-brew info openmotif
+### yacc conflicts
+The parser generator may show shift/reduce conflicts:
 ```
-
-The Makefile automatically detects the OpenMotif installation using `brew --prefix openmotif`. If you have a custom installation, you can override the path:
-
-```bash
-make OPENMOTIF_PREFIX=/your/custom/path
+conflicts: 77 shift/reduce
 ```
+This is normal for the Viola grammar.
 
-### X11 Not Found
+## Platform Support
 
-On macOS, you may need XQuartz:
+Currently tested on:
+- macOS (Darwin) with ARM64 architecture
+- Homebrew packages required: openmotif
 
-```bash
-brew install --cask xquartz
-```
-
-After installation, log out and log back in, or reboot.
-
-### Linker Errors
-
-If you get linker errors about missing symbols, try:
-
-```bash
-make distclean
-make
-```
-
-## Getting Help
-
-To see all available make targets:
-
-```bash
-make help
-```
-
-To see current build configuration:
-
-```bash
-make info
-```
-
-## Historical Context
-
-ViolaWWW was created by Pei-Yuan Wei at the University of California, Berkeley in 1991-1992. It was one of the first graphical web browsers and introduced many concepts that later became standard in web browsers.
-
-This modernized build system replaces the original imake-based build system with a cleaner, more maintainable Makefile that works on modern systems.
-
-## License
-
-See the original COPYRIGHT and copyright files in the source directories for licensing information.
-
+The build system auto-detects Homebrew paths and configures includes/libraries accordingly.

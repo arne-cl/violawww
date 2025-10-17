@@ -19,6 +19,9 @@ INCLUDES = -I$(BREW_PREFIX)/include \
            -I$(OPENMOTIF_PREFIX)/include \
            -I/opt/X11/include
 
+# Dependency generation flags
+DEPFLAGS = -MMD -MP
+
 # Linker flags
 LDFLAGS = $(ARCH_FLAGS) -L$(BREW_PREFIX)/lib \
           -L$(OPENMOTIF_PREFIX)/lib \
@@ -206,8 +209,23 @@ $(VIOLA): $(VIOLA_OBJS) $(LIBWWW) $(LIBXPM) $(LIBXPA) $(LIBIMG) $(LIBSTYLE)
 	@ls -lh $@
 	@echo ""
 
+# Compile Viola sources with automatic dependency generation
 $(VIOLA_DIR)/%.o: $(VIOLA_DIR)/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) -I$(VIOLA_DIR) -I$(LIBWWW_DIR) -c $< -o $@
+	$(CC) $(CFLAGS) $(DEPFLAGS) $(INCLUDES) -I$(VIOLA_DIR) -I$(LIBWWW_DIR) -c $< -o $@
+
+# Generate gram.c from gram.y using byacc (Berkeley Yacc)
+# Note: We use byacc instead of GNU Bison for compatibility with old SunOS yacc
+$(VIOLA_DIR)/gram.c: $(VIOLA_DIR)/gram.y
+	@echo "=== Generating gram.c from gram.y with byacc ==="
+	@if ! command -v byacc >/dev/null 2>&1; then \
+		echo "ERROR: byacc not found. Install with: brew install byacc"; \
+		exit 1; \
+	fi
+	cd $(VIOLA_DIR) && byacc gram.y && mv y.tab.c gram.c
+	@echo "gram.c generated successfully"
+
+# Include automatically generated dependencies
+-include $(VIOLA_OBJS:.o=.d)
 
 # ============================================================================
 # VW Browser (Motif interface)
@@ -234,8 +252,12 @@ $(VW): $(VW_OBJS) $(VIOLA_OBJS_NO_MAIN) $(LIBWWW) $(LIBXPM) $(LIBXPA) $(LIBIMG) 
 	@ls -lh $@
 	@echo ""
 
+# Compile VW sources with automatic dependency generation
 $(VW_DIR)/%.o: $(VW_DIR)/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) -I$(VW_DIR) -I$(VIOLA_DIR) -I$(LIBWWW_DIR) -c $< -o $@
+	$(CC) $(CFLAGS) $(DEPFLAGS) $(INCLUDES) -I$(VW_DIR) -I$(VIOLA_DIR) -I$(LIBWWW_DIR) -c $< -o $@
+
+# Include automatically generated dependencies
+-include $(VW_OBJS:.o=.d)
 
 # ============================================================================
 # Utility targets
@@ -243,8 +265,9 @@ $(VW_DIR)/%.o: $(VW_DIR)/%.c
 
 .PHONY: clean
 clean:
-	@echo "=== Cleaning object files ==="
+	@echo "=== Cleaning object files and dependencies ==="
 	find $(SRC_DIR) -name '*.o' -delete
+	find $(SRC_DIR) -name '*.d' -delete
 	@echo "Done"
 
 .PHONY: distclean
