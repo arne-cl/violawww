@@ -120,7 +120,7 @@ static String fallback_resources[] = {
     "*labelFontList: *times*medium*-r-*-14-*=plainFont",
     "*messageText*fontList:  *helv*bold*-r-*-12-*=textFont",
     "*XmScrollBar*width: 19",
-    "*foreground: white",
+    "*foreground: black",
     "*background: antiqueWhite4",
     "*borderColor: yellow",
     "*XmText.translations: #override\n\

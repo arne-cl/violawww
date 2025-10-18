@@ -1,5 +1,5 @@
 #ifdef COLOR
-Viola*foreground:		white
+Viola*foreground:		black
 Viola*background:		AntiqueWhite4
 Viola*borderColor:		AntiqueWhite4
 !Viola*background:		grey55
@@ -26,7 +26,7 @@ Viola.borderColor_input:	white
 Viola.hotlink_visited:		blue
 Viola.hotlink_unvisited:	red
 #else
-Viola*foreground:		white
+Viola*foreground:		black
 Viola*background:		black
 Viola*borderColor:		white
 #endif
