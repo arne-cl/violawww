@@ -32,9 +32,9 @@
 #define TOOLBAR_HEIGHT 38
 #define SEARCH_HEIGHT 33
 #define FORM_SPACING 4
-#define PRINT_COMMAND "/usr/ucb/lpr"
+#define PRINT_COMMAND "/usr/bin/lpr"
 
-#define MAIL_COMMAND "/usr/ucb/mail"
+#define MAIL_COMMAND "/usr/bin/mail"
 #define DEVELOPER_ADDRESS "viola@ora.com"
 
 /* --- GLOBALS ------------------------------------------------------------- */
