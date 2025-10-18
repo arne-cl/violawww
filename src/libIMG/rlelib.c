@@ -11,12 +11,17 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <stdarg.h>
 #include <ctype.h>
 
 #include "image.h"		/* need ZFILE definition */
 #include "rle.h"
+
+/* Forward declarations */
+void make_gamma();
+void make_magic();
 
 /* SUPPRESS 530y */
 /* SUPPRESS 558 */
@@ -426,6 +431,7 @@ register struct sv_globals * globals;
  */
 void
 RunSkipBlankLines(nblank, globals)
+int nblank;
 register struct sv_globals * globals;
 {
 }
@@ -437,6 +443,7 @@ register struct sv_globals * globals;
  */
 void
 RunSetColor(c, globals)
+int c;
 register struct sv_globals * globals;
 {
 }
@@ -449,6 +456,9 @@ register struct sv_globals * globals;
 /* ARGSUSED */
 void
 RunSkipPixels(nskip, last, wasrun, globals)
+int nskip;
+int last;
+int wasrun;
 register struct sv_globals * globals;
 {
 }
@@ -460,6 +470,7 @@ register struct sv_globals * globals;
  */
 void
 RunNewScanLine(flag, globals)
+int flag;
 register struct sv_globals * globals;
 {
 }
@@ -471,6 +482,7 @@ register struct sv_globals * globals;
 void
 Runputdata(buf, n, globals)
 rle_pixel * buf;
+int n;
 register struct sv_globals * globals;
 {
 }
@@ -483,6 +495,9 @@ register struct sv_globals * globals;
 /* ARGSUSED */
 void
 Runputrun(color, n, last, globals)
+int color;
+int n;
+int last;
 register struct sv_globals * globals;
 {
 }
@@ -822,7 +837,7 @@ static void	bfill();
  * Algorithm:
  * 	Read in the setup info and fill in sv_globals.
  */
-rle_get_setup( globals )
+int rle_get_setup( globals )
 struct sv_globals * globals;
 {
     struct XtndRsetup setup;
@@ -982,7 +997,8 @@ struct sv_globals * globals;
  *	Returns code.
  */
 
-rle_get_error( code, pgmname, fname )
+int rle_get_error( code, pgmname, fname )
+int code;
 char *pgmname;
 char *fname;
 {
@@ -1101,7 +1117,7 @@ int on_off;
  *	decoding the instructions into scanline data.
  */
 
-rle_getrow( globals, scanline )
+int rle_getrow( globals, scanline )
 struct sv_globals * globals;
 rle_pixel *scanline[];
 {
@@ -1386,6 +1402,7 @@ int dith_size = 16;
  */
 void
 dithermap( levels, gamma, rgbmap, divN, modN, magic )
+int levels;
 double gamma;
 int rgbmap[][3];
 int divN[256];
@@ -1446,6 +1463,7 @@ int magic[16][16];
  */
 void
 bwdithermap( levels, gamma, bwmap, divN, modN, magic )
+int levels;
 double gamma;
 int bwmap[];
 int divN[256];
@@ -1587,7 +1605,7 @@ int magic16x16[16][16] =
  * Algorithm:
  * 	Chose sub cell of 16 by 16 magic square
      */
-make_magic( size, magic )
+void make_magic( size, magic )
 int size;
 int magic[16][16];
 {
@@ -1631,7 +1649,7 @@ int magic[16][16];
  * Outputs:
  *  Changes gamma array entries.
  */
-make_gamma( gamma, gammamap )
+void make_gamma( gamma, gammamap )
 double gamma;
 int gammamap[256];
 {
@@ -1668,7 +1686,13 @@ int gammamap[256];
  * Algorithm:
  * 	see "Note:" in dithermap comment.
  */
-dithergb( x, y, r, g, b, levels, divN, modN, magic )
+int dithergb( x, y, r, g, b, levels, divN, modN, magic )
+int x;
+int y;
+int r;
+int g;
+int b;
+int levels;
 int divN[256];
 int modN[256];
 int magic[16][16];
@@ -1698,7 +1722,10 @@ int magic[16][16];
  * Algorithm:
  * 	see "Note:" in bwdithermap comment.
  */
-ditherbw( x, y, val, divN, modN, magic )
+int ditherbw( x, y, val, divN, modN, magic )
+int x;
+int y;
+int val;
 int divN[256];
 int modN[256];
 int magic[16][16];

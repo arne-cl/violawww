@@ -11,6 +11,9 @@
  */
 
 #include "copyright.h"
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 #include "image.h"
 
 #ifdef VMS

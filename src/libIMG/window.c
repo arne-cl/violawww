@@ -11,10 +11,12 @@
 #include "copyright.h"
 #include "xloadimage.h"
 #include <ctype.h>
+#include <string.h>
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 #include <signal.h>
 #include <errno.h>
+#include <unistd.h>
 #include <sys/types.h>
 #ifdef _AIX
 #include <sys/select.h>
@@ -208,7 +210,7 @@ void setViewportColormap(disp, scrn, visual)
      int scrn;
      Visual *visual;
 { XSetWindowAttributes swa;
-  static cmap_atom= None;
+  static Atom cmap_atom= None;
   Window cmap_windows[2];
 
   if (cmap_atom == None)
@@ -859,7 +861,7 @@ return ximageinfo;/*XXX*/
 	XFlush(disp);
 	cleanUpImage(disp, scrn, swa_view.cursor, pixmap,
 		     image, ximageinfo);
-	return('n');
+	return(NULL);
       }
     }
     else
@@ -900,7 +902,7 @@ return ximageinfo;/*XXX*/
 /*	cleanUpImage(disp, scrn, swa_view.cursor, pixmap,
 		     image, ximageinfo);
 */
-	return(ret);
+	return(NULL);
       case '\003': /* ^C */
       case 'q':
 	if (delay)
@@ -975,7 +977,7 @@ return ximageinfo;/*XXX*/
 	  (event.message.data.l[0] == delete_atom)) {
 	cleanUpImage(disp, scrn, swa_view.cursor, pixmap,
 		      image, ximageinfo);
-	return('q');
+	return(NULL);
       }
       break;
     }

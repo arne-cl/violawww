@@ -6,6 +6,7 @@
  */
 
 #include "copyright.h"
+#include <stdlib.h>
 #include "image.h"
 
 /* rotate_bitmap()
@@ -40,6 +41,7 @@ int *new_pos;				/* Destination bit position */
 Image *rotate(simage, rotate, verbose)
 Image *simage;				/* Image to rotate             */
 int    rotate;				/* Number of degrees to rotate */
+unsigned int verbose;
 { 
   char buf[BUFSIZ];			/* New title                   */
   Image    *image1;			/* Source image                */

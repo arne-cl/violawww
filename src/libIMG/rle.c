@@ -21,10 +21,18 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "image.h"
 #include "rle.h"
 
+/* Forward declarations */
 void dithermap();
+int rle_get_setup();
+int rle_getrow();
+void make_gamma();
+void bw_m_line();
+void c_m_line();
 
 /* input file stuff */
 static int ptype;				/* picture type : */
@@ -394,7 +402,7 @@ Image *rleLoad(fullname,name,verbose)
 #define DMAP(v,x,y)	(modN[v]>magic[x][y] ? divN[v] + 1 : divN[v])
 
 /* run the black and white through its map */
-bw_m_line(dp,number)
+void bw_m_line(dp,number)
      int number;
      register unsigned char *dp;
 {
@@ -408,7 +416,7 @@ bw_m_line(dp,number)
 }
 
 /* convert a colour line with map to 8 bits per pixel */
-c_m_line(dp,number,line)
+void c_m_line(dp,number,line)
      int number,line;
      register unsigned char *dp;
 {

@@ -9,6 +9,7 @@
  */
 
 #include "copyright.h"
+#include <string.h>
 #include "image.h"
 
 static Image *doSmooth(image)
@@ -72,6 +73,7 @@ static Image *doSmooth(image)
 
 Image *smooth(image, iterations, verbose)
      Image *image;
+     int iterations;
      int    verbose;
 { int a;
   Image *new;

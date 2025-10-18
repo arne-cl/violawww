@@ -9,6 +9,7 @@
  */
 
 #include "copyright.h"
+#include <stdlib.h>
 #include "image.h"
 #include "sunraster.h"
 

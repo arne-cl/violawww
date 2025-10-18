@@ -14,13 +14,14 @@
  */
 
 #include "copyright.h"
+#include <stdlib.h>
+#include <string.h>
 #include "xloadimage.h"
 
 /* SUPPRESS 530 */
 /* SUPPRESS 560 */
 
 #if defined(SYSV) || defined(VMS)
-#include <string.h>
 #define rindex strrchr
 #else
 char *rindex();

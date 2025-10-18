@@ -14,6 +14,8 @@
 
 #include "mit.cpyrght"
 #include "copyright.h"
+#include <stdlib.h>
+#include <string.h>
 #include "image.h"
 #include <ctype.h>
 

@@ -8,6 +8,9 @@
  * copyright information.
  */
 
+#ifndef IMAGE_H
+#define IMAGE_H
+
 #include "copyright.h"
 #include <stdio.h>
 
@@ -207,3 +210,5 @@ Image *zoom(); /* zoom.c */
 extern unsigned short RedIntensity[];
 extern unsigned short GreenIntensity[];
 extern unsigned short BlueIntensity[];
+
+#endif /* IMAGE_H */

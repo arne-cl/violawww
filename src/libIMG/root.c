@@ -85,7 +85,7 @@ freePrevious(dpy, w)
     if ((actual_type == XA_PIXMAP) && (format == 32) &&
 	(nitems == 1) && (bytes_after == 0)) {
       /* blast it away */
-      XKillClient(dpy, (Pixmap *) *pm);
+      XKillClient(dpy, *((Pixmap *) pm));
       XFree(pm);
     }
     else if (actual_type != None) {

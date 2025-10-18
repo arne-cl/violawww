@@ -91,7 +91,7 @@ struct color_area {
 /* predicate functions for qsort
  */
 
-static sortRGB(p1, p2)
+static int sortRGB(p1, p2)
      unsigned short *p1, *p2;
 { unsigned int red1, green1, blue1, red2, green2, blue2;
 
@@ -118,7 +118,7 @@ static sortRGB(p1, p2)
     return(1);
 }
 
-static sortRBG(p1, p2)
+static int sortRBG(p1, p2)
      unsigned short *p1, *p2;
 { unsigned int red1, green1, blue1, red2, green2, blue2;
 
@@ -145,7 +145,7 @@ static sortRBG(p1, p2)
     return(1);
 }
 
-static sortGRB(p1, p2)
+static int sortGRB(p1, p2)
      unsigned short *p1, *p2;
 { unsigned int red1, green1, blue1, red2, green2, blue2;
 
@@ -172,7 +172,7 @@ static sortGRB(p1, p2)
     return(1);
 }
 
-static sortGBR(p1, p2)
+static int sortGBR(p1, p2)
      unsigned short *p1, *p2;
 { unsigned int red1, green1, blue1, red2, green2, blue2;
 
@@ -199,7 +199,7 @@ static sortGBR(p1, p2)
     return(1);
 }
 
-static sortBRG(p1, p2)
+static int sortBRG(p1, p2)
      unsigned short *p1, *p2;
 { unsigned int red1, green1, blue1, red2, green2, blue2;
 
@@ -226,7 +226,7 @@ static sortBRG(p1, p2)
     return(1);
 }
 
-static sortBGR(p1, p2)
+static int sortBGR(p1, p2)
      unsigned short *p1, *p2;
 { unsigned int red1, green1, blue1, red2, green2, blue2;
 
@@ -257,7 +257,7 @@ static sortBGR(p1, p2)
  * the color area in the list of color areas.
  */
 
-static insertColorArea(pixel_counts, rlargest, rsmallest, area)
+static void insertColorArea(pixel_counts, rlargest, rsmallest, area)
      unsigned long *pixel_counts;
      struct color_area **rlargest, **rsmallest, *area;
 { int a;
@@ -392,7 +392,7 @@ Image *reduce(image, n, verbose)
 
   case IRGB:
     if (image->rgb.used <= n)
-      return;
+      return(image);
     if (verbose) {
       printf("  Reducing RGB image color usage to %d colors...", n);
       fflush(stdout);

@@ -15,6 +15,14 @@ ARCH_FLAGS = -arch arm64
 CFLAGS = -Os $(ARCH_FLAGS) -std=gnu89 -Wno-everything -D__DARWIN__
 CFLAGS_LIBS = -Os $(ARCH_FLAGS) -Wno-everything -no-cpp-precomp -fno-common \
               -D__DARWIN__ -DNO_ALLOCA -DCSRG_BASED
+
+# 64-bit migration warning flags (use with: make WARN_64BIT=1)
+ifdef WARN_64BIT
+CFLAGS := $(filter-out -Wno-everything,$(CFLAGS))
+CFLAGS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast -Wint-to-pointer-cast
+CFLAGS_LIBS := $(filter-out -Wno-everything,$(CFLAGS_LIBS))
+CFLAGS_LIBS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast
+endif
 INCLUDES = -I$(BREW_PREFIX)/include \
            -I$(OPENMOTIF_PREFIX)/include \
            -I/opt/X11/include
@@ -66,6 +74,7 @@ help:
 	@echo "  libs       - Build all libraries"
 	@echo "  clean      - Remove object files"
 	@echo "  distclean  - Remove all build artifacts"
+	@echo "  check-64bit - Check for 64-bit migration issues (long->int truncation)"
 	@echo "  help       - Show this help message"
 
 # ============================================================================
@@ -288,6 +297,15 @@ install: $(VW) $(VIOLA)
 # ============================================================================
 # Development helpers
 # ============================================================================
+
+.PHONY: check-64bit
+check-64bit:
+	@echo "=== Checking for 64-bit migration issues ==="
+	@echo "This will show warnings about long->int truncation and related problems"
+	@$(MAKE) clean
+	@$(MAKE) WARN_64BIT=1 all 2>&1 | tee 64bit-warnings.log
+	@echo ""
+	@echo "Warnings saved to: 64bit-warnings.log"
 
 .PHONY: rebuild
 rebuild: distclean all

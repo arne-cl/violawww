@@ -9,6 +9,8 @@
  */
 
 #include "copyright.h"
+#include <stdlib.h>
+#include <strings.h>
 #include "xloadimage.h"
 
 static int GotError;
