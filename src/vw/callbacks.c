@@ -249,7 +249,7 @@ void clonePage(parentDocViewInfo) DocViewInfo* parentDocViewInfo;
 
     menuBar = XmCreateMenuBar(form, "menuBar", NULL, 0);
     for (i = 0; clonePageMainMenus[i].title != NULL; i++)
-        buildPulldownMenu(menuBar, clonePageMainMenus[i].title, clonePageMainMenus[i].mnemonic,
+        buildPulldownMenu(menuBar, clonePageMainMenus[i].title, &clonePageMainMenus[i].mnemonic,
                           clonePageMainMenus[i].menuItems, helpLabel, localDocViewInfo);
     XtManageChild(menuBar);
 
