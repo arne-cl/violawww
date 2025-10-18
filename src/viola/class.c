@@ -15,7 +15,6 @@
 #include <strings.h>
 #include "utils.h"
 
-/* Forward declarations */
 extern long setMember();
 extern char *vl_expandPath();
 extern char *loadFile();

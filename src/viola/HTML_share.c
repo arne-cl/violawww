@@ -25,7 +25,6 @@
 #include "html2.h"
 #include "event_x.h"
 
-/* Forward declarations */
 extern int drawLineOffset();
 
 /* a collection of C routines to replace script version of HTML tag handlers.

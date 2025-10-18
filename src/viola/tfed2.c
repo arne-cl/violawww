@@ -32,7 +32,6 @@
 #include "cl_txtDisp.h"
 #include "tfed_i.h"
 
-/* Forward declarations */
 extern int replaceNodeLine();
 
 /* delete to left and pull 

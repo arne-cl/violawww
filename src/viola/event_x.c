@@ -51,7 +51,6 @@
 #include <sys/select.h>
 #endif
 
-/* Forward declarations for event handlers */
 void handle_KeyPress();
 void handle_KeyRelease(XKeyEvent *ep);
 long handle_EnterNotify();

@@ -45,7 +45,6 @@ extern int verbose;
 
 char scanComment();
 
-/* Forward declarations */
 int refresh_buf();
 int grabop();
 int grabint();

@@ -42,7 +42,6 @@
 #include <string.h>
 #include <strings.h>
 
-/* Forward declarations */
 extern int init_sys();
 extern int init_obj();
 extern int init_scanutils();

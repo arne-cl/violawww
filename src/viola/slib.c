@@ -22,9 +22,8 @@ int SLBellVolume(int percent)
 
 int SLBell(void)
 {
-	/* Use X11 bell instead of writing to stdout */
-	XBell(display, 0);  /* 0 = default volume */
-	XFlush(display);    /* Ensure the bell is sent immediately */
+	XBell(display, 0);
+	XFlush(display);
 	return 0;
 }
 

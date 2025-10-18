@@ -1,5 +1,5 @@
 #pragma once
-/* Forward declarations to avoid multiple includes */
+
 typedef struct Packet Packet;
 typedef struct Attr Attr;
 typedef long VObj;

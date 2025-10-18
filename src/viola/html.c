@@ -50,7 +50,6 @@
 #include "tfed.h"
 #include "sgml.h"
 
-/* Forward declarations */
 extern void freeNodeLines();
 extern void renderTF();
 #include "html.h"

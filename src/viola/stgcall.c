@@ -7,7 +7,6 @@
 #include "packet.h"
 #include "../libStyle/libstg.h"
 
-/* Forward declarations */
 extern char *loadFile();
 
 STGLib *stgLib;

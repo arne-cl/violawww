@@ -25,7 +25,6 @@
 #include <strings.h>
 #include <unistd.h>
 
-/* Forward declarations */
 extern void process_event();
 extern int countBreaks();
 extern int insertStr();

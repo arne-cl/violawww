@@ -38,7 +38,6 @@
 
 #include "HTML_style.h"
 
-/* Forward declarations */
 extern void stgcall_init();
 extern char *vl_expandPath();
 extern char *loadFile();
