@@ -14,16 +14,17 @@
 #include "slotaccess.h"
 #include "glib.h"
 
-int SLBellVolume(percent) 
-	int percent;
+int SLBellVolume(int percent)
 {
 	XBell(display, percent);
 	return percent;
 }
 
-int SLBell()
+int SLBell(void)
 {
-	write(1, "\007", 1);  /* beep */
+	/* Use X11 bell instead of writing to stdout */
+	XBell(display, 0);  /* 0 = default volume */
+	XFlush(display);    /* Ensure the bell is sent immediately */
 	return 0;
 }
 
