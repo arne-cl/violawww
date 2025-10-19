@@ -373,23 +373,25 @@ check-libwww:
 	fi
 
 # Unit tests
-.PHONY: test test_htcharset
-test: test_htcharset
+.PHONY: test
+test:
+	@echo "Running unit tests..."
+	@$(MAKE) test-htcharset
 
-test_htcharset: test_htcharset.c src/libWWW/Library/darwin/HTCharset.o
-	@echo "Building HTCharset unit tests..."
+.PHONY: test-htcharset
+test-htcharset: test/test_htcharset.c src/libWWW/Library/darwin/HTCharset.o
 ifeq ($(ICU_AVAILABLE),yes)
-	$(CC) $(CFLAGS) $(ICU_INCLUDES) -Isrc/libWWW/Library/Implementation \
-		-o test_htcharset test_htcharset.c \
+	@echo "Building HTCharset tests..."
+	@$(CC) $(CFLAGS) $(ICU_INCLUDES) -I. \
+		-o test/test_htcharset test/test_htcharset.c \
 		src/libWWW/Library/darwin/HTCharset.o \
 		$(ICU_LIBS)
-	@echo "Running tests..."
-	@./test_htcharset
+	@./test/test_htcharset
 else
 	@echo "⚠ ICU not available - skipping HTCharset tests"
 endif
 
 .PHONY: clean-test
 clean-test:
-	rm -f test_htcharset
+	rm -f test/test_htcharset
 
