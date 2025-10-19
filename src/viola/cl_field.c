@@ -873,14 +873,14 @@ long meth_field_eventMask(VObj* self, Packet* result, int argc, Packet argv[]) {
         result->canFree = PK_CANFREE_STR;
         return 1;
     } else {
-        char lbuff[64];
+        char lbuff[256];
         char* str = PkInfo2Str(&argv[0]);
         int i = 0, j, k;
 
         do {
             j = i;
             SkipBlanks(str, &i);
-            i = NextWord(str, i, lbuff);
+            i = NextWordSafe(str, i, lbuff, sizeof(lbuff));
             if (AllBlank(lbuff))
                 break;
             for (k = 0; eventMaskName[k].mask; k++) {

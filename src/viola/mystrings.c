@@ -141,11 +141,7 @@ char* wordp;
  * PreCondition: i <= strlen(linep);
  * PostCondition: *wordp contains an argument string from *linep, truncated if necessary.
  */
-int NextWordSafe(linep, i, wordp, maxlen)
-char* linep;
-int i;
-char* wordp;
-int maxlen;
+int NextWordSafe(char* linep, int i, char* wordp, int maxlen)
 {
     int j = 0;
 

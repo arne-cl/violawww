@@ -80,8 +80,7 @@ int intBuff[];
     return i;
 }
 
-VObjList* strOListToOList(str)
-char* str;
+VObjList* strOListToOList(char* str)
 {
     char name[1024];
     int i = 0;
