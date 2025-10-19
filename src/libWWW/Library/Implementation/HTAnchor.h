@@ -166,12 +166,9 @@ extern HTParentAnchor* HTAnchor_parent PARAMS((HTAnchor * me));
 extern void HTAnchor_setDocument PARAMS((HTParentAnchor * me, HyperDoc* doc));
 
 extern HyperDoc* HTAnchor_document PARAMS((HTParentAnchor * me));
-/* We don't want code to change an address after anchor creation... yet ?
-extern void HTAnchor_setAddress
-  PARAMS(
-     (HTAnchor *me, char *addr)
-     );
-*/
+
+/* Enable changing address after anchor creation (e.g., for redirects, Wayback) */
+extern void HTAnchor_setAddress PARAMS((HTAnchor* me, char* addr));
 
 /*      Returns the full URI of the anchor, child or parent
 **      as a malloc'd string to be freed by the caller.

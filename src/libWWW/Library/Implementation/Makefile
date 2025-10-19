@@ -297,7 +297,7 @@ COMMON = $(LOB)/HTParse.o $(LOB)/HTAccess.o $(LOB)/HTTP.o \
 	$(LOB)/HTList.o $(LOB)/HTString.o $(LOB)/HTAlert.o \
 	$(LOB)/HTRules.o $(LOB)/HTFormat.o $(LOB)/HTInit.o $(LOB)/HTMIME.o \
 	$(LOB)/HTHistory.o $(LOB)/HTNews.o $(LOB)/HTGopher.o \
-	$(LOB)/HTTelnet.o  $(LOB)/HTWSRC.o $(HTWAIS)
+	$(LOB)/HTTelnet.o  $(LOB)/HTWSRC.o $(LOB)/HTWayback.o $(HTWAIS)
 
 CFILES = $(CMN)HTParse.c $(CMN)HTAccess.c $(CMN)HTTP.c $(CMN)HTFile.c \
 	$(CMN)HTFTP.c   $(CMN)HTTCP.c     $(CMN)SGML.c $(CMN)HTML.c	\
@@ -458,6 +458,9 @@ $(LOB)/HTAccess.o : $(OE)  $(CMN)HTAccess.c $(CMN)HTUtils.h
 
 $(LOB)/HTParse.o : $(OE) $(CMN)HTParse.c $(CMN)HTUtils.h
 	$(CC) -c -o $@ $(CFLAGS2) $(CMN)HTParse.c
+
+$(LOB)/HTWayback.o : $(OE) $(CMN)HTWayback.c $(CMN)HTWayback.h $(CMN)HTUtils.h
+	$(CC) -c -o $@ $(CFLAGS2) $(CMN)HTWayback.c
 
 ###########################################################################
 # common rules for all Makefiles - do not edit

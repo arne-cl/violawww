@@ -67,7 +67,7 @@ MethodInfo defaultKeyBinding[] = {
     RETURN, kbf_newline, TAB, kbf_ident, 0, NULL};
 
 long (*kbflookup[128])();
-char sbuff[128];
+char sbuff[1024];  /* Increased from 128 to handle long URLs (e.g., Web Archive URLs) */
 int buffi;
 
 /* 
@@ -2786,6 +2786,9 @@ TFLineNode* source;
                     break;
                 }
                 length = s - buildInfo->str - 2;
+                if (length >= sizeof(sbuff)) {
+                    length = sizeof(sbuff) - 1;  /* Prevent buffer overflow */
+                }
                 strncpy(sbuff, buildInfo->str + 1, length);
                 sbuff[length] = '\0';
 
@@ -2934,6 +2937,9 @@ TFLineNode* source;
                     break;
                 }
                 length = s - buildInfo->str - 2;
+                if (length >= sizeof(sbuff)) {
+                    length = sizeof(sbuff) - 1;  /* Prevent buffer overflow */
+                }
                 strncpy(sbuff, buildInfo->str + 1, length);
                 sbuff[length] = '\0';
 
@@ -3117,6 +3123,9 @@ TFLineNode* source;
                     break;
                 }
                 length = s - buildInfo->str - 2;
+                if (length >= sizeof(sbuff)) {
+                    length = sizeof(sbuff) - 1;  /* Prevent buffer overflow */
+                }
                 strncpy(sbuff, buildInfo->str + 1, length);
                 sbuff[length] = '\0';
                 newFontID = atoi(sbuff);

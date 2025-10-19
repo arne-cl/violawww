@@ -295,14 +295,11 @@ void HTAnchor_setDocument ARGS2(HTParentAnchor*, me, HyperDoc*, doc) {
 
 HyperDoc* HTAnchor_document ARGS1(HTParentAnchor*, me) { return me ? me->document : NULL; }
 
-/* We don't want code to change an address after anchor creation... yet ?
-void HTAnchor_setAddress
-  ARGS2 (HTAnchor *,me, char *,addr)
-{
-  if (me)
-    StrAllocCopy (me->parent->address, addr);
+/* Enable changing address after anchor creation for redirects and Wayback */
+PUBLIC void HTAnchor_setAddress ARGS2(HTAnchor*, me, char*, addr) {
+    if (me)
+        StrAllocCopy(me->parent->address, addr);
 }
-*/
 
 char* HTAnchor_address ARGS1(HTAnchor*, me) {
     char* addr = NULL;

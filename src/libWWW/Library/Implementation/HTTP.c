@@ -1,11 +1,14 @@
 /*	HyperText Tranfer Protocol	- Client implementation		HTTP.c
 **	==========================
 **
-** Bugs:
+** Status:
+**	Implemented:
+**		✓ Redirection (3xx status codes with Location header)
+**		✓ Error handling (4xx and 5xx status codes)
+**		✓ Web Archive fallback (DNS failures)
+**
 **	Not implemented:
-**		Forward
-**		Redirection
-**		Error handling
+**		Forward/Proxy support
 */
 
 /*	Module parameters:
@@ -21,6 +24,7 @@
 /* Implements:
  */
 #include "HTTP.h"
+#include "HTWayback.h"
 #include <stddef.h>
 #include <unistd.h>
 
@@ -179,7 +183,7 @@ PUBLIC int HTLoadHTTP ARGS4(CONST char*, arg,
         int status = HTParseInet(sin, p1); /* TBL 920622 */
         free(p1);
         if (status) {
-            return status; /* No such host for example */
+            return status; /* No such host - let caller handle Wayback */
         }
     }
 
@@ -238,10 +242,33 @@ retry:
 #else
     s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 #endif
+    
+    /* Set socket timeouts to prevent hanging on unresponsive servers */
+    {
+        struct timeval timeout;
+        timeout.tv_sec = 30;  /* 30 seconds timeout */
+        timeout.tv_usec = 0;
+        setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+        setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    }
+    
+    if (TRACE) {
+        char* p1 = HTParse(gate ? gate : arg, "", PARSE_HOST);
+        fprintf(stderr, "HTTP: Connecting to %s...\n", p1);
+        free(p1);
+    }
+    
     status = connect(s, (struct sockaddr*)&soc_address, sizeof(soc_address));
     if (status < 0) {
+        if (TRACE) {
+            fprintf(stderr, "HTTP: Connection failed (errno=%d)\n", errno);
+        }
         /* free(command);   BUG OUT TBL 921121 */
         return HTInetStatus("connect");
+    }
+    
+    if (TRACE) {
+        fprintf(stderr, "HTTP: Connected successfully\n");
     }
 
     /*	Ask that node for the document,

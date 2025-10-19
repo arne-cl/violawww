@@ -21,6 +21,7 @@
 #include "HTTCP.h"
 #include "HTUtils.h"
 #include "HTSSL.h"
+#include "HTWayback.h"
 #include "tcp.h"
 #include <ctype.h>
 #include <stddef.h>
@@ -160,7 +161,7 @@ PUBLIC int HTLoadHTTPS ARGS4(CONST char*, arg,
         int status = HTParseInet(sin, p1);
         free(p1);
         if (status) {
-            return status;
+            return status; /* No such host - let caller handle Wayback */
         }
     }
 
@@ -223,10 +224,30 @@ retry:
     s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 #endif
     
+    /* Set socket timeouts to prevent hanging on unresponsive servers */
+    {
+        struct timeval timeout;
+        timeout.tv_sec = 30;  /* 30 seconds timeout */
+        timeout.tv_usec = 0;
+        setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+        setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    }
+    
+    if (TRACE) {
+        fprintf(stderr, "HTTPS: Connecting to %s...\n", hostname ? hostname : "unknown");
+    }
+    
     status = connect(s, (struct sockaddr*)&soc_address, sizeof(soc_address));
     if (status < 0) {
+        if (TRACE) {
+            fprintf(stderr, "HTTPS: Connection failed (errno=%d)\n", errno);
+        }
         if (hostname) free(hostname);
         return HTInetStatus("connect");
+    }
+    
+    if (TRACE) {
+        fprintf(stderr, "HTTPS: Connected successfully\n");
     }
 
     /* Wrap socket with SSL */

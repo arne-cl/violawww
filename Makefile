@@ -116,6 +116,7 @@ help:
 	@echo "  viola      - Build Viola browser"
 	@echo "  vw         - Build VW browser (Motif interface)"
 	@echo "  libs       - Build all libraries"
+	@echo "  test       - Build and run all tests"
 	@echo "  clean      - Remove object files"
 	@echo "  distclean  - Remove all build artifacts"
 	@echo "  check-64bit - Check for 64-bit migration issues (long->int truncation)"
@@ -144,7 +145,7 @@ LIBWWW_SRCS = $(LIBWWW_DIR)/HTParse.c $(LIBWWW_DIR)/HTAccess.c $(LIBWWW_DIR)/HTT
               $(LIBWWW_DIR)/HTAAServ.c $(LIBWWW_DIR)/FOSI.c $(LIBWWW_DIR)/FOSIDTD.c \
               $(LIBWWW_DIR)/HTLex.c $(LIBWWW_DIR)/HTGroup.c $(LIBWWW_DIR)/HTACL.c \
               $(LIBWWW_DIR)/HTPasswd.c $(LIBWWW_DIR)/HTAuth.c $(LIBWWW_DIR)/HTAAFile.c \
-              $(LIBWWW_DIR)/HTSSL.c $(LIBWWW_DIR)/HTTPS.c
+              $(LIBWWW_DIR)/HTSSL.c $(LIBWWW_DIR)/HTTPS.c $(LIBWWW_DIR)/HTWayback.c
 LIBWWW_OBJS = $(patsubst $(LIBWWW_DIR)/%.c,$(LIBWWW_DARWIN)/%.o,$(LIBWWW_SRCS))
 
 $(LIBWWW): $(LIBWWW_OBJS)
@@ -395,8 +396,18 @@ check-libwww:
 # Unit tests
 .PHONY: test
 test:
-	@echo "Running unit tests..."
+	@echo ""
+	@echo "======================================="
+	@echo "Running ViolaWWW Test Suite"
+	@echo "======================================="
+	@echo ""
 	@$(MAKE) test-htcharset
+	@$(MAKE) test-wayback
+	@echo ""
+	@echo "======================================="
+	@echo "All tests completed!"
+	@echo "======================================="
+	@echo ""
 	@echo "Cleaning up test artifacts..."
 	@rm -rf test/build
 
@@ -413,6 +424,18 @@ ifeq ($(ICU_AVAILABLE),yes)
 else
 	@echo "⚠ ICU not available - skipping HTCharset tests"
 endif
+
+.PHONY: test-wayback
+test-wayback: test/test_wayback.c $(LIBWWW)
+	@echo ""
+	@echo "Building Wayback tests..."
+	@mkdir -p test/build
+	@$(CC) $(CFLAGS) -Isrc/libWWW/Library/Implementation \
+		$(ICU_INCLUDES) $(SSL_INCLUDES) \
+		-o test/build/test_wayback test/test_wayback.c \
+		$(LIBWWW) \
+		-lm $(ICU_LIBS) $(SSL_LIBS)
+	@./test/build/test_wayback
 
 .PHONY: clean-test
 clean-test:

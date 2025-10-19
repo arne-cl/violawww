@@ -34,6 +34,7 @@
 #include "HTML.h" /* SCW */
 #include "HTParse.h"
 #include "HTUtils.h"
+#include "HTWayback.h"
 
 #ifndef NO_RULES
 #include "HTRules.h"
@@ -283,6 +284,25 @@ PRIVATE BOOL HTLoadDocument ARGS4(CONST char*, full_address, HTParentAnchor*, an
 #endif
 
     status = HTLoad(full_address, anchor, format_out, sink);
+
+    /* If load failed, try Wayback Machine */
+    if (status < 0) {
+        char* wayback_url = HTWaybackCheck(full_address);
+        if (wayback_url) {
+            /* Update current_addr so relative links resolve correctly */
+            /* This is a Viola global variable used as base URL for parsing */
+            extern char* current_addr;
+            if (current_addr) {
+                free(current_addr);
+            }
+            current_addr = strdup(wayback_url);
+            
+            /* Load Wayback URL as a completely new document */
+            status = HTLoadAbsolute(wayback_url) ? HT_LOADED : HT_NO_DATA;
+            
+            free(wayback_url);
+        }
+    }
 
     /*	Log the access if necessary
      */
