@@ -87,6 +87,9 @@ HTProtocol* protocol;
 PRIVATE void HTAccessInit NOARGS /* Call me once */
 {
     GLOBALREF HTProtocol HTTP, HTFile, HTTelnet, HTTn3270, HTRlogin;
+#ifdef USE_SSL
+    GLOBALREF HTProtocol HTTPS;
+#endif
 #ifndef DECNET
     GLOBALREF HTProtocol HTFTP, HTNews, HTGopher;
 #ifdef DIRECT_WAIS
@@ -101,6 +104,9 @@ PRIVATE void HTAccessInit NOARGS /* Call me once */
 #endif
 
     HTRegisterProtocol(&HTTP);
+#ifdef USE_SSL
+    HTRegisterProtocol(&HTTPS);
+#endif
     HTRegisterProtocol(&HTFile);
     HTRegisterProtocol(&HTTelnet);
     HTRegisterProtocol(&HTTn3270);

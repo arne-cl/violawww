@@ -73,11 +73,11 @@ static void readPathsAndExts(name) char* name;
 
         if (!strncmp(tokenbuf, PathToken, strlen(PathToken))) {
             secnum = PATHSECTION;
-            if (sscanf(tokenbuf + strlen(PathToken), "%s", buf) != 1)
+            if (sscanf(tokenbuf + strlen(PathToken), "%1023s", buf) != 1)
                 continue;
         } else if (!strncmp(tokenbuf, ExtToken, strlen(ExtToken))) {
             secnum = EXTSECTION;
-            if (sscanf(tokenbuf + strlen(ExtToken), "%s", buf) != 1)
+            if (sscanf(tokenbuf + strlen(ExtToken), "%1023s", buf) != 1)
                 continue;
         } else
             strcpy(buf, tokenbuf);

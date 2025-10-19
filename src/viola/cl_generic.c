@@ -1252,7 +1252,6 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
     }
 
     len = strlen(src);
-    fprintf(stderr, "DEBUG HTTPGet: src='%s' len=%zu\n", src, len);
 
     /* Safety check: ensure tempFileNamePrefix is valid
      * Check for:
@@ -1272,13 +1271,10 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
     for (p = src + len; p >= src; p--) {
         if (*p == '.') {
             ext = p; /* Found extension */
-            fprintf(stderr, "DEBUG: Found extension at offset %ld: '%s'\n", (long)(p - src), p);
             break;
         }
         if (*p == '/' || (p - src) > len - 6) {
             /* No extension or too far - use no extension */
-            fprintf(stderr, "DEBUG: No extension found (/ or too far)\n");
-            fprintf(stderr, "DEBUG: tempFileNamePrefix=%p\n", (void*)tempFileNamePrefix);
 
             /* Re-check tempFileNamePrefix before sprintf - catch sign-extended addresses */
             if (!tempFileNamePrefix || (unsigned long)tempFileNamePrefix < 0x1000 ||
@@ -1297,14 +1293,8 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
 
     /* If no extension found, use empty string */
     if (!ext) {
-        fprintf(stderr, "DEBUG: ext is NULL, using empty string\n");
         ext = "";
-    } else {
-        fprintf(stderr, "DEBUG: Using extension: '%s'\n", ext);
     }
-
-    fprintf(stderr, "DEBUG: About to sprintf with tempFileNamePrefix='%s' ext='%s'\n",
-            tempFileNamePrefix, ext);
 
     sprintf(tempFileName, "%s%ld%s", tempFileNamePrefix, tempFileNameIDCounter++, ext);
     tfn = tempFileName;

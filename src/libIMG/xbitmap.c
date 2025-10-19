@@ -167,7 +167,7 @@ unsigned int verbose;
         /* width/height/hot_x/hot_y scanning
          */
 
-        if (sscanf(line, "#define %s %d", name_and_type, &value) == 2) {
+        if (sscanf(line, "#define %254s %d", name_and_type, &value) == 2) {
             if (!(type = rindex(name_and_type, '_')))
                 type = name_and_type;
             else
@@ -182,12 +182,12 @@ unsigned int verbose;
         /* if start of data, determine if it's X10 or X11 data and break
          */
 
-        if (sscanf(line, "static short %s = {", name_and_type) == 1) {
+        if (sscanf(line, "static short %254s = {", name_and_type) == 1) {
             v10p = 1;
             break;
         }
-        if ((sscanf(line, "static unsigned char %s = {", name_and_type) == 1) ||
-            (sscanf(line, "static char %s = {", name_and_type) == 1)) {
+        if ((sscanf(line, "static unsigned char %254s = {", name_and_type) == 1) ||
+            (sscanf(line, "static char %254s = {", name_and_type) == 1)) {
             v10p = 0;
             break;
         }

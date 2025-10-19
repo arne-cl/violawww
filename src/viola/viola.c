@@ -204,6 +204,18 @@ Window parentWindow;
     if (!SGMLInit())
         exit(14);
 
+#ifdef USE_SSL
+    /* Initialize SSL/TLS support for HTTPS */
+    {
+        extern int HTSSL_init(void);
+        if (HTSSL_init() < 0) {
+            fprintf(stderr, "Warning: Failed to initialize SSL/TLS. HTTPS will not be available.\n");
+        } else if (verbose) {
+            fprintf(stderr, "SSL/TLS initialized for HTTPS support.\n");
+        }
+    }
+#endif
+
     if (violaPath) {
         if (init_loader(violaPath)) {
             if (verbose)
@@ -323,6 +335,13 @@ Window parentWindow;
 }
 
 void freeViolaResources() {
+#ifdef USE_SSL
+    /* Shutdown SSL/TLS */
+    {
+        extern void HTSSL_shutdown(void);
+        HTSSL_shutdown();
+    }
+#endif
     tfed_FreeTmpFileToFree(0);
     free_fonts();
     freeAllObjects();

@@ -10,9 +10,13 @@ RANLIB = ranlib
 BREW_PREFIX := $(shell brew --prefix 2>/dev/null || echo /opt/homebrew)
 OPENMOTIF_PREFIX := $(shell brew --prefix openmotif 2>/dev/null || echo $(BREW_PREFIX)/opt/openmotif)
 ICU_PREFIX := $(shell brew --prefix icu4c 2>/dev/null)
+OPENSSL_PREFIX := $(shell brew --prefix openssl@3 2>/dev/null || echo $(BREW_PREFIX)/opt/openssl@3)
 
 # Check if ICU is available
 ICU_AVAILABLE := $(shell test -d "$(ICU_PREFIX)/include" && echo yes || echo no)
+
+# Check if OpenSSL is available
+OPENSSL_AVAILABLE := $(shell test -d "$(OPENSSL_PREFIX)/include" && echo yes || echo no)
 
 # Compiler flags
 ARCH_FLAGS = -arch arm64
@@ -31,6 +35,17 @@ ICU_INCLUDES =
 ICU_LIBS =
 endif
 
+# Add OpenSSL support if available
+ifeq ($(OPENSSL_AVAILABLE),yes)
+CFLAGS += -DUSE_SSL
+CFLAGS_LIBS += -DUSE_SSL
+SSL_INCLUDES = -I$(OPENSSL_PREFIX)/include
+SSL_LIBS = -L$(OPENSSL_PREFIX)/lib -lssl -lcrypto
+else
+SSL_INCLUDES =
+SSL_LIBS =
+endif
+
 # 64-bit migration warning flags (use with: make WARN_64BIT=1)
 ifdef WARN_64BIT
 CFLAGS := $(filter-out -Wno-everything,$(CFLAGS))
@@ -41,6 +56,7 @@ endif
 INCLUDES = -I$(BREW_PREFIX)/include \
            -I$(OPENMOTIF_PREFIX)/include \
            $(ICU_INCLUDES) \
+           $(SSL_INCLUDES) \
            -I/opt/X11/include
 
 # Dependency generation flags
@@ -50,7 +66,7 @@ DEPFLAGS = -MMD -MP
 LDFLAGS = $(ARCH_FLAGS) -L$(BREW_PREFIX)/lib \
           -L$(OPENMOTIF_PREFIX)/lib \
           -L/opt/X11/lib
-LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lm $(ICU_LIBS)
+LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lm $(ICU_LIBS) $(SSL_LIBS)
 
 # Source directories
 SRC_DIR = src
@@ -82,6 +98,11 @@ all: config_info $(VW) $(VIOLA)
 config_info:
 ifeq ($(ICU_AVAILABLE),no)
 	@echo "⚠ Building without ICU (UTF-8 will not be transliterated)"
+	@echo ""
+endif
+ifeq ($(OPENSSL_AVAILABLE),no)
+	@echo "⚠ Building without OpenSSL (HTTPS will not be supported)"
+	@echo "  Install with: brew install openssl@3"
 	@echo ""
 endif
 
@@ -122,7 +143,8 @@ LIBWWW_SRCS = $(LIBWWW_DIR)/HTParse.c $(LIBWWW_DIR)/HTAccess.c $(LIBWWW_DIR)/HTT
               $(LIBWWW_DIR)/HTAssoc.c $(LIBWWW_DIR)/HTUU.c $(LIBWWW_DIR)/HTAAProt.c \
               $(LIBWWW_DIR)/HTAAServ.c $(LIBWWW_DIR)/FOSI.c $(LIBWWW_DIR)/FOSIDTD.c \
               $(LIBWWW_DIR)/HTLex.c $(LIBWWW_DIR)/HTGroup.c $(LIBWWW_DIR)/HTACL.c \
-              $(LIBWWW_DIR)/HTPasswd.c $(LIBWWW_DIR)/HTAuth.c $(LIBWWW_DIR)/HTAAFile.c
+              $(LIBWWW_DIR)/HTPasswd.c $(LIBWWW_DIR)/HTAuth.c $(LIBWWW_DIR)/HTAAFile.c \
+              $(LIBWWW_DIR)/HTSSL.c $(LIBWWW_DIR)/HTTPS.c
 LIBWWW_OBJS = $(patsubst $(LIBWWW_DIR)/%.c,$(LIBWWW_DARWIN)/%.o,$(LIBWWW_SRCS))
 
 $(LIBWWW): $(LIBWWW_OBJS)
@@ -134,7 +156,7 @@ $(LIBWWW): $(LIBWWW_OBJS)
 
 $(LIBWWW_DARWIN)/%.o: $(LIBWWW_DIR)/%.c
 	@mkdir -p $(LIBWWW_DARWIN)
-	$(CC) $(CFLAGS) -I$(LIBWWW_DIR) $(ICU_INCLUDES) -DACCESS_AUTH -DVIOLA -c $< -o $@
+	$(CC) $(CFLAGS) -I$(LIBWWW_DIR) $(ICU_INCLUDES) $(SSL_INCLUDES) -DACCESS_AUTH -DVIOLA -c $< -o $@
 
 # libXPM (XPM image support)
 LIBXPM_SRCS = $(LIBXPM_DIR)/data.c $(LIBXPM_DIR)/create.c $(LIBXPM_DIR)/visual.c \
