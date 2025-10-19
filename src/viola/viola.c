@@ -55,7 +55,7 @@ extern void XtToolkitInitialize();
 
 #define DFLT_USR_WWW_HOME "WWW" /* patched */
 
-char* viola_version = "Viola=3.0 Alpha";
+char* viola_version = "Viola=4.0 Beta";
 /*= <geom>		.\n\n\*/
 char* viola_usage = {"Usage:\n\
 -geometry <geom>	geometry\n\

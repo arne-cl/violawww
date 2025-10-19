@@ -3774,7 +3774,7 @@ print(\"\\n\
 		return;\n\
 	break;\n\
 	case \"version\":\n\
-		return \"Version 3.3 (95/01/01)\";\n\
+		return \"Version 4.0 Beta (2025)\";\n\
 	break;\n\
 	case \"winPosition\":\n\
 		return windowPosition();\n\
@@ -6549,7 +6549,7 @@ static char _slotValue_wwwAbout40[] = "normal";
 static char _slotValue_wwwAbout41[] = "\\f(2)Viola World Wide Web \n\
 Hypermedia Toolkit & Browser\\f(1)\n\
 \n\
-Version 3.3\n\
+Version 4.0 Beta\n\
 \n\
 By Pei Y. Wei (\\f(0)wei@ora.com\\f(1)), \n\
 O'Reilly & Associates, Inc.\n\

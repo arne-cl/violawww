@@ -141,7 +141,7 @@ PUBLIC char* HTWaybackCheck PARAMS((CONST char* url)) {
     sprintf(request,
             "GET /cdx/search/cdx?url=%s&limit=1&sort=ascending HTTP/1.1\r\n"
             "Host: %s\r\n"
-            "User-Agent: ViolaWWW/3.3 (Wayback)\r\n"
+            "User-Agent: ViolaWWW/4.0 (Wayback)\r\n"
             "Connection: close\r\n"
             "\r\n",
             url_encoded, WAYBACK_API_HOST);
