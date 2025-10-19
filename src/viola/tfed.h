@@ -188,7 +188,7 @@ TFStruct* updateEStrUser();
 int tfed_render();
 int tfed_processMouseInput();
 char* tfed_processMouseMove();
-int tfed_processKeyEvent();
+int tfed_processKeyEvent(VObj* self, Window w, char c);
 void tfed_insertChar();
 int tfed_setBuffer();
 int tfed_getBuffer();

@@ -231,7 +231,7 @@ HTStream* context;
 
         context->element_stack = N->next; /* Remove from stack */
         free(N);
-        (*context->actions->end_element)(context->target, t - context->dtd->tags);
+        (*context->actions->end_element)(context->target, (int)(t - context->dtd->tags));
         if (old_tag == t)
             return; /* Correct sequence */
 
@@ -252,7 +252,7 @@ HTTag* old_tag;
 #endif
 {
     /*PYW: for emulating SGMLS behaviour */
-    (*context->actions->end_element)(context->target, old_tag - context->dtd->tags);
+    (*context->actions->end_element)(context->target, (int)(old_tag - context->dtd->tags));
 }
 
 /*	Start a element
@@ -267,7 +267,7 @@ PRIVATE void start_element(context) HTStream* context;
 
     if (TRACE)
         fprintf(stderr, "SGML: Start <%s>\n", new_tag->name);
-    (*context->actions->start_element)(context->target, new_tag - context->dtd->tags,
+    (*context->actions->start_element)(context->target, (int)(new_tag - context->dtd->tags),
                                        context->present,
                                        (CONST char**)context->value, /* coerce type for think c */
                                        new_tag /*PYW*/);
@@ -351,7 +351,7 @@ PRIVATE void closeImpliedTags ARGS2(HTStream*, context, HTTag*, tag) {
     int i, high, low, diff;
     int tagIdx;
 
-    tagIdx = tag - context->dtd->tags;
+    tagIdx = (int)(tag - context->dtd->tags);
     tagName = context->dtd->tags[tagIdx].name;
 
     subep = (int*)context->element_stack->tag->valid_sub_elements;

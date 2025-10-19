@@ -138,7 +138,7 @@ char* eventStr[] = {"unknown event 0", "unknown event 1", "KeyPress",         "K
 Packet* result; /* scrap packets */
 Packet* result2;
 
-int intBuff[4]; /* temporary buffers */
+long intBuff[4]; /* temporary buffers */
 
 int init_event() {
     int i;
@@ -312,7 +312,7 @@ void violaIdleEvent() {
             if (!FD_ISSET(i, &cur_read_mask))
                 continue;
             /* tell object to handle socket data */
-            if (obj = objFDList[i]) {
+            if ((obj = objFDList[i])) {
                 if (verbose) {
                     sprintf(buff, "data in socket number = %d, obj = %s\n", i, GET_name(obj));
                     fprintf(stderr, buff);
@@ -408,7 +408,7 @@ int eventLoop() {
                 if (!FD_ISSET(i, &cur_read_mask))
                     continue;
                 /* tell object to handle socket data */
-                if (obj = objFDList[i]) {
+                if ((obj = objFDList[i])) {
 
                     if (verbose) {
                         sprintf(buff, "data in socket number = %d, obj = %s\n", i, GET_name(obj));
@@ -689,7 +689,7 @@ int tool;
                 Packet* result = borrowPacket();
                 XSelectionEvent reply;
                 XSelectionRequestEvent* sep;
-                int length;
+                size_t length;
 
                 length = strlen(cp);
 
@@ -1173,7 +1173,7 @@ int *from_x, *from_y;
 
             SET_x(*dragObjp, GET_x(*dragObjp) + dx);
             SET_y(*dragObjp, GET_y(*dragObjp) + dy);
-            XMoveWindow(display, w, GET_x(*dragObjp), GET_y(*dragObjp));
+            XMoveWindow(display, w, (int)GET_x(*dragObjp), GET_y(*dragObjp));
         }
         break;
 
@@ -1252,7 +1252,7 @@ int *from_x, *from_y;
             case RC_RIGHT:
                 SET_width(*dragObjp, GET_width(*dragObjp) + dx);
                 *resize_corner = checkParam(*dragObjp, *resize_corner);
-                XResizeWindow(display, w, GET_width(*dragObjp), GET_height(*dragObjp));
+                XResizeWindow(display, w, (int)GET_width(*dragObjp), GET_height(*dragObjp));
                 break;
 
             case RC_UPPER_LEFT:
@@ -1281,15 +1281,15 @@ int *from_x, *from_y;
                 SET_width(*dragObjp, GET_width(*dragObjp) + dx);
                 SET_height(*dragObjp, GET_height(*dragObjp) - dy);
                 *resize_corner = checkParam(*dragObjp, *resize_corner);
-                XMoveWindow(display, w, GET_x(*dragObjp), GET_y(*dragObjp));
-                XResizeWindow(display, w, GET_width(*dragObjp), GET_height(*dragObjp));
+                XMoveWindow(display, w, (int)GET_x(*dragObjp), GET_y(*dragObjp));
+                XResizeWindow(display, w, (int)GET_width(*dragObjp), GET_height(*dragObjp));
                 break;
 
             case RC_LOWER_RIGHT:
                 SET_width(*dragObjp, GET_width(*dragObjp) + dx);
                 SET_height(*dragObjp, GET_height(*dragObjp) + dy);
                 *resize_corner = checkParam(*dragObjp, *resize_corner);
-                XResizeWindow(display, w, GET_width(*dragObjp), GET_height(*dragObjp));
+                XResizeWindow(display, w, (int)GET_width(*dragObjp), GET_height(*dragObjp));
                 break;
             }
             GLDrawRubberFrame(*dragObjp, GET_x(*dragObjp) + 1, GET_y(*dragObjp) + 1,

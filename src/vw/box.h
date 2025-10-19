@@ -27,7 +27,7 @@ typedef struct LLNode {
 #ifdef _NOBOOLEAN_
 typedef long Boolean;
 enum { FALSE = 0, TRUE };
-#endif _NOBOOLEAN_
+#endif /* _NOBOOLEAN_ */
 
 /*
  * CompareFunction(void *key, void *data);
@@ -42,7 +42,7 @@ typedef void (*FreeFunction)();
 /*
  * putInBox(Box **box, void *item)
  */
-void putInBox();
+void putInBox(Box** box, void* item);
 
 /*
  * getFromBox(Box **box,
@@ -50,7 +50,7 @@ void putInBox();
  *            CompareFunction compare,
  *            Boolean findFirstOne)
  */
-void* getFromBox();
+void* getFromBox(Box** box, void* key, CompareFunction compare, Boolean findFirstOne);
 
 /*
  * deleteFromBox(Box **box,
@@ -59,22 +59,22 @@ void* getFromBox();
  *               FreeFunction freeitem,
  *               Boolean deleteAllItems)
  */
-void deleteFromBox();
+void deleteFromBox(Box** box, void* key, CompareFunction compare, FreeFunction freeData, Boolean deleteAllItems);
 
 /*
  * cloneBox(Box *box)
  */
-Box* cloneBox();
+Box* cloneBox(Box* box);
 
 /*
  * deleteBox(Box *box,
  *           FreeFunction freeData)
  */
-void deleteBox();
+void deleteBox(Box* box, FreeFunction freeData);
 
 /*
  * alwaysTrue()
  */
-Boolean alwaysTrue();
+Boolean alwaysTrue(void *vkey, void *vdata);
 
-#endif _BOX_H_
+#endif /* _BOX_H_ */

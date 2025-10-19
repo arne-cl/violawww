@@ -668,10 +668,7 @@ double gamma;
  * Algorithm:
  *	[None]
  */
-static char* match(n, v)
-char* n;
-char* v;
-{
+static char* match(char* n, char* v) {
     for (; *n != '\0' && *n != '=' && *n == *v; n++, v++)
         ;
     if (*n == '\0' || *n == '=')
@@ -697,10 +694,7 @@ char* v;
  * Algorithm:
  *	[None]
  */
-char* rle_getcom(name, globals)
-char* name;
-struct sv_globals* globals;
-{
+char* rle_getcom(char* name, struct sv_globals* globals) {
     char** cp;
     char* v;
 
@@ -782,9 +776,7 @@ static void bfill();
  * Algorithm:
  * 	Read in the setup info and fill in sv_globals.
  */
-int rle_get_setup(globals)
-struct sv_globals* globals;
-{
+int rle_get_setup(struct sv_globals* globals) {
     struct XtndRsetup setup;
     short magic; /* assume 16 bits */
     ZFILE* infile = globals->svfb_fd;

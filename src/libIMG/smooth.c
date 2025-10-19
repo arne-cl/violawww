@@ -12,9 +12,7 @@
 #include "image.h"
 #include <string.h>
 
-static Image* doSmooth(image)
-Image* image;
-{
+static Image* doSmooth(Image* image) {
     Image *old, *new;
     int x, y, x1, y1, linelen;
     int xindex[3];

@@ -950,11 +950,12 @@ long meth_generic_GB_nthChar(VObj* self, Packet* result, int argc, Packet argv[]
         result->info.c = GBuff[bufferID][n];
         return 1;
     } else if (argc == 3) {
-        int i, n1, n2;
+        int i;
+        long n1, n2;
         char *cp, *str;
 
-        n1 = (int)PkInfo2Int(&argv[1]);
-        n2 = (int)(int)PkInfo2Int(&argv[2]);
+        n1 = PkInfo2Int(&argv[1]);
+        n2 = PkInfo2Int(&argv[2]);
         str = GBuff[bufferID];
         cp = (char*)malloc(sizeof(char) * (n2 - n1 + 2));
         if (!cp) {
@@ -990,7 +991,8 @@ long meth_generic_GB_nthChar(VObj* self, Packet* result, int argc, Packet argv[]
  */
 long meth_generic_GB_nthLine(VObj* self, Packet* result, int argc, Packet argv[]) {
     int bufferID = (int)PkInfo2Int(&argv[0]);
-    int li, hi, lines, size;
+    long li, hi;
+    int lines, size;
     char *cp, *str;
 
     result->type = PKT_STR;
@@ -1003,10 +1005,10 @@ long meth_generic_GB_nthLine(VObj* self, Packet* result, int argc, Packet argv[]
     str = GBuff[bufferID];
 
     if (argc == 2) {
-        li = hi = (int)PkInfo2Int(&argv[1]);
+        li = hi = PkInfo2Int(&argv[1]);
     } else if (argc == 3) {
-        li = (int)PkInfo2Int(&argv[1]);
-        hi = (int)(int)PkInfo2Int(&argv[2]);
+        li = PkInfo2Int(&argv[1]);
+        hi = PkInfo2Int(&argv[2]);
     } else {
         /* incorrect number of arguments */
         result->info.s = "";
@@ -1125,7 +1127,8 @@ long meth_generic_HTTPCurrentDocAddrParsed(VObj* self, Packet* result, int argc,
     Packet* packet3 = makePacket(); /* file */
     Packet* packet4 = makePacket(); /* anchor */
     char *addr, *relative, *path, *anchor;
-    int i, length;
+    int i;
+    size_t length;
 
     if (argc >= 1)
         addr = PkInfo2Str(&argv[0]);
@@ -1151,8 +1154,8 @@ long meth_generic_HTTPCurrentDocAddrParsed(VObj* self, Packet* result, int argc,
     packet1->info.s = saveString(HTParse(addr, relative, PARSE_HOST));
     path = HTParse(addr, relative, PARSE_PATH | PARSE_PUNCTUATION);
 
-    length = (int)strlen(path);
-    for (i = length; i >= 0; i--)
+    length = strlen(path);
+    for (i = (int)length; i >= 0; i--)
         if (path[i] == '/') {
             strncpy(buff, path, i + 1);
             buff[i + 1] = '\0';
@@ -1227,7 +1230,8 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
     char *simpleAddress, *anchorSearch;
     FILE* fp;
     char *tfn, tempFileName[200], *ext, *src;
-    int len, span = 0;
+    size_t len;
+    int span = 0;
 
     /* now... is this a leak? this method can be called by
      * imgNodeRefInc.. only for images, so ... probably quite safe.
@@ -1245,8 +1249,8 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
         return 0;
     }
 
-    len = (int)strlen(src);
-    fprintf(stderr, "DEBUG HTTPGet: src='%s' len=%d\n", src, len);
+    len = strlen(src);
+    fprintf(stderr, "DEBUG HTTPGet: src='%s' len=%zu\n", src, len);
 
     /* Safety check: ensure tempFileNamePrefix is valid
      * Check for:
@@ -1320,7 +1324,7 @@ gogo:
     return 0;
 }
 
-long int helper_buildingHTML(Packet* result, VObj* obj, char* url, int width, int method,
+long int helper_buildingHTML(Packet* result, VObj* obj, char* url, long width, int method,
                              char* dataToPost) {
     VObj* newObj;
     char *simpleAddress, *anchorSearch;
@@ -1358,7 +1362,7 @@ long meth_generic_HTTPGetNParse(VObj* self, Packet* result, int argc, Packet arg
     if (notSecure(self))
         return 0;
     return helper_buildingHTML(result, PkInfo2Obj(&argv[1]), PkInfo2Str(&argv[0]),
-                               (int)PkInfo2Int(&argv[2]), HTTP_METHOD_GET, NULL);
+                               PkInfo2Int(&argv[2]), HTTP_METHOD_GET, NULL);
 }
 
 /*
@@ -1368,7 +1372,7 @@ long meth_generic_HTTPPost(VObj* self, Packet* result, int argc, Packet argv[]) 
     if (notSecure(self))
         return 0;
     return helper_buildingHTML(result, PkInfo2Obj(&argv[1]), PkInfo2Str(&argv[0]),
-                               (int)PkInfo2Int(&argv[2]), HTTP_METHOD_POST, PkInfo2Str(&argv[3]));
+                               PkInfo2Int(&argv[2]), HTTP_METHOD_POST, PkInfo2Str(&argv[3]));
 }
 
 /* XXX NOT YET WORKING */
@@ -1379,7 +1383,7 @@ long meth_generic_HTTPSubmit(VObj* self, Packet* result, int argc, Packet argv[]
     if (notSecure(self))
         return 0;
     return helper_buildingHTML(result, PkInfo2Obj(&argv[1]), PkInfo2Str(&argv[0]),
-                               (int)PkInfo2Int(&argv[2]), HTTP_METHOD_SUBMIT, PkInfo2Str(&argv[3]));
+                               PkInfo2Int(&argv[2]), HTTP_METHOD_SUBMIT, PkInfo2Str(&argv[3]));
 }
 
 long meth_generic_HTTPHotListAdd(VObj* self, Packet* result, int argc, Packet argv[]) {
@@ -2060,7 +2064,7 @@ long meth_generic_clone2(VObj* self, Packet* result, int argc, Packet argv[]) {
     VObj *cloneObj, *obj;
     VObjList *olist, *newolist;
     union PCode* pcode;
-    int size;
+    size_t size;  /* Changed from int to size_t for 64-bit safety */
 
     if (!meth_cosmic_clone2(self, result, argc, argv))
         return 0;
@@ -2098,7 +2102,7 @@ long meth_generic_clone2(VObj* self, Packet* result, int argc, Packet argv[]) {
     pcode = GET__script(self);
     if (pcode) {
         pcode[PCODE_IDX_REFC].i++;
-        size = (int)(sizeof(union PCode) * (pcode[PCODE_IDX_INSTR].i + pcode[PCODE_IDX_SIZE].i));
+        size = sizeof(union PCode) * (pcode[PCODE_IDX_INSTR].i + pcode[PCODE_IDX_SIZE].i);
         SET__script(cloneObj, pcode);
     }
 
@@ -2213,7 +2217,7 @@ long meth_generic_concatList(VObj* self, Packet* result, int argc, Packet argv[]
     char* cp;
     Attr* attrp;
     Attr* hattrp;
-    int totalLength = 0;
+    size_t totalLength = 0;
     int li = 0;
 
     hattrp = (Attr*)argv[0].info.a;
@@ -2225,7 +2229,7 @@ long meth_generic_concatList(VObj* self, Packet* result, int argc, Packet argv[]
     }
     for (attrp = hattrp; attrp; attrp = attrp->next) {
         cp = ((Packet*)(attrp->val))->info.s;
-        totalLength += (int)strlen(cp);
+        totalLength += strlen(cp);
         if (li < REVERSERBUFF)
             reverserBuff[li++] = cp;
     }
@@ -2438,7 +2442,7 @@ long meth_generic_defineNewFont(VObj* self, Packet* result, int argc, Packet arg
 long meth_generic_delay(VObj* self, Packet* result, int argc, Packet argv[]) {
     clearPacket(result);
     result->type = PKT_INT;
-    result->info.i = sleep((unsigned)PkInfo2Int(argv[0]));
+    result->info.i = sleep((unsigned)PkInfo2Int(&argv[0]));
     return 1;
 }
 
@@ -2447,7 +2451,7 @@ long meth_generic_deleteFile(VObj* self, Packet* result, int argc, Packet argv[]
         return 0;
     clearPacket(result);
     result->type = PKT_INT;
-    result->info.i = unlink(PkInfo2Str(argv[0]));
+    result->info.i = unlink(PkInfo2Str(&argv[0]));
     return 1;
 }
 
@@ -2562,7 +2566,7 @@ long meth_generic_filter(VObj* self, Packet* result, int argc, Packet argv[]) {
     result->type = PKT_STR;
     result->canFree = PK_CANFREE_STR;
 
-    while (c = *inStr++) {
+    while ((c = *inStr++)) {
         if (c == '\\') {
             switch (c = *inStr++) {
             case 'n':
@@ -2613,7 +2617,7 @@ long meth_generic_findPattern(VObj* self, Packet* result, int argc, Packet argv[
     char* cp;
     char *inStr, *patStr;
     int ii = 0, pi = 0;
-    int inLength, patLength;
+    size_t inLength, patLength;
 
     inStr = PkInfo2Str(&argv[0]);
     patStr = PkInfo2Str(&argv[1]);
@@ -2624,8 +2628,8 @@ long meth_generic_findPattern(VObj* self, Packet* result, int argc, Packet argv[
         result->info.i = -1;
         return 0;
     }
-    inLength = (int)strlen(inStr);
-    patLength = (int)strlen(patStr);
+    inLength = strlen(inStr);
+    patLength = strlen(patStr);
 
     for (cp = inStr; *cp; cp++) {
         if (*cp == patStr[pi]) {
@@ -3367,13 +3371,14 @@ long meth_generic_nthChar(VObj* self, Packet* result, int argc, Packet argv[]) {
             result->info.c = '\0';
 
     } else if (argc == 3) {
-        int i, n1, n2;
+        int i;
+        long n1, n2;
         char *cp, *str;
 
         result->type = PKT_STR;
         str = PkInfo2Str(&argv[0]);
-        n1 = (int)PkInfo2Int(&argv[1]);
-        n2 = (int)(int)PkInfo2Int(&argv[2]);
+        n1 = PkInfo2Int(&argv[1]);
+        n2 = PkInfo2Int(&argv[2]);
         cp = (char*)malloc(sizeof(char) * (n2 - n1 + 2));
         if (!cp) {
             result->info.s = "";
@@ -3447,17 +3452,18 @@ long meth_generic_nthItem(VObj* self, Packet* result, int argc, Packet argv[]) {
  * Return: 1 if successful, 0 if error occured
  */
 long meth_generic_nthLine(VObj* self, Packet* result, int argc, Packet argv[]) {
-    int li, hi, lines, size;
+    long li, hi;
+    int lines, size;
     char* str;
 
     result->type = PKT_STR;
     str = PkInfo2Str(&argv[0]);
     if (str) {
         if (argc == 2) {
-            li = hi = (int)PkInfo2Int(&argv[1]);
+            li = hi = PkInfo2Int(&argv[1]);
         } else if (argc == 3) {
-            li = (int)PkInfo2Int(&argv[1]);
-            hi = (int)(int)PkInfo2Int(&argv[2]);
+            li = PkInfo2Int(&argv[1]);
+            hi = PkInfo2Int(&argv[2]);
         } else {
             /* incorrect number of arguments */
             result->info.s = "";
@@ -3551,7 +3557,7 @@ long meth_generic_nthSibling(VObj* self, Packet* result, int argc, Packet argv[]
  */
 long meth_generic_nthWord(VObj* self, Packet* result, int argc, Packet argv[]) {
     char* str;
-    int n1, n2;
+    long n1, n2;
 
     str = PkInfo2Str(&argv[0]);
     if (!str) {
@@ -3563,10 +3569,10 @@ long meth_generic_nthWord(VObj* self, Packet* result, int argc, Packet argv[]) {
         str = SaveString(str);
         result->type = PKT_STR;
         if (argc == 2) {
-            n1 = n2 = (int)PkInfo2Int(&argv[1]);
+            n1 = n2 = PkInfo2Int(&argv[1]);
         } else if (argc == 3) {
-            n1 = (int)PkInfo2Int(&argv[1]);
-            n2 = (int)(int)PkInfo2Int(&argv[2]);
+            n1 = PkInfo2Int(&argv[1]);
+            n2 = PkInfo2Int(&argv[2]);
         } else {
             result->info.s = "";
             result->canFree = 0;
@@ -3799,14 +3805,14 @@ long meth_generic_replaceStr(VObj* self, Packet* result, int argc, Packet argv[]
     char *cp, *lp;
     char *inStr, *patStr, *repStr;
     int ii = 0, pi = 0;
-    int inLength, patLength, repLength;
+    size_t inLength, patLength, repLength;
 
     inStr = PkInfo2Str(&argv[0]);
     patStr = PkInfo2Str(&argv[1]);
     repStr = PkInfo2Str(&argv[3]);
-    inLength = (int)strlen(inStr);
-    patLength = (int)strlen(patStr);
-    repLength = (int)strlen(repStr);
+    inLength = strlen(inStr);
+    patLength = strlen(patStr);
+    repLength = strlen(repStr);
 
     result->type = PKT_STR;
     lp = inStr;

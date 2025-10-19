@@ -141,10 +141,7 @@ void* clientData;
  * when the caller is done with it.  If there is an error, readFile()
  * returns NULL.
  */
-char* readFile(fileName, dvi)
-char* fileName;
-DocViewInfo* dvi;
-{
+char* readFile(char* fileName, DocViewInfo* dvi) {
     size_t bytes, bytesRead = 0, bytesInFile;
     char* fileData;
     FILE* fp;

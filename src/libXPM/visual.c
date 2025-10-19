@@ -11,9 +11,7 @@
 #include "xpmP.h"
 #include <stdlib.h>
 
-int xpmVisualType(visual)
-Visual* visual;
-{
+int xpmVisualType(Visual* visual) {
     switch (visual->class) {
     case StaticGray:
     case GrayScale:

@@ -18,10 +18,7 @@
 
 /* SUPPRESS 558 */
 
-int babble(name, headerp)
-char* name;
-struct cmuwm_header* headerp;
-{
+int babble(char* name, struct cmuwm_header* headerp) {
     printf("%s is a %dx%d %d plane CMU WM raster\n", name, memToVal(headerp->width, sizeof(long)),
            memToVal(headerp->height, sizeof(long)), memToVal(headerp->depth, sizeof(short)));
 }

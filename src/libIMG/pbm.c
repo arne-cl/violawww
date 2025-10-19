@@ -56,9 +56,7 @@ static void initializeTable() {
     Initialized = 1;
 }
 
-static int pbmReadChar(zf)
-ZFILE* zf;
-{
+static int pbmReadChar(ZFILE* zf) {
     int c;
 
     if ((c = zgetc(zf)) == EOF) {
@@ -73,9 +71,7 @@ ZFILE* zf;
     return (c);
 }
 
-static int pbmReadInt(zf)
-ZFILE* zf;
-{
+static int pbmReadInt(ZFILE* zf) {
     int c, value;
 
     for (;;) {
@@ -376,7 +372,7 @@ unsigned int verbose;
                     freeImage(image);
                     return (NULL);
                 }
-                src = PM_SCALE(src, maxval, 0xff);
+                src = (int)PM_SCALE(src, maxval, 0xff);
                 *(destptr++) = src; /* red */
                 *(destptr++) = src; /* green */
                 *(destptr++) = src; /* blue */
@@ -405,7 +401,7 @@ unsigned int verbose;
                 zclose(zf);
                 exit(1);
             } else {
-                src = PM_SCALE(src, maxval, 0xff);
+                src = (int)PM_SCALE(src, maxval, 0xff);
                 if (TRUEP(image)) {
                     *(destptr++) = src; /* red */
                     *(destptr++) = src; /* green */

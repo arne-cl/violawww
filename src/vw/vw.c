@@ -780,8 +780,7 @@ DocViewInfo* docViewInfo;
 }
 #endif
 
-void closeAppShell(docViewInfo) DocViewInfo* docViewInfo;
-{
+void closeAppShell(DocViewInfo* docViewInfo) {
     /* Tell the Viola object to free itself. */
     if (docViewInfo->violaDocViewObj)
         sendMessage1(docViewInfo->violaDocViewObj, "freeSelf");
@@ -811,9 +810,7 @@ void closeAppShell(docViewInfo) DocViewInfo* docViewInfo;
 }
 
 /* already exists in viola
-char *makeString(oldstring)
-    char *oldstring;
-{
+char *makeString(char *oldstring) {
     char *newstring;
 
     if (!oldstring)
@@ -851,8 +848,7 @@ Boolean compareDocViewShell(vkey, vdata) void *vkey, *vdata;
     return (FALSE);
 }
 
-void freeDocViewInfo(vdvi) void* vdvi;
-{
+void freeDocViewInfo(void* vdvi) {
     DocViewInfo* dvi = (DocViewInfo*)vdvi;
 
     if (dvi) {
@@ -901,9 +897,7 @@ Boolean compareBookmarkDoc(key, data)
 }
 
 
-void freeBookmark(vbm)
-    void *vbm;
-{
+void freeBookmark(void *vbm) {
     Bookmark *bm = (Bookmark *) vbm;
 
     if (bm) {

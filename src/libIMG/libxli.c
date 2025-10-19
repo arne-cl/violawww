@@ -181,9 +181,9 @@ int *width, *height;
     if (onroot && (winwidth || winheight || images[0].center || images[0].atx || images[0].aty ||
                    fullscreen)) {
         if (!winwidth)
-            winwidth = DisplayWidth(disp, scrn);
+            winwidth = (unsigned int)DisplayWidth(disp, scrn);
         if (!winheight)
-            winheight = DisplayHeight(disp, scrn);
+            winheight = (unsigned int)DisplayHeight(disp, scrn);
         if (DefaultDepth(disp, scrn) == 1)
             dispimage = newBitImage(winwidth, winheight);
         else {
@@ -238,19 +238,19 @@ int *width, *height;
             XWindowAttributes wa;
             images[0].center = 1;
 
-            if ((newimage->width > DisplayWidth(disp, scrn)) ||
-                (newimage->height > DisplayHeight(disp, scrn))) {
-                images[0].xzoom = images[0].yzoom =
-                    (newimage->width - DisplayWidth(disp, scrn) >
-                             newimage->height - DisplayHeight(disp, scrn)
+            if ((newimage->width > (unsigned int)DisplayWidth(disp, scrn)) ||
+                (newimage->height > (unsigned int)DisplayHeight(disp, scrn))) {
+                images[0].xzoom = images[0].yzoom = (unsigned int)(
+                    (newimage->width - (unsigned int)DisplayWidth(disp, scrn) >
+                             newimage->height - (unsigned int)DisplayHeight(disp, scrn)
                          ? (float)DisplayWidth(disp, scrn) / (float)newimage->width * 100.0
-                         : (float)DisplayHeight(disp, scrn) / (float)newimage->height * 100.0);
+                         : (float)DisplayHeight(disp, scrn) / (float)newimage->height * 100.0));
             } else {
-                images[0].xzoom = images[0].yzoom =
-                    (DisplayWidth(disp, scrn) - newimage->width <
-                             DisplayHeight(disp, scrn) - newimage->height
+                images[0].xzoom = images[0].yzoom = (unsigned int)(
+                    ((unsigned int)DisplayWidth(disp, scrn) - newimage->width <
+                             (unsigned int)DisplayHeight(disp, scrn) - newimage->height
                          ? (float)DisplayWidth(disp, scrn) / (float)newimage->width * 100.0
-                         : (float)DisplayHeight(disp, scrn) / (float)newimage->height * 100.0);
+                         : (float)DisplayHeight(disp, scrn) / (float)newimage->height * 100.0));
             }
         }
 
@@ -272,8 +272,8 @@ int *width, *height;
         } else
             dispimage = newimage;
 
-        *width = dispimage->width;
-        *height = dispimage->height;
+        *width = (int)dispimage->width;
+        *height = (int)dispimage->height;
         /*
          *image = dispimage;
          */

@@ -40,26 +40,26 @@ static int isXWD(char* name, ZFILE* zf, XWDHeader* header, int verbose) {
      * are commented out.
      */
 
-    header->header_size = memToVal(gh.header_size, 4);
-    header->file_version = memToVal(gh.file_version, 4);
-    header->pixmap_format = memToVal(gh.pixmap_format, 4);
-    header->pixmap_depth = memToVal(gh.pixmap_depth, 4);
-    header->pixmap_width = memToVal(gh.pixmap_width, 4);
-    header->pixmap_height = memToVal(gh.pixmap_height, 4);
-    header->xoffset = memToVal(gh.xoffset, 4);
-    header->byte_order = memToVal(gh.byte_order, 4);
-    header->bitmap_unit = memToVal(gh.bitmap_unit, 4);
-    header->bitmap_bit_order = memToVal(gh.bitmap_bit_order, 4);
-    header->bitmap_pad = memToVal(gh.bitmap_pad, 4);
-    header->bits_per_pixel = memToVal(gh.bits_per_pixel, 4);
-    header->bytes_per_line = memToVal(gh.bytes_per_line, 4);
-    header->visual_class = memToVal(gh.visual_class, 4);
+    header->header_size = (unsigned int)memToVal(gh.header_size, 4);
+    header->file_version = (unsigned int)memToVal(gh.file_version, 4);
+    header->pixmap_format = (unsigned int)memToVal(gh.pixmap_format, 4);
+    header->pixmap_depth = (unsigned int)memToVal(gh.pixmap_depth, 4);
+    header->pixmap_width = (unsigned int)memToVal(gh.pixmap_width, 4);
+    header->pixmap_height = (unsigned int)memToVal(gh.pixmap_height, 4);
+    header->xoffset = (unsigned int)memToVal(gh.xoffset, 4);
+    header->byte_order = (unsigned int)memToVal(gh.byte_order, 4);
+    header->bitmap_unit = (unsigned int)memToVal(gh.bitmap_unit, 4);
+    header->bitmap_bit_order = (unsigned int)memToVal(gh.bitmap_bit_order, 4);
+    header->bitmap_pad = (unsigned int)memToVal(gh.bitmap_pad, 4);
+    header->bits_per_pixel = (unsigned int)memToVal(gh.bits_per_pixel, 4);
+    header->bytes_per_line = (unsigned int)memToVal(gh.bytes_per_line, 4);
+    header->visual_class = (unsigned int)memToVal(gh.visual_class, 4);
     /*header->red_mask= memToVal(gh.red_mask, 4);*/
     /*header->green_mask= memToVal(gh.green_mask, 4);*/
     /*header->blue_mask= memToVal(gh.blue_mask, 4);*/
     /*header->bits_per_rgb= memToVal(gh.bits_per_rgb, 4);*/
-    header->colormap_entries = memToVal(gh.colormap_entries, 4);
-    header->ncolors = memToVal(gh.ncolors, 4);
+    header->colormap_entries = (unsigned int)memToVal(gh.colormap_entries, 4);
+    header->ncolors = (unsigned int)memToVal(gh.ncolors, 4);
     /*header->window_width= memToVal(gh.window_width, 4);*/
     /*header->window_height= memToVal(gh.window_height, 4);*/
     /*header->window_x= memToVal(gh.window_x, 4);*/
@@ -398,7 +398,7 @@ XWDHeader header;
 Image* xwdLoad(char* fullname, char* name, int verbose) {
     ZFILE* zf;
     XWDHeader header;
-    int cmaplen;
+    size_t cmaplen;
     XWDColor* cmap;
     Image* image;
     int a;
@@ -478,9 +478,9 @@ Image* xwdLoad(char* fullname, char* name, int verbose) {
 
     image->rgb.used = header.ncolors;
     for (a = 0; a < header.ncolors; a++) {
-        image->rgb.red[memToVal(cmap[a].pixel, 4)] = memToVal(cmap[a].red, 2);
-        image->rgb.green[memToVal(cmap[a].pixel, 4)] = memToVal(cmap[a].green, 2);
-        image->rgb.blue[memToVal(cmap[a].pixel, 4)] = memToVal(cmap[a].blue, 2);
+        image->rgb.red[memToVal(cmap[a].pixel, 4)] = (Intensity)memToVal(cmap[a].red, 2);
+        image->rgb.green[memToVal(cmap[a].pixel, 4)] = (Intensity)memToVal(cmap[a].green, 2);
+        image->rgb.blue[memToVal(cmap[a].pixel, 4)] = (Intensity)memToVal(cmap[a].blue, 2);
     }
 
     lfree((byte*)cmap);

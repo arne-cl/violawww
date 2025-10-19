@@ -50,9 +50,7 @@ unsigned int* ui_return;
 /*
  * skip to the end of the current string and the beginning of the next one
  */
-int xpmNextString(mdata)
-xpmData* mdata;
-{
+int xpmNextString(xpmData* mdata) {
     int c;
 
     switch (mdata->type) {
@@ -75,10 +73,7 @@ xpmData* mdata;
  * skip whitespace and compute the following unsigned int,
  * returns 1 if one is found and 0 if not
  */
-int xpmNextUI(mdata, ui_return)
-xpmData* mdata;
-unsigned int* ui_return;
-{
+int xpmNextUI(xpmData* mdata, unsigned int* ui_return) {
     char buf[BUFSIZ];
     int l;
 
@@ -89,9 +84,7 @@ unsigned int* ui_return;
 /*
  * return the current character, skipping comments
  */
-int xpmGetC(mdata)
-xpmData* mdata;
-{
+int xpmGetC(xpmData* mdata) {
     int c;
     unsigned int n = 0, a;
     unsigned int notend;
@@ -177,10 +170,7 @@ int xpmUngetC(int c, xpmData* mdata) {
 /*
  * skip whitespace and return the following word
  */
-unsigned int xpmNextWord(mdata, buf)
-xpmData* mdata;
-char* buf;
-{
+unsigned int xpmNextWord(xpmData* mdata, char* buf) {
     unsigned int n = 0;
     int c;
 
@@ -212,10 +202,7 @@ char* buf;
 /*
  * get the current comment line
  */
-int xpmGetCmt(mdata, cmt)
-xpmData* mdata;
-char** cmt;
-{
+int xpmGetCmt(xpmData* mdata, char** cmt) {
     switch (mdata->type) {
     case XPMARRAY:
         *cmt = NULL;
@@ -236,10 +223,7 @@ char** cmt;
 /*
  * open the given file to be read as an xpmData which is returned.
  */
-int xpmReadFile(filename, mdata)
-char* filename;
-xpmData* mdata;
-{
+int xpmReadFile(char* filename, xpmData* mdata) {
     char *compressfile, buf[BUFSIZ];
     struct stat status;
 
@@ -290,10 +274,7 @@ xpmData* mdata;
 /*
  * open the given file to be written as an xpmData which is returned
  */
-int xpmWriteFile(filename, mdata)
-char* filename;
-xpmData* mdata;
-{
+int xpmWriteFile(char* filename, xpmData* mdata) {
     char buf[BUFSIZ];
 
     if (!filename) {
@@ -323,10 +304,7 @@ xpmData* mdata;
 /*
  * open the given array to be read or written as an xpmData which is returned
  */
-int xpmOpenArray(data, mdata)
-char** data;
-xpmData* mdata;
-{
+int xpmOpenArray(char** data, xpmData* mdata) {
     mdata->type = XPMARRAY;
     mdata->stream.data = data;
     mdata->cptr = *data;

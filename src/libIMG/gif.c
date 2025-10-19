@@ -103,9 +103,7 @@ static BYTE gifin_interlace_flag; /* interlace image format flag */
  * open a GIF file, using s as the input stream
  */
 
-static int gifin_open_file(s)
-ZFILE* s;
-{
+static int gifin_open_file(ZFILE* s) {
     /* make sure there isn't already a file open */
     if (file_open)
         return GIFIN_ERR_FAO;
@@ -240,9 +238,7 @@ static int gifin_open_image() {
  * try to read next pixel from the raster, return result in *pel
  */
 
-static int gifin_get_pixel(pel)
-int* pel;
-{
+static int gifin_get_pixel(int* pel) {
     int code;
     int first;
     int place;
@@ -265,7 +261,7 @@ int* pel;
         }
 
         /* get the next code */
-        code = work_data & code_mask;
+        code = (int)(work_data & code_mask);
         work_data >>= code_size;
         work_bits -= code_size;
 
@@ -413,9 +409,7 @@ static int gifin_read_data_block() {
  * (returns the code of the first pixel in the string)
  */
 
-static int gifin_push_string(code)
-int code;
-{
+static int gifin_push_string(int code) {
     int rslt;
 
     while (prefix[code] != NULL_CODE) {
@@ -433,10 +427,7 @@ int code;
  * add a new string to the string table
  */
 
-static int gifin_add_string(p, e)
-int p;
-int e;
-{
+static int gifin_add_string(int p, int e) {
     prefix[table_size] = p;
     extnsn[table_size] = e;
 
@@ -452,9 +443,7 @@ int e;
  * semi-graceful fatal error mechanism
  */
 
-static int gifin_fatal(msg)
-char* msg;
-{
+static int gifin_fatal(char* msg) {
     printf("Error reading GIF file: %s\n", msg);
     exit(0);
 }

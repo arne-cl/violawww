@@ -22,35 +22,35 @@
 #define HOTLIST_CHUNK 256
 
 /* PROTOTYPES */
-void hotlistPrev();
-void hotlistNext();
-void hotlistBackUp();
+void hotlistPrev(DocViewInfo* dvi);
+void hotlistNext(DocViewInfo* dvi);
+void hotlistBackUp(DocViewInfo* dvi);
 
-void hotlistPrevMH();
-void hotlistNextMH();
-void hotlistBackUpMH();
+void hotlistPrevMH(char* arg[], int argc, void* clientData);
+void hotlistNextMH(char* arg[], int argc, void* clientData);
+void hotlistBackUpMH(char* arg[], int argc, void* clientData);
 
-void hotlistAdd();
-void hotlistAddMH();
-void setHotlistList();
-void setHotlistListMH();
+void hotlistAdd(DocViewInfo* dvi, char* newItem);
+void hotlistAddMH(char* arg[], int argc, void* clientData);
+void setHotlistList(DocViewInfo* dvi, char* newList[], int numItems);
+void setHotlistListMH(char* arg[], int argc, void* clientData);
 
-void freeHotlistList();
-void growHotlistList();
+void freeHotlistList(DocViewInfo* dvi);
+void growHotlistList(DocViewInfo* dvi);
 
-Widget createHotlistDialog();
-void showHotlist();
-void showHotlistCB();
-void hideHotlist();
-void hotlistSelect();
-void hotlistSelectCB();
+Widget createHotlistDialog(DocViewInfo* dvi);
+void showHotlist(DocViewInfo* dvi);
+void showHotlistCB(Widget widget, XtPointer clientData, XtPointer callData);
+void hideHotlist(Widget button, XtPointer clientData, XtPointer callData);
+void hotlistSelect(DocViewInfo* dvi, char* url);
+void hotlistSelectCB(Widget list, XtPointer clientData, XtPointer callData);
 
-void addToHotlist();
-void addToHotlistCB();
+void addToHotlist(DocViewInfo* dvi);
+void addToHotlistCB(Widget widget, XtPointer clientData, XtPointer callData);
 
-void addHotlistItem();
-void deleteHotlistItem();
-void gotoHotlistItem();
-void editHotlistItem();
+void addHotlistItem(Widget button, XtPointer clientData, XtPointer callData);
+void deleteHotlistItem(Widget button, XtPointer clientData, XtPointer callData);
+void gotoHotlistItem(Widget button, XtPointer clientData, XtPointer callData);
+void editHotlistItem(Widget button, XtPointer clientData, XtPointer callData);
 
-#endif _HOTLIST_H_
+#endif /* _HOTLIST_H_ */

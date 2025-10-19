@@ -25,12 +25,12 @@ unsigned int* rwidth;
         *rwidth = width;
     } else {
         fzoom = (float)zoom / 100.0;
-        *rwidth = fzoom * width;
+        *rwidth = (unsigned int)(fzoom * width);
     }
     index = (unsigned int*)lmalloc(sizeof(unsigned int) * *rwidth);
     for (a = 0; a < *rwidth; a++)
         if (zoom)
-            *(index + a) = (float)a / fzoom;
+            *(index + a) = (unsigned int)((float)a / fzoom);
         else
             *(index + a) = a;
     return (index);

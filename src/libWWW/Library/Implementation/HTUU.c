@@ -94,7 +94,7 @@ PUBLIC int HTUU_encode ARGS3(unsigned char*, bufin, unsigned int, nbytes, char*,
         outptr[-2] = '=';
     }
     *outptr = '\0';
-    return (outptr - bufcoded);
+    return (int)((outptr - bufcoded));
 }
 
 /*--- function HTUU_decode ------------------------------------------------
@@ -170,7 +170,7 @@ PUBLIC int HTUU_decode ARGS3(char*, bufcoded, unsigned char*, bufplain, int, out
     bufin = bufcoded;
     while (pr2six[*(bufin++)] <= MAXVAL)
         ;
-    nprbytes = bufin - bufcoded - 1;
+    nprbytes = (int)(bufin - bufcoded - 1);
     nbytesdecoded = ((nprbytes + 3) / 4) * 3;
     if (nbytesdecoded > outbufsize) {
         nprbytes = (outbufsize * 4) / 3;

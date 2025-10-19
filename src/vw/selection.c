@@ -31,9 +31,7 @@
  */
 DocViewInfo* selectionOwner = NULL;
 
-void urlLoseSelection(widget, selection) Widget widget;
-Atom* selection;
-{
+void urlLoseSelection(Widget widget, Atom* selection) {
     Pixel p;
 
     XtVaGetValues(widget, XmNbackground, &p, NULL);
@@ -84,18 +82,14 @@ int* format_return;
     }
 }
 
-void urlToggleSelection(widget, dvi) Widget widget;
-DocViewInfo* dvi;
-{
+void urlToggleSelection(Widget widget, DocViewInfo* dvi) {
     if (selectionOwner == dvi)
         urlGiveUpSelection(widget);
     else
         urlGetSelection(widget, dvi);
 }
 
-void urlGetSelection(widget, dvi) Widget widget;
-DocViewInfo* dvi;
-{
+void urlGetSelection(Widget widget, DocViewInfo* dvi) {
     Pixel p;
 
     XtVaGetValues(widget, XmNforeground, &p, NULL);
@@ -107,8 +101,7 @@ DocViewInfo* dvi;
     selectionOwner = dvi;
 }
 
-void urlGiveUpSelection(widget) Widget widget;
-{
+void urlGiveUpSelection(Widget widget) {
     XtDisownSelection(widget, XA_PRIMARY, CurrentTime);
     selectionOwner = NULL;
 }

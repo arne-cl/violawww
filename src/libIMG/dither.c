@@ -39,10 +39,7 @@ static void RightToLeft();
  * simple floyd-steinberg dither with serpentine raster processing
  */
 
-Image* dither(cimage, verbose)
-Image* cimage;
-unsigned int verbose;
-{
+Image* dither(Image* cimage, unsigned int verbose) {
     Image* image;       /* destination image */
     unsigned int* grey; /* grey map for source image */
     unsigned int spl;   /* source pixel length in bytes */
@@ -169,10 +166,7 @@ unsigned int verbose;
     return (image);
 }
 
-Image* approx(cimage, verbose)
-Image* cimage;
-unsigned int verbose;
-{
+Image* approx(Image* cimage, unsigned int verbose) {
     Image* image;       /* destination image */
     unsigned int* grey; /* grey map for source image */
     unsigned int spl;   /* source pixel length in bytes */
@@ -318,9 +312,7 @@ unsigned int verbose;
  *
  * this should help things look a bit better on most displays.
  */
-static unsigned int tone_scale_adjust(val)
-unsigned int val;
-{
+static unsigned int tone_scale_adjust(unsigned int val) {
     unsigned int rslt;
 
     if (val < Threshold)

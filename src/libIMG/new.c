@@ -56,9 +56,7 @@ unsigned long DepthToColorsTable[] = {
     /* 32 */ 2147483648 /* bigger than unsigned int; this is good enough */
 };
 
-unsigned long colorsToDepth(ncolors)
-unsigned long ncolors;
-{
+unsigned long colorsToDepth(unsigned long ncolors) {
     unsigned long a;
 
     for (a = 0; (a < 32) && (DepthToColorsTable[a] < ncolors); a++)
@@ -67,9 +65,7 @@ unsigned long ncolors;
     return (a);
 }
 
-char* dupString(s)
-char* s;
-{
+char* dupString(char* s) {
     char* d;
 
     if (!s)
@@ -175,9 +171,7 @@ void freeImage(image) Image* image;
     lfree((byte*)image);
 }
 
-byte* lmalloc(size)
-unsigned int size;
-{
+byte* lmalloc(unsigned int size) {
     byte* area;
 
     if (size == 0) {
@@ -192,9 +186,7 @@ unsigned int size;
     return (area);
 }
 
-byte* lcalloc(size)
-unsigned int size;
-{
+byte* lcalloc(unsigned int size) {
     byte* area;
 
     if (size == 0) {

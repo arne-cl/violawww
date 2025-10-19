@@ -1069,7 +1069,7 @@ int* pc;
     return 0;
 }
 
-void printPCode(union PCode* pcode, int* pc, int size) {
+void printPCode(union PCode* pcode, int* pc, long size) {
     int code, data;
 
     while (*pc < size) {
@@ -1133,7 +1133,7 @@ void printPCode(union PCode* pcode, int* pc, int size) {
 
             case CODE_PUSH_REFPS: {
                 int i, n;
-                n = pcode[*pc].i;
+                n = (int)pcode[*pc].i;
                 fprintf(stderr, "%d\tcount=%d\n", *pc, n);
                 (*pc)++;
                 while (n--) {

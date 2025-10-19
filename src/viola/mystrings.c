@@ -177,7 +177,7 @@ char* cutOffWord;
     int cutOffWordLen = strlen(cutOffWord);
     extern int hush;
 
-    while (c = str[ci]) {
+    while ((c = str[ci])) {
         if (parenLevel == 0 && quoteToggle == 0)
             if (c == cutOffWord[cuti]) {
                 ++cuti;
@@ -380,7 +380,7 @@ char sc;
     char c;
     int i = 0;
 
-    while (c = str[i]) {
+    while ((c = str[i])) {
         if (c == sc)
             return i;
         i++;
@@ -497,11 +497,13 @@ int strToVal(str)
 char* str;
 {
     int i, j = 1, val = 0, negate = 1;
+    size_t len;
 
     if (str == NULL)
         return 0;
 
-    for (i = (int)strlen(str) - 1; i >= 0; i--) {
+    len = strlen(str);
+    for (i = (int)len - 1; i >= 0; i--) {
         /* fprintf(stderr, "%d %d %d %d\n",(*(str+i)-'0'), val,*(str+i),j);*/
         if (*(str + i) == '-')
             negate *= -1;
@@ -613,7 +615,7 @@ char sc;
     char c;
     int i = 0, j = 0;
 
-    while (c = str[i]) {
+    while ((c = str[i])) {
         if (c == sc)
             j++;
         i++;
@@ -876,6 +878,7 @@ char* deBracket(char* list) {
     } else {
         int i;
         char c;
+        size_t len;
 
         for (i = 0; c = list[i]; i++) {
             if (c == '{') {
@@ -883,7 +886,8 @@ char* deBracket(char* list) {
                 break;
             }
         }
-        for (i = (int)strlen(list); i >= 0; i--) {
+        len = strlen(list);
+        for (i = (int)len; i >= 0; i--) {
             if (list[i] == '}') {
                 list[i] = '\0';
                 break;

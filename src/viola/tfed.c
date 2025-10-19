@@ -266,9 +266,9 @@ char* text;
         tf->csr_px_sticky = tf->csr_px = 0;
         tf->csr_py = tf->yUL;
 
-        tf->align = GET__paneConfig(self);
+        tf->align = (int)GET__paneConfig(self);
     }
-    tf->wrap = GET_wrap(self);
+    tf->wrap = (int)GET_wrap(self);
 
     tfed_updateTFStruct(self, text);
 
@@ -290,7 +290,7 @@ VObj* self;
 char* text;
 {
     TFStruct* tf = updateEStrUser(self);
-    int fontID = GET__font(self);
+    int fontID = (int)GET__font(self);
     int newWidth, newHeight;
     int geometryChanged = 0;
     TFLineNode* currentp;
@@ -305,10 +305,10 @@ char* text;
     /* to allow space between border and characters */
     tf->xUL = PXX;
     tf->yUL = PYY;
-    tf->xLR = GET_width(self) - 2;
-    tf->yLR = GET_height(self) - 2;
-    newWidth = GET_width(self) - 4;
-    newHeight = GET_height(self) - 4;
+    tf->xLR = (int)GET_width(self) - 2;
+    tf->yLR = (int)GET_height(self) - 2;
+    newWidth = (int)GET_width(self) - 4;
+    newHeight = (int)GET_height(self) - 4;
 
     if ((newWidth != tf->width) || (newHeight != tf->height)) {
         tf->width = newWidth;
@@ -318,8 +318,8 @@ char* text;
         geometryChanged = 1;
     }
 
-    tf->wrap = GET_wrap(self);
-    tf->w = GET_window(self);
+    tf->wrap = (int)GET_wrap(self);
+    tf->w = (Window)GET_window(self);
     tf->fontID = fontID;
     tf->currentFontID = fontID;
 
@@ -359,8 +359,8 @@ char* text;
 
         buildInfo.px = 0;
         buildInfo.makeLinep = 1;
-        buildInfo.verbatim = GET_verbatim(self);
-        buildInfo.format = GET_format(self);
+        buildInfo.verbatim = (int)GET_verbatim(self);
+        buildInfo.format = (int)GET_format(self);
         buildInfo.vspan = 0;
         buildInfo.pics = 0;
 
@@ -417,7 +417,8 @@ VObj *orig, *clone;
     TFLineNode *prevp, *currentp, *newLN;
     TFChar* newChs;
     char* cp;
-    int i, sz;
+    int i;
+    size_t sz;
     TFStruct* origtf = GET__TFStruct(orig);
     TagInfo *ti, *cti;
 
@@ -1833,7 +1834,7 @@ char* strBuff;
     else
         tfcArray = tf->currentp->linep;
 
-    while (tfcp = &(tfcArray[i++])) {
+    while ((tfcp = &(tfcArray[i++]))) {
         if (!TFCChar(tfcp))
             break;
         strBuff[j++] = TFCChar(tfcp);
@@ -1863,7 +1864,7 @@ char* strBuff;
         if (!isalpha(TFCChar(tfcp)))
             break;
     }
-    while (tfcp = &(tfcArray[++i])) {
+    while ((tfcp = &(tfcArray[++i]))) {
         if (!isalpha(TFCChar(tfcp)))
             break;
         else if (TFCChar(tfcp) == '\0')
@@ -2093,7 +2094,7 @@ int destLine;
             TFStruct *tf = updateEStrUser(self);
             int i = 0;
             Window w = GET_window(self);
-            int fontID = GET__font(self);
+            int fontID = (int)GET__font(self);
 
             if (tf) i = jumpLine(tf, w, fontID, destLine);
             return i;

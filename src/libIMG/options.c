@@ -409,9 +409,7 @@ size of the image, values greater than 100 will enlarge it.  See also\n\
     },
     {NULL, 0, NULL, NULL}};
 
-OptionId optionNumber(arg)
-char* arg;
-{
+OptionId optionNumber(char* arg) {
     int a, b;
 
     if ((*arg) != '-')
@@ -443,9 +441,7 @@ static void listOptions() {
     }
 }
 
-static int helpOnOption(option)
-char* option;
-{
+static int helpOnOption(char* option) {
     int a, foundone;
 
     if (*option == '-')

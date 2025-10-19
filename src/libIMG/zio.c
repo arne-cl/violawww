@@ -52,16 +52,16 @@ int len;
                     /* if the reader told us to stop caching, just do the read.
                      */
 
-                    if (zf->nocache)
-                        return (fread(zf->dataptr->buf, 1, BUFSIZ, zf->stream));
+                if (zf->nocache)
+                    return (int)fread(zf->dataptr->buf, 1, BUFSIZ, zf->stream);
                     zf->data = zf->dataptr = (struct cache*)lmalloc(sizeof(struct cache));
                 } else {
                     zf->dataptr->next = (struct cache*)lmalloc(sizeof(struct cache));
                     zf->dataptr = zf->dataptr->next;
                 }
-                zf->dataptr->next = NULL;
-                zf->dataptr->len = fread(zf->dataptr->buf, 1, BUFSIZ, zf->stream);
-                if (zf->dataptr->len < 0) {
+            zf->dataptr->next = NULL;
+            zf->dataptr->len = (int)fread(zf->dataptr->buf, 1, BUFSIZ, zf->stream);
+            if (zf->dataptr->len < 0) {
                     perror("fread");
                     exit(1);
                 }
@@ -84,8 +84,7 @@ int len;
 /* reset a read cache
  */
 
-void zreset(filename) char* filename;
-{
+void zreset(char* filename) {
     int a;
     struct cache* old;
 
@@ -137,9 +136,7 @@ void zreset(filename) char* filename;
     }
 }
 
-ZFILE* zopen(name)
-char* name;
-{
+ZFILE* zopen(char* name) {
     int a;
     ZFILE* zf;
     char buf[BUFSIZ];
@@ -234,17 +231,11 @@ char* name;
     return (zf);
 }
 
-int zread(zf, buf, len)
-ZFILE* zf;
-byte* buf;
-unsigned int len;
-{
+int zread(ZFILE* zf, byte* buf, int len) {
     return (doRead(zf, buf, len));
 }
 
-int zgetc(zf)
-ZFILE* zf;
-{
+int zgetc(ZFILE* zf) {
     unsigned char c;
 
     if (doRead(zf, &c, 1) > 0)
@@ -253,11 +244,7 @@ ZFILE* zf;
         return (EOF);
 }
 
-char* zgets(buf, size, zf)
-byte* buf;
-unsigned int size;
-ZFILE* zf;
-{
+char* zgets(byte* buf, unsigned int size, ZFILE* zf) {
     int p = 0;
 
     while (doRead(zf, buf + p, 1) > 0) {
@@ -276,8 +263,7 @@ ZFILE* zf;
  * need to re-open it
  */
 
-void znocache(zf) ZFILE* zf;
-{
+void znocache(ZFILE* zf) {
     zf->nocache = 1;
 }
 
@@ -285,8 +271,7 @@ void znocache(zf) ZFILE* zf;
  * zreset() is called with the filename.
  */
 
-void zclose(zf) ZFILE* zf;
-{
+void zclose(ZFILE* zf) {
     zf->dataptr = zf->data;
     zf->bufptr = 0;
 }

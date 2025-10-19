@@ -27,6 +27,6 @@
 #define CANCELED 0
 #define SAVED 1
 
-int vwSaveAs();
+int vwSaveAs(char* message, DocViewInfo* dvi);
 
-#endif _FILE_IO_H_
+#endif /* _FILE_IO_H_ */

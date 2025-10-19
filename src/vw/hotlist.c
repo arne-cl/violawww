@@ -45,21 +45,18 @@
 
 Packet pk;
 
-void setBusyCursor_history(dvi) DocViewInfo* dvi;
-{
+void setBusyCursor_history(DocViewInfo* dvi) {
     XDefineCursor(XtDisplay((dvi)->hotlistListWidget), XtWindow((dvi)->hotlistListWidget),
                   busyCursor);
     setBusyCursor(dvi);
 }
 
-void setIdleCursor_history(dvi) DocViewInfo* dvi;
-{
+void setIdleCursor_history(DocViewInfo* dvi) {
     XUndefineCursor(XtDisplay((dvi)->hotlistListWidget), XtWindow((dvi)->hotlistListWidget));
     setIdleCursor(dvi);
 }
 
-void printHotlistList(dvi) DocViewInfo* dvi;
-{
+void printHotlistList(DocViewInfo* dvi) {
     int i;
     /*
         fprintf(stderr, "\nHotlist List (%d items, %d = current):\n",
@@ -71,8 +68,7 @@ void printHotlistList(dvi) DocViewInfo* dvi;
     */
 }
 
-void hotlistPrev(dvi) DocViewInfo* dvi;
-{
+void hotlistPrev(DocViewInfo* dvi) {
     /*
             dvi->currentHotlistItem--;
             if (dvi->hotlistListWidget) {
@@ -84,8 +80,7 @@ void hotlistPrev(dvi) DocViewInfo* dvi;
     */
 }
 
-void hotlistNext(dvi) DocViewInfo* dvi;
-{
+void hotlistNext(DocViewInfo* dvi) {
     /*
             dvi->currentHotlistItem++;
             if (dvi->hotlistListWidget) {
@@ -97,8 +92,7 @@ void hotlistNext(dvi) DocViewInfo* dvi;
     */
 }
 
-void hotlistBackUp(dvi) DocViewInfo* dvi;
-{
+void hotlistBackUp(DocViewInfo* dvi) {
     int end, i;
     /*
         if (dvi->currentHotlistItem == 0) {
@@ -125,9 +119,7 @@ void hotlistBackUp(dvi) DocViewInfo* dvi;
     /*printHotlistList(dvi);*/
 }
 
-void hotlistAdd(dvi, newItem) DocViewInfo* dvi;
-char* newItem;
-{
+void hotlistAdd(DocViewInfo* dvi, char* newItem) {
     int i, nitems;
     XmString itemXMS;
 
@@ -146,9 +138,7 @@ char* newItem;
     }
 }
 
-void hotlistSelect(dvi, url) DocViewInfo* dvi;
-char* url;
-{
+void hotlistSelect(DocViewInfo* dvi, char* url) {
     /*printHotlistList(dvi);*/
     /*
         int i, nitems=dvi->nHotlistItems;
@@ -199,17 +189,14 @@ int numItems;
 #endif
 }
 
-void freeHotlistList(dvi) DocViewInfo* dvi;
-{
+void freeHotlistList(DocViewInfo* dvi) {
     int i;
 
     dvi->hotlistSize = 0;
     dvi->nHotlistItems = 0;
 }
 
-Widget createHotlistDialog(dvi)
-DocViewInfo* dvi;
-{
+Widget createHotlistDialog(DocViewInfo* dvi) {
     Widget dlog, form, list, doneButton;
     Widget actionForm, addButton, deleteButton, gotoButton, editButton;
     Arg args[16];
@@ -339,8 +326,7 @@ XtPointer clientData, callData;
     addToHotlist(dvi);
 }
 
-void addToHotlist(dvi) DocViewInfo* dvi;
-{
+void addToHotlist(DocViewInfo* dvi) {
     if (dvi->violaDocViewObj) {
         setBusyCursor_history(dvi);
         clearPacket(&pk);
@@ -364,8 +350,7 @@ XtPointer clientData, callData;
         XtPopup(dvi->hotlistDlog, XtGrabNone);
 }
 
-void showHotlist(dvi) DocViewInfo* dvi;
-{
+void showHotlist(DocViewInfo* dvi) {
     /*
         if (!dvi->hotlistDlog)
             dvi->hotlistDlog = createHotlistDialog(dvi);

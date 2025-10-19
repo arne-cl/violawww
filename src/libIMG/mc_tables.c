@@ -7,9 +7,7 @@
  *   return a string describing the sensor source.
  *
  */
-char* mc_sensor(sscode)
-int sscode;
-{
+char* mc_sensor(int sscode) {
     switch (sscode) {
     case 0:
         return ("Non-Image Derived Data");

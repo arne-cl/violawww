@@ -13,9 +13,7 @@ char* mc_sensor();
 /*
  * convert from little endian to big endian four byte object
  */
-static unsigned long vhtonl(lend)
-unsigned long lend;
-{
+static unsigned long vhtonl(unsigned long lend) {
     unsigned long bend;
     unsigned char *lp, *bp;
 

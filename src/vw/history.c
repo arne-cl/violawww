@@ -33,8 +33,7 @@
 #include "history.h"
 #include "vw.h"
 
-void printHistoryList(dvi) DocViewInfo* dvi;
-{
+void printHistoryList(DocViewInfo* dvi) {
     int i;
 
     fprintf(stderr, "\nHistory List (%d items, %d = current):\n", dvi->nHistoryItems,
@@ -45,8 +44,7 @@ void printHistoryList(dvi) DocViewInfo* dvi;
     fprintf(stderr, "\n");
 }
 
-void historyPrev(dvi) DocViewInfo* dvi;
-{
+void historyPrev(DocViewInfo* dvi) {
     dvi->currentHistoryItem--;
     if (dvi->historyListWidget) {
         XmListDeselectAllItems(dvi->historyListWidget);
@@ -54,8 +52,7 @@ void historyPrev(dvi) DocViewInfo* dvi;
     }
 }
 
-void historyNext(dvi) DocViewInfo* dvi;
-{
+void historyNext(DocViewInfo* dvi) {
     dvi->currentHistoryItem++;
     if (dvi->historyListWidget) {
         XmListDeselectAllItems(dvi->historyListWidget);
@@ -63,8 +60,7 @@ void historyNext(dvi) DocViewInfo* dvi;
     }
 }
 
-void historyBackUp(dvi) DocViewInfo* dvi;
-{
+void historyBackUp(DocViewInfo* dvi) {
     int end, i;
 
     if (dvi->currentHistoryItem == 0) {
@@ -88,9 +84,7 @@ void historyBackUp(dvi) DocViewInfo* dvi;
     /*printHistoryList(dvi);*/
 }
 
-void historyAdd(dvi, newItem) DocViewInfo* dvi;
-char* newItem;
-{
+void historyAdd(DocViewInfo* dvi, char* newItem) {
     int i, nitems;
     char** tmpList;
     XmString itemXMS;
@@ -115,9 +109,7 @@ char* newItem;
     }
 }
 
-void historySelect(dvi, url) DocViewInfo* dvi;
-char* url;
-{
+void historySelect(DocViewInfo* dvi, char* url) {
     /*printHistoryList(dvi);*/
     /*
         int i, nitems=dvi->nHistoryItems;
@@ -134,10 +126,7 @@ char* url;
     */
 }
 
-void setHistoryList(dvi, newList, numItems) DocViewInfo* dvi;
-char* newList[];
-int numItems;
-{
+void setHistoryList(DocViewInfo* dvi, char* newList[], int numItems) {
     int i;
     XmStringTable listItems = NULL;
 
@@ -166,8 +155,7 @@ int numItems;
     }
 }
 
-void freeHistoryList(dvi) DocViewInfo* dvi;
-{
+void freeHistoryList(DocViewInfo* dvi) {
     int i;
 
     for (i = 0; i < dvi->nHistoryItems; i++)
@@ -180,8 +168,7 @@ void freeHistoryList(dvi) DocViewInfo* dvi;
     dvi->historySize = 0;
 }
 
-void growHistoryList(dvi) DocViewInfo* dvi;
-{
+void growHistoryList(DocViewInfo* dvi) {
     int i;
     char** newList = (char**)malloc((dvi->historySize + HISTORY_CHUNK) * sizeof(char*));
     dvi->historySize += HISTORY_CHUNK;
@@ -193,9 +180,7 @@ void growHistoryList(dvi) DocViewInfo* dvi;
     dvi->historyList = newList;
 }
 
-Widget createHistoryDialog(dvi)
-DocViewInfo* dvi;
-{
+Widget createHistoryDialog(DocViewInfo* dvi) {
     Widget dlog, form, list, doneButton, label1, label2, labelForm;
     Arg args[16];
     int n = 0, i;
@@ -211,7 +196,7 @@ DocViewInfo* dvi;
     XtSetArg(args[n], XmNautoUnmanage, FALSE);
     n++;
 
-    form = XmCreateFormDialog(dvi->shell, "History Manager", args, n);
+    form = XmCreateFormDialog(dvi->shell, "History Manager", args, (Cardinal)n);
     XtVaSetValues(form, XmNhorizontalSpacing, 6, XmNverticalSpacing, 6, NULL);
 
     labelForm = XtVaCreateManagedWidget(
@@ -291,9 +276,7 @@ DocViewInfo* dvi;
     return (XtParent(form));
 }
 
-void historySelectCB(list, clientData, callData) Widget list;
-XtPointer clientData, callData;
-{
+void historySelectCB(Widget list, XtPointer clientData, XtPointer callData) {
     DocViewInfo* dvi = (DocViewInfo*)clientData;
     XmListCallbackStruct* cbs = (XmListCallbackStruct*)callData;
 
@@ -308,9 +291,7 @@ XtPointer clientData, callData;
     }
 }
 
-void showHistoryCB(widget, clientData, callData) Widget widget;
-XtPointer clientData, callData;
-{
+void showHistoryCB(Widget widget, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
@@ -320,50 +301,35 @@ XtPointer clientData, callData;
         XtPopup(dvi->historyDlog, XtGrabNone);
 }
 
-void showHistory(dvi) DocViewInfo* dvi;
-{
+void showHistory(DocViewInfo* dvi) {
     if (!dvi->historyDlog)
         dvi->historyDlog = createHistoryDialog(dvi);
     else
         XtPopup(dvi->historyDlog, XtGrabNone);
 }
 
-void hideHistory(button, clientData, callData) Widget button;
-XtPointer clientData, callData;
-{
+void hideHistory(Widget button, XtPointer clientData, XtPointer callData) {
     DocViewInfo* dvi = (DocViewInfo*)clientData;
 
     XtPopdown(dvi->historyDlog);
 }
 
-void historyBackUpMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void historyBackUpMH(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvip = (DocViewInfo*)clientData;
     historyBackUp(dvip);
 }
 
-void historyPrevMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void historyPrevMH(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvip = (DocViewInfo*)clientData;
     historyPrev(dvip);
 }
 
-void historyNextMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void historyNextMH(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvip = (DocViewInfo*)clientData;
     historyNext(dvip);
 }
 
-void historyAddMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void historyAddMH(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvip = (DocViewInfo*)clientData;
 
     if (argc < 3)
@@ -380,10 +346,7 @@ void* clientData;
  * arg[1] = cloneID
  * arg[2] - arg[argc-1] = list items
  */
-void setHistoryListMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void setHistoryListMH(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvip = (DocViewInfo*)clientData;
 
     if (argc < 3)

@@ -28,24 +28,13 @@ typedef struct VMsgHandlerStruct {
 /*
  * Registers a message handler that responds to the message named in msgName.
  */
-void ViolaRegisterMessageHandler(/*
-void ViolaRegisterMesssageHandler(/*
-			          char *msgName,
-			          VMsgHandler msgHandler,
-				  void *clientData,
-				  long handlerID
-			          */);
+void ViolaRegisterMessageHandler(char *msgName, VMsgHandler msgHandler, void *clientData);
 
 /*
  * Deletes the message handler named by msgName and linked to the function
  * msgHandler.
  */
-void ViolaDeleteMessageHandler(/*
-			       char *msgName,
-			       VMsgHandler msgHandler,
-			       void *clientData,
-			       long handlerID
-			       */);
+void ViolaDeleteMessageHandler(char *msgName, VMsgHandler msgHandler, void *clientData);
 
 /*
  * Looks up and invokes all message handlers registered to the message
@@ -57,4 +46,4 @@ void ViolaInvokeMessageHandler(/*
 			       long handlerID
 			       */);
 
-#endif _MSGHANDLER_H_
+#endif /* _MSGHANDLER_H_ */

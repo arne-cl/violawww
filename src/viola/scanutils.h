@@ -1,4 +1,4 @@
-long getIdent();
+long getIdent(char* identStr);
 long tokenize(char* identStr);
 void set_parsing_string(char* s);
 /*HashEntry *_getIdent_entry;*/

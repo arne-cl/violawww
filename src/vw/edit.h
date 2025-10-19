@@ -18,23 +18,23 @@
 #ifndef _EDIT_H_
 #define _EDIT_H_
 
-void showSourceCB();
-void showSourceStringMH();
-void showSourceFileMH();
-void showSourceEditor();
-void editorValueChangedCB();
-void closeSourceEditor();
-void saveSource();
-void saveAsSource();
-void reloadSource();
-void uploadSource();
+void showSourceCB(Widget button, XtPointer clientData, XtPointer callData);
+void showSourceStringMH(char* arg[], int argc, void* clientData);
+void showSourceFileMH(char* arg[], int argc, void* clientData);
+void showSourceEditor(DocViewInfo* parentDVI, char* data, int editable);
+void editorValueChangedCB(Widget textEditor, XtPointer clientData, XtPointer callData);
+void closeSourceEditor(Widget button, XtPointer clientData, XtPointer callData);
+void saveSource(Widget button, XtPointer clientData, XtPointer callData);
+void saveAsSource(Widget button, XtPointer clientData, XtPointer callData);
+void reloadSource(Widget button, XtPointer clientData, XtPointer callData);
+void uploadSource(Widget button, XtPointer clientData, XtPointer callData);
 
-char* readFile();
-int writeFile();
+char* readFile(char* fileName, DocViewInfo* dvi);
+int writeFile(char* textData, char* fileName, DocViewInfo* dvi);
 
 #include <stdio.h>
 #ifndef SEEK_END
 #define SEEK_END 2L
 #endif
 
-#endif _EDIT_H_
+#endif /* _EDIT_H_ */

@@ -20,12 +20,12 @@
 
 #include "vw.h"
 
-void showMailEditor();
+void showMailEditor(Widget widget, XtPointer clientData, XtPointer callData);
 
-void sendMailCB();
-void mailLoadFileCB();
-void mailSaveAsCB();
-void mailValueChangedCB();
-void closeMailEditorCB();
+void sendMailCB(Widget button, XtPointer clientData, XtPointer callData);
+void mailLoadFileCB(Widget button, XtPointer clientData, XtPointer callData);
+void mailSaveAsCB(Widget button, XtPointer clientData, XtPointer callData);
+void mailValueChangedCB(Widget textEditor, XtPointer clientData, XtPointer callData);
+void closeMailEditorCB(Widget button, XtPointer clientData, XtPointer callData);
 
-#endif _MAIL_H_
+#endif /* _MAIL_H_ */

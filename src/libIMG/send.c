@@ -15,10 +15,7 @@
 
 static int GotError;
 
-static int pixmapErrorTrap(disp, pErrorEvent)
-Display* disp;
-XErrorEvent* pErrorEvent;
-{
+static int pixmapErrorTrap(Display* disp, XErrorEvent* pErrorEvent) {
 #define MAXERRORLEN 100
     char buf[MAXERRORLEN + 1];
     GotError = 1;

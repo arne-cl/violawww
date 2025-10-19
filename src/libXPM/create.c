@@ -410,10 +410,7 @@ static unsigned char Const _reverse_byte[0x100] = {
     0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7, 0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7,
     0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef, 0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff};
 
-static int _XReverse_Bytes(bpt, nb)
-unsigned char* bpt;
-int nb;
-{
+static int _XReverse_Bytes(unsigned char* bpt, int nb) {
     do {
         *bpt = _reverse_byte[*bpt];
         bpt++;
@@ -421,10 +418,7 @@ int nb;
     return 0;
 }
 
-int xpm_xynormalizeimagebits(bp, img)
-unsigned char* bp;
-XImage* img;
-{
+int xpm_xynormalizeimagebits(unsigned char* bp, XImage* img) {
     unsigned char c;
 
     if (img->byte_order != img->bitmap_bit_order) {
@@ -451,10 +445,7 @@ XImage* img;
     return 0;
 }
 
-int xpm_znormalizeimagebits(bp, img)
-unsigned char* bp;
-XImage* img;
-{
+int xpm_znormalizeimagebits(unsigned char* bp, XImage* img) {
     unsigned char c;
 
     switch (img->bits_per_pixel) {

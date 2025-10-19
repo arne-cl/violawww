@@ -46,8 +46,8 @@ extern int GBuffSize[];
 #define trimBackSpaces(str, strLength)                                                             \
     for (buffi = strLength; buffi >= 0 && ISSPACE(str[buffi]); str[buffi--] = '\0')
 
-int cmp_str();
-int cmp_int();
+int cmp_str(char* s1, char* s2);
+int cmp_int(int n1, int n2);
 
 char* trimFrontSpaces(char* str);
 
@@ -61,8 +61,8 @@ void SkipBlanks(char* linep, int* i);
 /*
  * case insensitive strcmp
  */
-int noCaseCharCmp();
-int noCaseStrCmp();
+int noCaseCharCmp(char c1, char c2);
+int noCaseStrCmp(char *s1, char *s2);
 
 /*
  ** Stores the next word in linep in *wordp. Current postion in line is
@@ -73,7 +73,7 @@ int noCaseStrCmp();
  *               *wordp must be large enough to hold any argument in *linep.
  * PostCondition: *wordp contains an argument string from *linep.
  */
-int NextWord();
+int NextWord(char* linep, int i, char* wordp);
 
 /*
  ** Skips the next word linep in *wordp. Current postion in line is
@@ -84,12 +84,12 @@ int NextWord();
  *               *wordp must be large enough to hold any argument in *linep.
  * PostCondition: *wordp contains an argument string from *linep.
  */
-int SkipNextWord();
+int SkipNextWord(char* linep, int i);
 
 /*
  * copys the next phrase, before cutOffWord, onto destStr.
  */
-int GetNextPhrase();
+int GetNextPhrase(char* str, int i, char* destStr, char* cutOffWord);
 
 char* NextLines(char** textpp, int* lines, int* size);
 
@@ -109,7 +109,7 @@ char* GetLine(char* commandline);
  *
  * PreCondition: inline must end with a zero.
  */
-int AllBlank();
+int AllBlank(char* str);
 
 /*
  ** Searches a char is within a string.
@@ -118,7 +118,7 @@ int AllBlank();
  *         -1 if search character is not in the string.
  * PRECONDITION: str must end with null.
  */
-int SearchChar();
+int SearchChar(char* str, char sc);
 
 /*
  ** Cut the trailing spaces.  ie. move the '\0' toward the front,
@@ -127,10 +127,10 @@ int SearchChar();
  * PRECONDITION: str must end with null.
  * RETURN: Number of spaces cut.
  */
-int CutTailSpace();
+int CutTailSpace(char* str);
 
 /* convert a string to int number value */
-int strToVal();
+int strToVal(char* str);
 
 /* puts the int val in str form*/
 char* valToStr(long val, char* str);

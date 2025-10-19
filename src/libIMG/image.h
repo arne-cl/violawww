@@ -176,23 +176,19 @@ Image* smooth(); /* smooth.c */
  * (void)(thing= value) conversion used in the macros.
  */
 
-unsigned long doMemToVal(); /* value.c */
-unsigned long doValToMem();
-unsigned long doMemToValLSB();
-unsigned long doValToMemLSB();
-void flipBits();
+unsigned long doMemToVal(byte* p, unsigned int len); /* value.c */
+unsigned long doValToMem(unsigned long val, byte* p, unsigned int len);
+unsigned long doMemToValLSB(byte* p, unsigned int len);
+unsigned long doValToMemLSB(unsigned long val, byte* p, unsigned int len);
+void flipBits(byte* p, unsigned int len);
 
-ZFILE* zopen();
-int zread();
-void zreset();
-
-ZFILE* zopen(); /* zio.c */
-int zread();
-int zgetc();
-char* zgets();
-void zclose();
-void znocache();
-void zreset();
+ZFILE* zopen(char* name); /* zio.c */
+int zread(ZFILE* zf, byte* buf, int len);
+int zgetc(ZFILE* zf);
+char* zgets(byte* buf, unsigned int size, ZFILE* zf);
+void zclose(ZFILE* zf);
+void znocache(ZFILE* zf);
+void zreset(char* filename);
 
 Image* zoom(); /* zoom.c */
 

@@ -86,7 +86,7 @@ PUBLIC HTChildAnchor* HTAnchor_findChild ARGS2(HTParentAnchor*, parent, CONST ch
             printf("HTAnchor_findChild called with NULL parent.\n");
         return NULL;
     }
-    if (kids = parent->children) { /* parent has children : search them */
+    if ((kids = parent->children)) { /* parent has children : search them */
         if (tag && *tag) {         /* TBL */
             while (child = HTList_nextObject(kids)) {
                 if (equivalent(child->tag, tag)) { /* Case sensitive 920226 */

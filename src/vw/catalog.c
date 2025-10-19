@@ -92,9 +92,7 @@ static Menu catalogMenus[] = {
 
 /* ---- ROUTINES  ---------------------------------------------------- */
 
-int initCatalog(shell)
-Widget shell;
-{
+int initCatalog(Widget shell) {
     if (!defaultLinkIcon) {
         /*
          * Get the icons and make them.
@@ -106,25 +104,19 @@ Widget shell;
     }
 }
 
-Widget makeCatalogMenus(mainWin, helpLabel, catalog)
-Widget mainWin;
-Widget helpLabel;
-Catalog* catalog;
-{
+Widget makeCatalogMenus(Widget mainWin, Widget helpLabel, Catalog* catalog) {
     return (buildMenus(catalogMenus, catalogHelpMenuItems, mainWin, helpLabel, (void*)catalog));
 }
 
-readCatalog(catalogFile) char* catalogFile;
-{
+int readCatalog(char* catalogFile) {
+    return 0;
 }
 
-writeCatalog(catalogFile) char* catalogFile;
-{
+int writeCatalog(char* catalogFile) {
+    return 0;
 }
 
-void drawLink(canvas, link) Widget canvas;
-Link* link;
-{
+void drawLink(Widget canvas, Link* link) {
     XmFontList bogusFontList;
 
     if (!link)
@@ -137,9 +129,7 @@ Link* link;
                  (XRectangle*)NULL);
 }
 
-void drawFolder(canvas, folder) Widget canvas;
-Folder* folder;
-{
+void drawFolder(Widget canvas, Folder* folder) {
     XmFontList bogusFontList;
 
     if (!folder)
@@ -165,8 +155,7 @@ Folder* folder;
         break;                                                                                     \
     }
 
-void drawCatalog(catalog) Catalog* catalog;
-{
+void drawCatalog(Catalog* catalog) {
     int i;
     int nItems = catalog->currentFolder->nItems;
     Display* theDisplay = XtDisplay(catalog->canvas);
@@ -176,11 +165,7 @@ void drawCatalog(catalog) Catalog* catalog;
         drawItem(catalog->canvas, catalog->currentFolder->items[i]);
 }
 
-void catalogButtonDownEH(widget, clientData, event, cont) Widget widget;
-XtPointer clientData;
-XEvent* event;
-Boolean* cont;
-{
+void catalogButtonDownEH(Widget widget, XtPointer clientData, XEvent* event, Boolean* cont) {
     /*
      * If in an object:
      *    If shift-click:
@@ -350,9 +335,7 @@ XtPointer clientData, callData;
         }                                                                                          \
     }
 
-void forceDeleteLink(link, catalog) Link* link;
-Catalog* catalog;
-{
+void forceDeleteLink(Link* link, Catalog* catalog) {
     if (!link)
         return;
 
@@ -370,9 +353,7 @@ Catalog* catalog;
     /* folder and folderName are pointers to fields in pointer */
 }
 
-void forceDeleteFolder(folder, catalog) Folder* folder;
-Catalog* catalog;
-{
+void forceDeleteFolder(Folder* folder, Catalog* catalog) {
     if (folder) {
         int i;
         int nItems = folder->nItems;
@@ -396,9 +377,7 @@ Catalog* catalog;
     }
 }
 
-void deleteFolder(folder, catalog) Folder* folder;
-Catalog* catalog;
-{
+void deleteFolder(Folder* folder, Catalog* catalog) {
     int nItems = 0;
 
     if (folder->nItems) {
@@ -429,26 +408,18 @@ XtPointer clientData, callData;
     /* Look for all selected items and attempt to open them. */
 }
 
-void openItemSameWindow(item, catalog) Item* item;
-Catalog* catalog;
-{
+void openItemSameWindow(Item* item, Catalog* catalog) {
     /* Open the given item in the current catalog shell. */
 }
 
-void openItemNewWindow(item, catalog) Item* item;
-Catalog* catalog;
-{
+void openItemNewWindow(Item* item, Catalog* catalog) {
     /* Open the given item in a new catalog shell. */
 }
 
-void openFolder(folder, catalog) Folder* folder;
-Catalog* catalog;
-{
+void openFolder(Folder* folder, Catalog* catalog) {
 }
 
-void openLink(link, catalog) Link* link;
-Catalog* catalog;
-{
+void openLink(Link* link, Catalog* catalog) {
 }
 
 void createLink(widget, clientData, callData) Widget widget;
@@ -467,9 +438,7 @@ XtPointer clientData, callData;
 /*
  * Pops up a text editor with the given string data in it.
  */
-void showCatalog(catalogFile, parentDVI) char* catalogFile;
-DocViewInfo* parentDVI;
-{
+void showCatalog(char* catalogFile, DocViewInfo* parentDVI) {
     XmString xms;
     Catalog* catalog;
     Widget shell, mainWindow, form, helpLabel, titleFrame, folderNameLabel, folderNameText,

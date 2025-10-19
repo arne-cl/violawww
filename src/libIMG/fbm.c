@@ -59,9 +59,7 @@ static char* fbmin_img_credit; /* credit for image */
  * open FBM image in the input stream; returns FBMIN_SUCCESS if
  * successful. (might also return various FBMIN_ERR codes.)
  */
-static int fbmin_open_image(s)
-ZFILE* s;
-{
+static int fbmin_open_image(ZFILE* s) {
     char* hp; /* header pointer */
 
     /* make sure there isn't already a file open */

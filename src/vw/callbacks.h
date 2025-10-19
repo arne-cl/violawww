@@ -18,62 +18,65 @@
 #ifndef _CALLBACKS_H_
 #define _CALLBACKS_H_
 
-void genericCallback();
-void okCallback();
-void quitCallback();
-void quitOk();
-void openDocument();
-void searchCallback();
-void vwSaveAsCB();
-void saveAsMH();
-void printFile();
-void reloadDoc();
-void reloadDocCB();
-void oneMessageCB();
+/* Forward declaration */
+typedef struct DocViewInfoStruct DocViewInfo;
 
-void clonePage(); /* clone page for navigation */
-void clonePageMH();
-void clonePageCB();
-void pageCloneMapped();
-void showPageClone();
-void closePageCB();
-void closePageShell();
-void cloneApp(); /* clone app */
-void appCloneMapped();
-void showAppClone();
-void closeThisShell();
+void genericCallback(Widget thing, XtPointer clientData, XtPointer callData);
+void okCallback(Widget button, XtPointer clientData, XtPointer callData);
+void quitCallback(Widget widget, XtPointer client, XtPointer call);
+void quitOk(Widget widget, XtPointer clientData, XtPointer call);
+void openDocument(Widget widget, XtPointer clientD, XtPointer callData);
+void searchCallback(Widget textField, XtPointer clientData, XtPointer callData);
+void vwSaveAsCB(Widget button, XtPointer clientData, XtPointer callData);
+void saveAsMH(char* arg[], int argc, void* clientData);
+void printFile(Widget widget, XtPointer clientData, XtPointer callData);
+void reloadDoc(DocViewInfo* dvi);
+void reloadDocCB(Widget widget, XtPointer clientData, XtPointer callData);
+void oneMessageCB(Widget widget, XtPointer clientData, XtPointer callData);
 
-void flipGlobe();
-void showHelpMessage();
-void showHelpMessageInMainWindow();
-void helpHandler();
-void blankHelpHandler();
-void blankHelpMessageInMainWindow();
+void clonePage(DocViewInfo* parentDocViewInfo); /* clone page for navigation */
+void clonePageMH(char* arg[], int argc, void* clientData);
+void clonePageCB(Widget widget, XtPointer clientData, XtPointer callData);
+void pageCloneMapped(Widget canvas, XtPointer clientData, XEvent* event, Boolean* continueDispatch);
+void showPageClone(char* arg[], int argc, void* clientData);
+void closePageCB(Widget button, XtPointer clientData, XtPointer callData);
+void closePageShell(DocViewInfo* dvi);
+void cloneApp(Widget widget, XtPointer clientData, XtPointer callData); /* clone app */
+void appCloneMapped(Widget canvas, XtPointer clientData, XEvent* event, Boolean* continueDispatch);
+void showAppClone(char* arg[], int argc, void* clientData);
+void closeThisShell(Widget button, XtPointer clientData, XtPointer callData);
 
-void navigateBackUp();
-void navigateNext();
-void navigatePrev();
-void navigateHome();
-void navigateHomeEH();
+void flipGlobe(XtPointer clientData, XtIntervalId* intervalID);
+void showHelpMessage(Widget widget, char* message);
+void showHelpMessageInMainWindow(char* message);
+void helpHandler(Widget widget, XtPointer clientData, XEvent* event, Boolean* cont);
+void blankHelpHandler(Widget widget, XtPointer clientData, XEvent* event, Boolean* cont);
+void blankHelpMessageInMainWindow(void);
 
-void changeFonts();
+void navigateBackUp(Widget widget, XtPointer clientData, XtPointer callData);
+void navigateNext(Widget widget, XtPointer clientData, XtPointer callData);
+void navigatePrev(Widget widget, XtPointer clientData, XtPointer callData);
+void navigateHome(Widget widget, XtPointer clientData, XtPointer callData);
+void navigateHomeEH(Widget widget, XtPointer clientData, XEvent* event, Boolean* cont);
 
-void oneWordMessageCB();
+void changeFonts(Widget widget, XtPointer clientData, XtPointer callData);
 
-void titleButtonEH();
-void editorTitleButtonEH();
+void oneWordMessageCB(Widget widget, XtPointer clientData, XtPointer callData);
 
-void newDocument();
-void searchModeMH();
-void sliderConfig();
+void titleButtonEH(Widget w, XtPointer clientData, XEvent* evt, Boolean* cont);
+void editorTitleButtonEH(Widget w, XtPointer clientData, XEvent* evt, Boolean* cont);
 
-void doViolaEvent();
-void doViolaIdle();
-void resizeViola();
+void newDocument(char* arg[], int argc, void* clientData);
+void searchModeMH(char* arg[], int argc, void* clientData);
+void sliderConfig(char* arg[], int argc, void* clientData);
 
-void scrollBarValueChanged();
-void scrollBarDrag();
+void doViolaEvent(Widget widget, XtPointer clientData, XEvent* event, Boolean* continueDispatch);
+void doViolaIdle(XtPointer clientData);
+void resizeViola(Widget widget, XtPointer clientData, XEvent* event, Boolean* continueDispatch);
 
-void printTest();
+void scrollBarValueChanged(Widget sbar, XtPointer clientData, XtPointer callData);
+void scrollBarDrag(Widget sbar, XtPointer clientData, XtPointer callData);
 
-#endif _CALLBACKS_H_
+void printTest(void);
+
+#endif /* _CALLBACKS_H_ */

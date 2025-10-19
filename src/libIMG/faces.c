@@ -64,10 +64,7 @@ static void initHexTable() {
 /* read a hex value and return its value
  */
 
-static int nextInt(zf, len)
-ZFILE* zf;
-unsigned int len;
-{
+static int nextInt(ZFILE* zf, unsigned int len) {
     int c;
     int value = 0;
     int count;

@@ -2,7 +2,10 @@
 
 #include "hash.h"
 
+#ifndef VOBJ_DEFINED
+#define VOBJ_DEFINED
 typedef long VObj;
+#endif
 
 typedef struct ObjList {
     struct ObjList* next; /* must be the first item  (see vlist.h) */

@@ -46,4 +46,4 @@ void freeAllObjects();
 
 int exitingViola;
 
-#endif _VIOLA_OBJ_H_
+#endif /* _VIOLA_OBJ_H_ */

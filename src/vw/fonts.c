@@ -18,10 +18,7 @@
 
 #include <Xm/Xm.h>
 
-XFontStruct* loadFont(display, fontNames)
-Display* display;
-char** fontNames;
-{
+XFontStruct* loadFont(Display* display, char** fontNames) {
     int i = 0;
     XFontStruct* font;
 
@@ -114,9 +111,7 @@ char* subTitleFonts[] = {"*helvetica*medium*-r-*--14-*koi8*",
                          "*iso8859*",
                          NULL};
 
-XmFontList loadFonts(display)
-Display* display;
-{
+XmFontList loadFonts(Display* display) {
     XmFontList fl;
     XFontStruct* fp;
 

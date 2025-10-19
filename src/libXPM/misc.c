@@ -15,10 +15,7 @@
  * Free the computed color table
  */
 
-int xpmFreeColorTable(colorTable, ncolors)
-char*** colorTable;
-int ncolors;
-{
+int xpmFreeColorTable(char*** colorTable, int ncolors) {
     int a, b;
 
     if (colorTable) {
@@ -39,9 +36,7 @@ int ncolors;
  * which ones must be freed later on.
  */
 
-int xpmInitInternAttrib(attrib)
-xpmInternAttrib* attrib;
-{
+int xpmInitInternAttrib(xpmInternAttrib* attrib) {
     attrib->ncolors = 0;
     attrib->colorTable = NULL;
     attrib->pixelindex = NULL;
@@ -54,9 +49,7 @@ xpmInternAttrib* attrib;
  * Free the xpmInternAttrib pointers which have been allocated
  */
 
-int xpmFreeInternAttrib(attrib)
-xpmInternAttrib* attrib;
-{
+int xpmFreeInternAttrib(xpmInternAttrib* attrib) {
     unsigned int a;
 
     if (attrib->colorTable)
@@ -84,9 +77,7 @@ int XpmAttributesSize() { return sizeof(XpmAttributes); }
  * but the structure itself
  */
 
-int XpmFreeAttributes(attributes)
-XpmAttributes* attributes;
-{
+int XpmFreeAttributes(XpmAttributes* attributes) {
     if (attributes) {
         if (attributes->valuemask & XpmReturnPixels && attributes->pixels) {
             free(attributes->pixels);
@@ -125,10 +116,7 @@ XpmAttributes* attributes;
  * the xpmInternAttrib structure.
  */
 
-int xpmSetAttributes(attrib, attributes)
-xpmInternAttrib* attrib;
-XpmAttributes* attributes;
-{
+int xpmSetAttributes(xpmInternAttrib* attrib, XpmAttributes* attributes) {
     if (attributes) {
         if (attributes->valuemask & XpmReturnInfos) {
             attributes->cpp = attrib->cpp;

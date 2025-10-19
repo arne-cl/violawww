@@ -13,10 +13,7 @@
 #include "copyright.h"
 #include "image.h"
 
-unsigned long doMemToVal(p, len)
-byte* p;
-unsigned int len;
-{
+unsigned long doMemToVal(byte* p, unsigned int len) {
     unsigned int a;
     unsigned long i;
 
@@ -40,10 +37,7 @@ unsigned int len;
     return (val);
 }
 
-unsigned long doMemToValLSB(p, len)
-byte* p;
-unsigned int len;
-{
+unsigned long doMemToValLSB(byte* p, unsigned int len) {
     int val, a;
 
     val = 0;

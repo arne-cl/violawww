@@ -41,25 +41,25 @@ struct lentryDlogStruct {
 #define warningDialog(dvip, msg) messageDialog(dvip, msg, WARNING)
 #define errorDialog(dvip, msg) messageDialog(dvip, msg, ERROR)
 
-void messageDialog();
-void modalErrorDialog();
-char* promptDialog();
-char* questionDialog();
-char* fileSelectionDialog();
+void messageDialog(DocViewInfo* dvip, char* msg, int type);
+void modalErrorDialog(DocViewInfo* dvip, char* msg);
+char* promptDialog(DocViewInfo* dvip, char *msg, char *defaultString);
+char* questionDialog(DocViewInfo* dvip, char *question, char *defaultChoice, char *yesLabel, char *noLabel, char *cancelLabel);
+char* fileSelectionDialog(DocViewInfo* dvi, char *message, char *helpMsg);
 
-void infoDialogMH();
-void warningDialogMH();
-void modalErrorDialogMH();
-void errorDialogMH();
-void promptDialogMH();
-void questionDialogMH();
+void infoDialogMH(char* arg[], int argc, void* clientData);
+void warningDialogMH(char* arg[], int argc, void* clientData);
+void modalErrorDialogMH(char* arg[], int argc, void* clientData);
+void errorDialogMH(char* arg[], int argc, void* clientData);
+void promptDialogMH(char* arg[], int argc, void* clientData);
+void questionDialogMH(char* arg[], int argc, void* clientData);
 
-void printDialog();
-void openURLDialog();
-void simpleOpenURLDialog();
+void printDialog(DocViewInfo* dvi, char *data);
+void openURLDialog(Widget widget, XtPointer clientData, XtPointer callData);
+void simpleOpenURLDialog(Widget widget, XtPointer clientData, XtPointer callData);
 
-void openURLInSelectionBuffer();
+void openURLInSelectionBuffer(Widget widget, XtPointer clientData, XtPointer callData);
 
-char* openSimpleLineEntryDialog();
+char* openSimpleLineEntryDialog(DocViewInfo* dvi, char* title, char* defaultData, void (*okCB)());
 
-#endif _DIALOG_H_
+#endif /* _DIALOG_H_ */

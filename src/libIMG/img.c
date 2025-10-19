@@ -177,11 +177,7 @@ unsigned int verbose;
 **		5 if pattern length is too big ( > 255)
 */
 
-static int IMG_ReadHeader(zf, h)
-
-ZFILE* zf;
-IMG_Header* h;
-{
+static int IMG_ReadHeader(ZFILE* zf, IMG_Header* h) {
     int tlen;                               /* total to read in */
     int rlen;                               /* read lengths */
     unsigned char junkbuffer[MAX_SCANLINE]; /* scrap buffer */

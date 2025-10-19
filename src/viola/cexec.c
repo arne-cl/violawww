@@ -46,7 +46,7 @@ int total_usecs = 0;
 
 char tokenBuff[2];
 
-int i;
+long i;
 int j;
 Packet reg1;
 Packet reg2;
@@ -87,7 +87,7 @@ int callObjStackIdx = 0;
 
 long incrementExecStack(); /* forward declaration */
 
-int init_cexec() {
+long init_cexec() {
     nullPacket(&reg1);
     nullPacket(&reg2);
     return incrementExecStack();
@@ -366,7 +366,7 @@ void dumpVarList(varlist) Attr* varlist;
     int i = 0;
 
     for (attrp = varlist; attrp; attrp = attrp->next) {
-        printf("%d) id=%d=\"%s\", val=%d ", i, attrp->id,
+        printf("%d) id=%d=\"%s\", val=%ld ", i, attrp->id,
                (char*)symID2Str->get(symID2Str, attrp->id), attrp->val);
         packetp = (Packet*)attrp->val;
         if (packetp) {
@@ -374,7 +374,7 @@ void dumpVarList(varlist) Attr* varlist;
                 dumpPacket(packetp);
                 printf(":\n");
                 for (attrp2 = packetp->info.a; attrp2; attrp2 = attrp2->next) {
-                    printf("\tid=%d,", attrp2->id);
+                    printf("\tid=%ld,", (long)attrp2->id);
                     dumpPacket((Packet*)(attrp2->val));
                     printf(";\n");
                 }
@@ -392,16 +392,17 @@ void dumpVarList(varlist) Attr* varlist;
  * XXX reduce redundant code...
  */
 Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** varVectorp[]) {
-    int currBaseIdx = stackBaseIdx;
+    long currBaseIdx = stackBaseIdx;
     union PCode* pcode_start = pcode;
     extern char* PCodeStr[];
-    int data, code;
+    int data;
+    long code;
 
     while (pcode < pcode_end) {
 
         if (flag_printExec) {
-            fprintf(stderr, "pc=%d\tcurrBaseIdx=%d\tstackExecIdx=%d\tcode=%lx\n",
-                    pcode - pcode_start, currBaseIdx, stackExecIdx, (*pcode).x);
+            fprintf(stderr, "pc=%ld\tcurrBaseIdx=%ld\tstackExecIdx=%ld\tcode=%lx\n",
+                    (long)(pcode - pcode_start), currBaseIdx, stackExecIdx, (*pcode).x);
         }
 
         code = (*pcode++).x;
@@ -553,7 +554,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(packetp, &reg1);
                 }
                 if (func) {
-                    int save_stackExecIdx = stackExecIdx - 1;
+                    long save_stackExecIdx = stackExecIdx - 1;
 
                     clearPacket(&reg1);
 
@@ -576,8 +577,9 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                 continue;
 
             case CODE_CALL2 << 16: {
-                int save_stackExecIdx;
-                int funcid, argc;
+                long save_stackExecIdx;
+                long funcid;
+                int argc;
                 extern MHInfo allmhp;
                 CallObjStack* cs;
 
@@ -664,12 +666,11 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                 }
                 {
                     char fname[64], *oname;
-                    int length;
                     VObj* obj;
 
                     oname = (char*)symID2Str->get(symID2Str, funcid)->val;
                     strcpy(fname, oname);
-                    length = strlen(fname);
+                    size_t length = strlen(fname);
                     if (length >= 2) {
                         if (fname[length - 2] != '.' || fname[length - 1] != 'v')
                             strcat(fname, ".v");
@@ -721,7 +722,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                 continue;
 
             case CODE_CALL2_C << 16: {
-                int save_stackExecIdx;
+                long save_stackExecIdx;
                 long (*func)(), argc;
                 CallObjStack* cs;
 
@@ -1047,11 +1048,9 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                 /* PUSH_REFPS */
             case CODE_PUSH_REFPS: {
                 Attr* varlist;
-                int varID;
-                int varCount;
+                long varID,varCount;
                 Packet* vvp;
-                int vvi;
-                int varCount_TMP;
+                long vvi, varCount_TMP;
 
                 varCount = (*pcode++).i;
                 if (*varVectorp) {
@@ -2470,8 +2469,8 @@ Packet* packets;
 int packetc;
 {
     int i;
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2503,8 +2502,8 @@ int packetc;
 Packet* result;
 {
     int i;
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2533,8 +2532,8 @@ Packet* result;
 
 long sendMessageAndInts(VObj* self, char* messg, int* intArray, int intCount) {
     int i;
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2563,10 +2562,10 @@ long sendMessageAndInts(VObj* self, char* messg, int* intArray, int intCount) {
     return 1;
 }
 
-long sendTokenMessageAndInts(VObj* self, int tok, int* intArray, int intCount) {
+long sendTokenMessageAndInts(VObj* self, int tok, long* intArray, int intCount) {
     int i;
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2599,8 +2598,8 @@ VObj* self;
 int tok;
 Packet* result;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2630,8 +2629,8 @@ long sendTokenMessage(self, tok)
 VObj* self;
 int tok;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2656,8 +2655,8 @@ long sendMessage1(self, messg)
 VObj* self;
 char* messg;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2686,8 +2685,8 @@ VObj* self;
 char* messg;
 char* s1;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2715,8 +2714,8 @@ VObj* self;
 char* messg;
 char *s1, *s2;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2746,8 +2745,8 @@ VObj* self;
 char* messg;
 int a;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2776,8 +2775,8 @@ char* messg;
 int val;
 Packet* result;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2810,8 +2809,8 @@ VObj* self;
 int tok;
 int a;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2864,8 +2863,8 @@ long sendMessage1chr(self, c1)
 VObj* self;
 char c1;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2891,8 +2890,8 @@ VObj* self;
 char* messg;
 Packet* result;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2923,8 +2922,8 @@ VObj* self;
 char c1;
 Packet* result;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2955,8 +2954,8 @@ VObj* self;
 char *messg, *s1;
 Packet* result;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -2989,8 +2988,8 @@ VObj* self;
 char *messg, *s1, *s2;
 Packet* result;
 {
-    int save_stackExecIdx = stackExecIdx;
-    int save_stackBaseIdx = stackBaseIdx;
+    long save_stackExecIdx = stackExecIdx;
+    long save_stackBaseIdx = stackBaseIdx;
 
     CLEAR_REG1();
 
@@ -3022,7 +3021,7 @@ Packet* result;
 
 int getVariable(Attr* varlist, char* name, Packet* result) {
     HashEntry* entry;
-    int varid;
+    long varid;
     Packet* pk;
 
     /* note: if the identifier is not even in the dictionary, then no
@@ -3070,7 +3069,7 @@ int setVariable(Attr* varlist, char* name, char* valp) { return 0; }
 Attr* setVariable_STR(Attr* varlist, char* name, char* valp, int canFree) {
     Attr* head = varlist;
     HashEntry* entry;
-    int varid;
+    long varid;
     Packet* pk;
 
     if (entry = symStr2ID->get(symStr2ID, (long)name)) {

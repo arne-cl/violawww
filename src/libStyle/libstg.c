@@ -52,18 +52,18 @@ char stack_op = '\0';
 
 int (*stg_tagNameCmp)();
 int (*stg_tagName2ID)();
-int (*stg_tagID2Name)();
+char* (*stg_tagID2Name)();
 int (*stg_tagAttrNameCmp)();
 int (*stg_tagAttrName2ID)();
-int (*stg_tagAttrID2Name)();
+char* (*stg_tagAttrID2Name)();
 
 STGLib* STG_init(tagNameCmp_f, tagName2ID_f, tagID2Name_f, tagAttrNameCmp_f, tagAttrName2ID_f,
                  tagAttrID2Name_f) int (*tagNameCmp_f)();
 int (*tagName2ID_f)();
-int (*tagID2Name_f)();
+char* (*tagID2Name_f)();
 int (*tagAttrNameCmp_f)();
 int (*tagAttrName2ID_f)();
-int (*tagAttrID2Name_f)();
+char* (*tagAttrID2Name_f)();
 {
     STGLib* stgLib = (STGLib*)malloc(sizeof(struct STGLib));
     stgLib->first = NULL;
@@ -650,10 +650,7 @@ char* attrName;
     return NULL;
 }
 
-int freeGroup(lib, group)
-STGLib* lib;
-STGGroup** group;
-{
+int freeGroup(STGLib* lib, STGGroup** group) {
     STGGroup *gp, *lgp = NULL;
 
     if (!lib || !group || !*group)
@@ -674,9 +671,7 @@ STGGroup** group;
     return 0;
 }
 
-int freeLib(lib)
-STGLib* lib;
-{
+int freeLib(STGLib* lib) {
     lib = NULL; /*!!*/
     /* leak to be plugged up */
     return 0;

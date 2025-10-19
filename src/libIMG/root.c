@@ -87,10 +87,7 @@ Window w;
  * out of xsetroot with minor formatting changes.
  */
 
-static Window getWmRootWindow(dpy, root)
-Display* dpy;
-Window root;
-{
+static Window getWmRootWindow(Display* dpy, Window root) {
     Window parent;
     Window* child;
     unsigned int nchildren;
@@ -117,10 +114,7 @@ Window root;
     }
 }
 
-static Window getDECRootWindow(dpy, root)
-Display* dpy;
-Window root;
-{
+static Window getDECRootWindow(Display* dpy, Window root) {
     Window temporary_rootW;
 
     temporary_rootW = getWmRootWindow(dpy, root);

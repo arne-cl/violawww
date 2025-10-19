@@ -20,9 +20,7 @@ extern int _Xdebug;
 extern Display* Disp;
 extern int Scrn;
 
-static char* signalName(sig)
-int sig;
-{
+static char* signalName(int sig) {
     static char buf[32];
 
     switch (sig) {
@@ -103,9 +101,7 @@ Type `%s -help [option ...]' for information on a particular option, or\n\
     exit(1);
 }
 
-char* tail(path)
-char* path;
-{
+char* tail(char* path) {
     int s;
     char* t;
 
@@ -235,10 +231,7 @@ unsigned int verbose;
 /* simple error handler.  this provides us with some kind of error recovery.
  */
 
-int errorHandler(disp, error)
-Display* disp;
-XErrorEvent* error;
-{
+int errorHandler(Display* disp, XErrorEvent* error) {
     char errortext[BUFSIZ];
 
     XGetErrorText(disp, error->error_code, errortext, BUFSIZ);

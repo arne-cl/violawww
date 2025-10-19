@@ -110,7 +110,7 @@ typedef union ItemStruct {
 } CatalogItem;
 
 /* PROTOTYPES */
-void showCatalogCB();
-void closeCatalogCB();
+void showCatalogCB(Widget widget, XtPointer clientData, XtPointer callData);
+void closeCatalogCB(Widget widget, XtPointer clientData, XtPointer callData);
 
-#endif _CATALOG_H_
+#endif /* _CATALOG_H_ */

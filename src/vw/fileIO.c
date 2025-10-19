@@ -30,10 +30,7 @@
 #include "fileIO.h"
 #include "vw.h"
 
-int vwSaveAs(message, dvi)
-char* message;
-DocViewInfo* dvi;
-{
+int vwSaveAs(char* message, DocViewInfo* dvi) {
     FILE* fp;
     int done = 0;
     size_t length;

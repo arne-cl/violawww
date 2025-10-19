@@ -66,16 +66,16 @@ int type;
 
     switch (type) {
     case INFO:
-        dlog = XmCreateInformationDialog(dvip->shell, "Information", args, n);
+        dlog = XmCreateInformationDialog(dvip->shell, "Information", args, (Cardinal)n);
         break;
     case WARNING:
-        dlog = XmCreateWarningDialog(dvip->shell, "Warning", args, n);
+        dlog = XmCreateWarningDialog(dvip->shell, "Warning", args, (Cardinal)n);
         /*	XtVaSetValues(dlog, XmNdialogStyle,
                               XmDIALOG_PRIMARY_APPLICATION_MODAL, NULL);
         */
         break;
     case ERROR:
-        dlog = XmCreateErrorDialog(dvip->shell, "Error", args, n);
+        dlog = XmCreateErrorDialog(dvip->shell, "Error", args, (Cardinal)n);
         XtVaSetValues(dlog, XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL, NULL);
         break;
     default:
@@ -100,9 +100,7 @@ XtPointer clientData, callData;
     *donep = 1;
 }
 
-void modalErrorDialog(dvip, msg) DocViewInfo* dvip;
-char* msg;
-{
+void modalErrorDialog(DocViewInfo* dvip, char* msg) {
     Widget dlog, button;
     Arg args[8];
     int n = 0, done = 0;
@@ -123,7 +121,7 @@ char* msg;
     n++;
     XtSetArg(args[n], XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL);
     n++;
-    dlog = XmCreateErrorDialog(dvip->shell, "Error", args, n);
+    dlog = XmCreateErrorDialog(dvip->shell, "Error", args, (Cardinal)n);
 
     XmStringFree(msg_xms);
 
@@ -175,10 +173,7 @@ XtPointer clientData, callData;
     *(ps->done) = 1;
 }
 
-char* promptDialog(dvip, msg, defaultString)
-DocViewInfo* dvip;
-char *msg, *defaultString;
-{
+char* promptDialog(DocViewInfo* dvip, char *msg, char *defaultString) {
     Widget dlog, button, textField;
     Arg args[12];
     int n = 0, done = 0;
@@ -224,7 +219,7 @@ char *msg, *defaultString;
     n++;
     XtSetArg(args[n], XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL);
     n++;
-    dlog = XmCreatePromptDialog(dvip->shell, "Printing", args, n);
+    dlog = XmCreatePromptDialog(dvip->shell, "Printing", args, (Cardinal)n);
 
     textField = XmSelectionBoxGetChild(dlog, XmDIALOG_TEXT);
     XtVaSetValues(textField, XmNcolumns, 50, NULL);
@@ -279,10 +274,7 @@ XtPointer clientData, callData;
     *(ps->done) = 1;
 }
 
-char* questionDialog(dvip, question, defaultChoice, yesLabel, noLabel, cancelLabel)
-DocViewInfo* dvip;
-char *question, *defaultChoice, *yesLabel, *noLabel, *cancelLabel;
-{
+char* questionDialog(DocViewInfo* dvip, char *question, char *defaultChoice, char *yesLabel, char *noLabel, char *cancelLabel) {
     Widget dlog, button;
     Arg args[16];
     int n = 0, done = 0;
@@ -377,7 +369,7 @@ char *question, *defaultChoice, *yesLabel, *noLabel, *cancelLabel;
     n++;
     XtSetArg(args[n], XmNautoUnmanage, FALSE);
     n++;
-    dlog = XmCreateQuestionDialog(dvip->shell, "Question", args, n);
+    dlog = XmCreateQuestionDialog(dvip->shell, "Question", args, (Cardinal)n);
 
     XmStringFree(question_xms);
     XmStringFree(yesLabel_xms);
@@ -571,9 +563,7 @@ XtPointer clientData, callData;
     ps->result = NULL;
 }
 
-void printDialog(dvip, docName) DocViewInfo* dvip;
-char* docName;
-{
+void printDialog(DocViewInfo* dvip, char* docName) {
     Widget dlog, label, commandLabel, commandText, optionLabel, optionText, printButton,
         cancelButton, frame, form;
     Arg args[8];
@@ -596,7 +586,7 @@ char* docName;
     n++;
     XtSetArg(args[n], XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL);
     n++;
-    dlog = XmCreateFormDialog(dvip->shell, "Printing", args, n);
+    dlog = XmCreateFormDialog(dvip->shell, "Printing", args, (Cardinal)n);
 
     frame = XtVaCreateManagedWidget(
         "frame", xmFrameWidgetClass, dlog, XmNtopAttachment, XmATTACH_FORM, XmNbottomAttachment,
@@ -924,7 +914,7 @@ XtPointer clientData, callData;
     /*    XtSetArg(args[n], XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL);  n++;*/
     XtSetArg(args[n], XmNautoUnmanage, FALSE);
     n++;
-    form = XmCreateFormDialog(dvi->shell, "URL", args, n);
+    form = XmCreateFormDialog(dvi->shell, "URL", args, (Cardinal)n);
     uds->dlog = XtParent(form);
 
     labelStringXMS =
@@ -1082,7 +1072,7 @@ XtPointer clientData, callData;
     /*XtSetArg(args[n], XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL);  n++;*/
     XtSetArg(args[n], XmNautoUnmanage, FALSE);
     n++;
-    form = XmCreateFormDialog(dvi->shell, "URL", args, n);
+    form = XmCreateFormDialog(dvi->shell, "URL", args, (Cardinal)n);
     uds->dlog = XtParent(form);
 
     labelStringXMS =
@@ -1179,10 +1169,7 @@ XtPointer clientData, callData;
     infoDialog((DocViewInfo*)cd->shellInfo, (char*)cd->data);
 }
 
-char* fileSelectionDialog(dvi, message, helpMsg)
-DocViewInfo* dvi;
-char *message, *helpMsg;
-{
+char* fileSelectionDialog(DocViewInfo* dvi, char *message, char *helpMsg) {
     Widget dlog, textField, button;
     int n, done = 0;
     FileSelectStruct fss;
@@ -1207,7 +1194,7 @@ char *message, *helpMsg;
     n++;
     XtSetArg(args[n], XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL);
     n++;
-    dlog = XmCreateFileSelectionDialog(dvi->shell, "File Selection", args, n);
+    dlog = XmCreateFileSelectionDialog(dvi->shell, "File Selection", args, (Cardinal)n);
     XmStringFree(xms);
     XtAddCallback(dlog, XmNokCallback, fileSelectCB, (XtPointer)&fss);
 
@@ -1274,11 +1261,7 @@ XtPointer clientData, callData;
 /*
  * SIMPLE LINE ENTRY DIALOG
  */
-char* openSimpleLineEntryDialog(dvi, dialogLabel, defaultAns, okCB)
-DocViewInfo* dvi;
-char *dialogLabel, *defaultAns;
-void (*okCB)();
-{
+char* openSimpleLineEntryDialog(DocViewInfo* dvi, char *dialogLabel, char *defaultAns, void (*okCB)()) {
     Widget dlog, frame, form, label, lineText, LineEntry_okButton, LineEntry_clearButton,
         LineEntry_cancelButton;
     Arg args[12];
@@ -1306,7 +1289,7 @@ void (*okCB)();
     /*XtSetArg(args[n], XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL);  n++;*/
     XtSetArg(args[n], XmNautoUnmanage, FALSE);
     n++;
-    form = XmCreateFormDialog(dvi->shell, "LineEntry", args, n);
+    form = XmCreateFormDialog(dvi->shell, "LineEntry", args, (Cardinal)n);
     lds->dlog = XtParent(form);
 
     labelStringXMS = XmStringCreateLtoR(dialogLabel, "largeFont");

@@ -56,7 +56,7 @@ typedef struct ColorInfoStruct {
     ColorStruct bd; /* border color */
     ColorStruct cr; /* cursor color */
 } ColorInfo;
-#endif BEFORE_SHARING_COLOR_INFO_________________________________________
+#endif /* BEFORE_SHARING_COLOR_INFO_________________________________________ */
 
 typedef struct ColorStruct {
     XColor xcolor;
@@ -316,4 +316,4 @@ ColorStruct* addColorName();
 void releaseColor();
 void releaseColorByString();
 
-int GLShadeColor(/*orig_red, orig_green, orig_blue, shade*/);
+int GLShadeColor(int orig_red, int orig_green, int orig_blue, float shade);

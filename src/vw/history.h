@@ -22,27 +22,27 @@
 #define HISTORY_CHUNK 256
 
 /* PROTOTYPES */
-void historyPrev();
-void historyNext();
-void historyBackUp();
+void historyPrev(DocViewInfo* dvi);
+void historyNext(DocViewInfo* dvi);
+void historyBackUp(DocViewInfo* dvi);
 
-void historyPrevMH();
-void historyNextMH();
-void historyBackUpMH();
+void historyPrevMH(char* arg[], int argc, void* clientData);
+void historyNextMH(char* arg[], int argc, void* clientData);
+void historyBackUpMH(char* arg[], int argc, void* clientData);
 
-void historyAdd();
-void historyAddMH();
-void setHistoryList();
-void setHistoryListMH();
+void historyAdd(DocViewInfo* dvi, char* newItem);
+void historyAddMH(char* arg[], int argc, void* clientData);
+void setHistoryList(DocViewInfo* dvi, char* newList[], int numItems);
+void setHistoryListMH(char* arg[], int argc, void* clientData);
 
-void freeHistoryList();
-void growHistoryList();
+void freeHistoryList(DocViewInfo* dvi);
+void growHistoryList(DocViewInfo* dvi);
 
-Widget createHistoryDialog();
-void showHistory();
-void showHistoryCB();
-void hideHistory();
-void historySelect();
-void historySelectCB();
+Widget createHistoryDialog(DocViewInfo* dvi);
+void showHistory(DocViewInfo* dvi);
+void showHistoryCB(Widget widget, XtPointer clientData, XtPointer callData);
+void hideHistory(Widget button, XtPointer clientData, XtPointer callData);
+void historySelect(DocViewInfo* dvi, char* url);
+void historySelectCB(Widget list, XtPointer clientData, XtPointer callData);
 
-#endif _HISTORY_H_
+#endif /* _HISTORY_H_ */

@@ -298,7 +298,7 @@ char* classScriptPath;
     int i;
 
     for (cip = classList; cip; cip++) {
-        if (entry = symID2Str->get(symID2Str, (long)cip->id)) {
+        if ((entry = symID2Str->get(symID2Str, (long)cip->id))) {
             sprintf(buff, "%s/cs_%s.vs", classScriptPath, (char*)entry->val);
             if (loadFile(buff, &classScript) != -1) {
                 /*				printf(">>>old %s {%s}\n", buff,
@@ -476,7 +476,7 @@ char* className;
     HashEntry* entry;
     int classid, i;
 
-    if (entry = symStr2ID->get(symStr2ID, (long)className)) {
+    if ((entry = symStr2ID->get(symStr2ID, (long)className))) {
         classid = entry->val;
         for (i = 0; cip = classList[i++]; cip++)
             if (classid == cip->id)

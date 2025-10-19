@@ -52,9 +52,7 @@ static int macin_img_BPL;    /* image bytes per line */
  * successful. (might also return various MACIN_ERR codes.)
  */
 /* ARGSUSED */
-static int macin_open_image(s)
-ZFILE* s;
-{
+static int macin_open_image(ZFILE* s) {
     BYTE mhdr[MAC_HDR_LEN];
     char* hp; /* header pointer */
 

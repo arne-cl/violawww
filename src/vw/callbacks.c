@@ -64,11 +64,7 @@ static Menu clonePageMainMenus[] = {
     NULL,
 };
 
-void titleButtonEH(w, clientData, evt, cont) Widget w;
-XtPointer clientData;
-XEvent* evt;
-Boolean* cont;
-{
+void titleButtonEH(Widget w, XtPointer clientData, XEvent* evt, Boolean* cont) {
     XButtonReleasedEvent* buttonEvt = (XButtonEvent*)evt;
 
     if (buttonEvt->button == 1) {
@@ -79,11 +75,7 @@ Boolean* cont;
     }
 }
 
-void editorTitleButtonEH(w, clientData, evt, cont) Widget w;
-XtPointer clientData;
-XEvent* evt;
-Boolean* cont;
-{
+void editorTitleButtonEH(Widget w, XtPointer clientData, XEvent* evt, Boolean* cont) {
     XButtonReleasedEvent* buttonEvt = (XButtonEvent*)evt;
 
     if (buttonEvt->button == 1) {
@@ -94,27 +86,19 @@ Boolean* cont;
     }
 }
 
-void navigateHomeEH(w, clientData, evt, cont) Widget w;
-XtPointer clientData;
-XEvent* evt;
-Boolean* cont;
-{
+void navigateHomeEH(Widget w, XtPointer clientData, XEvent* evt, Boolean* cont) {
     DocViewInfo* dvi = (DocViewInfo*)clientData;
     sendMessage1(dvi->violaDocViewObj, "home");
 }
 
-void navigateHome(w, clientData, callData) Widget w;
-XtPointer clientData, callData;
-{
+void navigateHome(Widget w, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
     sendMessage1(dvi->violaDocViewObj, "home");
 }
 
-void navigateBackUp(w, clientData, callData) Widget w;
-XtPointer clientData, callData;
-{
+void navigateBackUp(Widget w, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
@@ -122,9 +106,7 @@ XtPointer clientData, callData;
     historyBackUp(dvi);
 }
 
-void navigatePrev(w, clientData, callData) Widget w;
-XtPointer clientData, callData;
-{
+void navigatePrev(Widget w, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
@@ -132,9 +114,7 @@ XtPointer clientData, callData;
     historyPrev(dvi);
 }
 
-void navigateNext(w, clientData, callData) Widget w;
-XtPointer clientData, callData;
-{
+void navigateNext(Widget w, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
@@ -142,26 +122,21 @@ XtPointer clientData, callData;
     historyNext(dvi);
 }
 
-void changeFonts(w, clientData, callData) Widget w;
-XtPointer clientData, callData;
-{
+void changeFonts(Widget w, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
     sendMessage1N1str(dvi->violaDocViewObj, "changeFonts", (char*)cd->data);
 }
 
-void oneWordMessageCB(w, clientData, callData) Widget w;
-XtPointer clientData, callData;
-{
+void oneWordMessageCB(Widget w, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
     sendMessage1(dvi->violaDocViewObj, (char*)cd->data);
 }
 
-void clonePage(parentDocViewInfo) DocViewInfo* parentDocViewInfo;
-{
+void clonePage(DocViewInfo* parentDocViewInfo) {
     Widget shell, menu, menuBar, closeB, titleFrame, title, helpLabel, form, titleForm, frame,
         canvasForm, scrollBar, violaCanvas;
     DocViewInfo* localDocViewInfo;
@@ -298,24 +273,15 @@ void clonePage(parentDocViewInfo) DocViewInfo* parentDocViewInfo;
     XtPopup(shell, XtGrabNone);
 }
 
-void clonePageCB(button, clientData, callData) Widget button;
-XtPointer clientData, callData;
-{
+void clonePageCB(Widget button, XtPointer clientData, XtPointer callData) {
     clonePage((DocViewInfo*)((ClientData*)clientData)->shellInfo);
 }
 
-void clonePageMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void clonePageMH(char* arg[], int argc, void* clientData) {
     clonePage((DocViewInfo*)clientData);
 }
 
-void pageCloneMapped(canvas, clientData, event, continueDispatch) Widget canvas;
-XtPointer clientData;
-XEvent* event;
-Boolean* continueDispatch;
-{
+void pageCloneMapped(Widget canvas, XtPointer clientData, XEvent* event, Boolean* continueDispatch) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
@@ -344,10 +310,7 @@ Boolean* continueDispatch;
  * arg[1] = cloneID
  * arg[2] = top object name
  */
-void showPageClone(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void showPageClone(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvi = (DocViewInfo*)clientData;
     Dimension width, height;
     VObj* obj;
@@ -406,11 +369,7 @@ void* clientData;
                       (XtPointer)dvi->violaDocViewWindow);
 }
 
-void appCloneMapped(canvas, clientData, event, continueDispatch) Widget canvas;
-XtPointer clientData;
-XEvent* event;
-Boolean* continueDispatch;
-{
+void appCloneMapped(Widget canvas, XtPointer clientData, XEvent* event, Boolean* continueDispatch) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
     char* parentObjName = (char*)cd->data;
@@ -439,10 +398,7 @@ Boolean* continueDispatch;
  * arg[1] = cloneID
  * arg[2] = top object name
  */
-void showAppClone(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void showAppClone(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvi = (DocViewInfo*)clientData;
     Dimension width, height;
     VObj* obj;
@@ -506,8 +462,7 @@ void* clientData;
                       (XtPointer)dvi->violaDocViewWindow);
 }
 
-void closePageShell(dvi) DocViewInfo* dvi;
-{
+void closePageShell(DocViewInfo* dvi) {
     ViolaDeleteMessageHandler("sliderConfig", sliderConfig, (void*)dvi);
 
     /* The following is done just to be sure...
@@ -536,15 +491,11 @@ void closePageShell(dvi) DocViewInfo* dvi;
     freeDocViewInfo(dvi);
 }
 
-void closePageCB(button, clientData, callData) Widget button;
-XtPointer clientData, callData;
-{
+void closePageCB(Widget button, XtPointer clientData, XtPointer callData) {
     closePageShell((DocViewInfo*)((ClientData*)clientData)->shellInfo);
 }
 
-void cloneApp(button, clientData, callData) Widget button;
-XtPointer clientData, callData;
-{
+void cloneApp(Widget button, XtPointer clientData, XtPointer callData) {
     Widget shell;
     DocViewInfo* dvi = (DocViewInfo*)clientData;
     ClientData* cd;
@@ -566,15 +517,11 @@ XtPointer clientData, callData;
     XtPopup(shell, XtGrabNone);
 }
 
-void closeThisShell(button, clientData, callData) Widget button;
-XtPointer clientData, callData;
-{
+void closeThisShell(Widget button, XtPointer clientData, XtPointer callData) {
     closeAppShell((DocViewInfo*)clientData);
 }
 
-void quitOk(widget, clientData, call) Widget widget;
-XtPointer clientData, call;
-{
+void quitOk(Widget widget, XtPointer clientData, XtPointer call) {
     VObj* obj;
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
@@ -587,17 +534,13 @@ XtPointer clientData, call;
     exit(0);
 }
 
-void cancelCB(widget, client, call) Widget widget;
-XtPointer client, call;
-{
+void cancelCB(Widget widget, XtPointer client, XtPointer call) {
     ClientData* cd = (ClientData*)client;
     Widget dlog = (Widget)cd->data;
     XtPopdown(XtParent(dlog));
 }
 
-void quitCallback(widget, client, call) Widget widget;
-XtPointer client, call;
-{
+void quitCallback(Widget widget, XtPointer client, XtPointer call) {
     ClientData* clientData = (ClientData*)client;
     DocViewInfo* dvi = (DocViewInfo*)clientData->shellInfo;
     Widget dlog = (Widget)0;
@@ -675,16 +618,14 @@ XtPointer client, call;
     XtPopup(XtParent(dvi->quitDlog), XtGrabExclusive);
 }
 
-void okCallback(button, clientData, callData) {
+void okCallback(Widget button, XtPointer clientData, XtPointer callData) {
     Widget dlog = (Widget)clientData;
 
     /*XtUnmanageChild(dlog);*/
     XtDestroyWidget(XtParent(dlog));
 }
 
-void genericCallback(thing, clientData, callData) Widget thing;
-XtPointer callData, clientData;
-{
+void genericCallback(Widget thing, XtPointer clientData, XtPointer callData) {
     Widget dlog, button;
     DocViewInfo* dvi = ((ClientData*)clientData)->shellInfo;
     XmString message;
@@ -716,9 +657,7 @@ XtPointer callData, clientData;
     XmStringFree(message);
 }
 
-void openOk(widget, clientData, callData) Widget widget;
-XtPointer clientData, callData;
-{
+void openOk(Widget widget, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
     XmFileSelectionBoxCallbackStruct* fscb = (XmFileSelectionBoxCallbackStruct*)callData;
@@ -732,16 +671,12 @@ XtPointer clientData, callData;
     sendMessage1N2str(dvi->violaDocViewObj, "show", fileName, "file:");
 }
 
-void openCancel(widget, clientD, callData) Widget widget;
-XtPointer clientD, callData;
-{
+void openCancel(Widget widget, XtPointer clientD, XtPointer callData) {
     ClientData* clientData = (ClientData*)clientD;
     XtPopdown(XtParent((Widget)clientData->data));
 }
 
-void openDocument(widget, clientD, callData) Widget widget;
-XtPointer clientD, callData;
-{
+void openDocument(Widget widget, XtPointer clientD, XtPointer callData) {
     static Widget dlog = (Widget)0;
     static ClientData cd, *helpCD = NULL;
     ClientData* clientData = (ClientData*)clientD;
@@ -812,9 +747,7 @@ int thumbPercent, positionPercent;
                   (positionPercent * maximum / SBAR_MAGNITUDE), NULL);
 }
 
-void scrollBarDrag(sbar, clientData, callData) Widget sbar;
-XtPointer clientData, callData;
-{
+void scrollBarDrag(Widget sbar, XtPointer clientData, XtPointer callData) {
     XmScrollBarCallbackStruct* sbData = (XmScrollBarCallbackStruct*)callData;
     VObj* violaObj = (VObj*)clientData;
     int sliderSize, maximum, percent;
@@ -830,9 +763,7 @@ XtPointer clientData, callData;
     calledDrag++;
 }
 
-void scrollBarValueChanged(sbar, clientData, callData) Widget sbar;
-XtPointer clientData, callData;
-{
+void scrollBarValueChanged(Widget sbar, XtPointer clientData, XtPointer callData) {
     XmScrollBarCallbackStruct* sbData = (XmScrollBarCallbackStruct*)callData;
     char* violaObj = (char*)clientData;
     extern int calledDrag;
@@ -887,9 +818,7 @@ XtPointer clientData, callData;
 /*
  * titleIcon
  */
-void flipGlobe(clientData, intervalID) XtPointer clientData;
-XtIntervalId* intervalID;
-{
+void flipGlobe(XtPointer clientData, XtIntervalId* intervalID) {
     DocViewInfo* dvi = (DocViewInfo*)clientData;
 
     dvi->globeNum = (dvi->globeNum ? 0 : 1);
@@ -897,24 +826,15 @@ XtIntervalId* intervalID;
     dvi->intervalID = XtAppAddTimeOut(appCon, GLOBE_TIME, flipGlobe, clientData);
 }
 
-void doViolaEvent(widget, clientData, event, continueDispatch) Widget widget;
-XtPointer clientData;
-XEvent* event;
-Boolean* continueDispatch;
-{
+void doViolaEvent(Widget widget, XtPointer clientData, XEvent* event, Boolean* continueDispatch) {
     violaProcessEvent(event);
 }
 
-void doViolaIdle(clientData) XtPointer clientData;
-{
+void doViolaIdle(XtPointer clientData) {
     violaIdleEvent();
 }
 
-void resizeViola(widget, clientData, event, continueDispatch) Widget widget;
-XtPointer clientData;
-XEvent* event;
-Boolean continueDispatch;
-{
+void resizeViola(Widget widget, XtPointer clientData, XEvent* event, Boolean* continueDispatch) {
     if (event->type == ConfigureNotify) {
         XConfigureEvent* xcep = (XConfigureEvent*)event;
 
@@ -922,9 +842,7 @@ Boolean continueDispatch;
     }
 }
 
-void showHelpMessage(widget, message) Widget widget;
-char* message;
-{
+void showHelpMessage(Widget widget, char* message) {
     XmString xms;
 
     /* there's bug elsewhere in this code, to cause this check to be necessary
@@ -949,8 +867,7 @@ char* message;
 /* Pei: needed for showing anything other than just what-GUIs-do-what,
  * like progress reporting, etc.
  */
-void showHelpMessageInMainWindow(message) char* message;
-{
+void showHelpMessageInMainWindow(char* message) {
     if (mainHelpWidget) {
         XmString xms;
         xms = XmStringCreateLtoR(message, "boldFont");
@@ -962,11 +879,7 @@ void showHelpMessageInMainWindow(message) char* message;
     }
 }
 
-void helpHandler(widget, clientData, event, cont) Widget widget;
-XtPointer clientData;
-XEvent* event;
-Boolean* cont;
-{
+void helpHandler(Widget widget, XtPointer clientData, XEvent* event, Boolean* cont) {
     if (!widget)
         return;
     if (activeHelpLock == 0) {
@@ -976,11 +889,7 @@ Boolean* cont;
     }
 }
 
-void blankHelpHandler(widget, clientData, event, cont) Widget widget;
-XtPointer clientData;
-XEvent* event;
-Boolean* cont;
-{
+void blankHelpHandler(Widget widget, XtPointer clientData, XEvent* event, Boolean* cont) {
     if (!widget)
         return;
     if (activeHelpLock == 0) {
@@ -1007,23 +916,18 @@ void blankHelpHandlerInMainWindow() {
     activeHelpLock = 0;
 }
 
-void reloadDoc(dvi) DocViewInfo* dvi;
-{
+void reloadDoc(DocViewInfo* dvi) {
     if (dvi->violaDocViewObj)
         sendMessage1(dvi->violaDocViewObj, "reload");
 }
 
-void reloadDocCB(widget, clientData, callData) Widget widget;
-XtPointer clientData, callData;
-{
+void reloadDocCB(Widget widget, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
 
     reloadDoc((DocViewInfo*)cd->shellInfo);
 }
 
-void oneMessageCB(widget, clientData, callData) Widget widget;
-XtPointer clientData, callData;
-{
+void oneMessageCB(Widget widget, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)(cd->shellInfo);
 
@@ -1042,10 +946,7 @@ XtPointer clientData, callData;
  * arg[3] = optional document title
  *
  */
-void newDocument(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void newDocument(char* arg[], int argc, void* clientData) {
     long cloneID;
     XmString xms;
     DocViewInfo* dvi = (DocViewInfo*)clientData;
@@ -1091,10 +992,7 @@ void* clientData;
  * arg[3] = Size of slider thumb in thousandths.
  *
  */
-void sliderConfig(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void sliderConfig(char* arg[], int argc, void* clientData) {
     int sliderSize, sliderPos;
     DocViewInfo* dvi = (DocViewInfo*)clientData;
 
@@ -1122,9 +1020,7 @@ void* clientData;
                   sliderPos, NULL);
 }
 
-void searchCallback(textField, clientData, callData) Widget textField;
-XtPointer clientData, callData;
-{
+void searchCallback(Widget textField, XtPointer clientData, XtPointer callData) {
     char* searchText;
     DocViewInfo* dvi = (DocViewInfo*)clientData;
 
@@ -1139,9 +1035,7 @@ XtPointer clientData, callData;
     free(searchText);
 }
 
-void vwSaveAsCB(button, clientData, callData) Widget button;
-XtPointer clientData, callData;
-{
+void vwSaveAsCB(Widget button, XtPointer clientData, XtPointer callData) {
     size_t length;
     char *fileName, cwd[MAXPATHLEN];
     ClientData* cd = (ClientData*)clientData;
@@ -1170,10 +1064,7 @@ XtPointer clientData, callData;
  * arg[2] = temp data file name
  * arg[3] = filename
  */
-void saveAsMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void saveAsMH(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvi = (DocViewInfo*)clientData;
     char* data;
 
@@ -1189,9 +1080,7 @@ void* clientData;
     free(data);
 }
 
-void printFile(widget, clientData, callData) Widget widget;
-XtPointer clientData, callData;
-{
+void printFile(Widget widget, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
@@ -1205,10 +1094,7 @@ XtPointer clientData, callData;
  * arg[1] = cloneID
  *
  */
-void searchModeMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void searchModeMH(char* arg[], int argc, void* clientData) {
     DocViewInfo* dvi = (DocViewInfo*)clientData;
     int isIndex;
 

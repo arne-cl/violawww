@@ -196,7 +196,7 @@ unsigned int verbose;
             break;
     }
 
-    if (p = rindex(what, '_'))
+    if ((p = rindex(what, '_')))
         p++;
     else
         p = what;
@@ -241,7 +241,7 @@ char *fullname, *name;
 {
     Image* image;
 
-    if (image = xpixmapLoad(fullname, name, (unsigned int)1)) {
+    if ((image = xpixmapLoad(fullname, name, (unsigned int)1))) {
         freeImage(image);
         return (1);
     }

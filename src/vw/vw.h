@@ -141,7 +141,7 @@ void freeBookmark();
 DocViewInfo* makeBrowserInterface();
 void closeAppShell();
 char* makeString();
-void setHelp();
+void setHelp(Widget widget, Widget helpLabel, char* helpText);
 XmString makeXMSTitle();
 void tmpMessageMH();
 
@@ -171,6 +171,6 @@ struct helpStruct {
     char* helpText;
 };
 
-#endif _SPIDER_H_
+#endif /* _SPIDER_H_ */
 
 #define makeString(s) saveString(s)

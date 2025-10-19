@@ -572,9 +572,7 @@ unsigned int n, verbose;
 /* expand an image into a true color image
  */
 
-Image* expand(image)
-Image* image;
-{
+Image* expand(Image* image) {
     Image* new_image;
     int x, y;
     Pixel spixval;

@@ -21,6 +21,7 @@
 /* Implements:
  */
 #include "HTTP.h"
+#include <stddef.h>
 #include <unistd.h>
 
 /* Forward declarations */
@@ -98,7 +99,7 @@ PUBLIC int HTLoadHTTP ARGS4(CONST char*, arg,
     int buffer_length = INIT_LINE_SIZE; /* Why not? */
     BOOL extensions = YES;              /* Assume good HTTP server */
     int server_status = 0;
-    int offset = 0;
+    ptrdiff_t offset = 0;  /* Changed from int to ptrdiff_t for 64-bit safety */
 
     int tries = 0;
 
@@ -317,7 +318,7 @@ retry:
     }
 #endif
 
-    status = NETWRITE(s, command, (int)strlen(command));
+    status = NETWRITE(s, command, strlen(command));
     free(command);
     if (status < 0) {
         return HTInetStatus("send");
@@ -716,7 +717,7 @@ copy:
     }
 wheee:
     (*target->isa->put_block)(target, binary_buffer + (start_of_data - text_buffer) + offset,
-                              length - (start_of_data - text_buffer) - offset);
+                              (int)(length - (start_of_data - text_buffer) - offset));
     HTCopy(s, target);
     (*target->isa->free)(target);
     status = HT_LOADED;

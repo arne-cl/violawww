@@ -130,10 +130,7 @@ int a, b;
     return ((te && te->length == length && te->code == code) ? te : 0);
 }
 
-int g3_getfaxrow(fd, bitrow)
-ZFILE* fd;
-byte* bitrow;
-{
+int g3_getfaxrow(ZFILE* fd, byte* bitrow) {
     int col;
     int curlen, curcode, nextbit;
     int count, color;
@@ -250,9 +247,7 @@ byte* bitrow;
     return (0);
 }
 
-int g3_skiptoeol(fd)
-ZFILE* fd;
-{
+int g3_skiptoeol(ZFILE* fd) {
     while (g3_rawzeros < 11 && !g3_eof)
         (void)g3_rawgetbit(fd);
     while (!g3_rawgetbit(fd) && !g3_eof)
@@ -260,9 +255,7 @@ ZFILE* fd;
     return (0);
 }
 
-int g3_rawgetbit(fd)
-ZFILE* fd;
-{
+int g3_rawgetbit(ZFILE* fd) {
     int b;
     static int shdata;
 
@@ -328,9 +321,7 @@ int c, n;
  * to after the hash table init.  -nazgul
  */
 
-int g3_ident(fd)
-ZFILE* fd;
-{
+int g3_ident(ZFILE* fd) {
 
     int ret = 0, col1, col2, i;
     byte* tmpline;

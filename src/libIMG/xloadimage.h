@@ -82,18 +82,18 @@ void showPath();
 
 void imageOnRoot(); /* root.c */
 
-void sendXImage(); /* send.c */
-XImageInfo* imageToXImage();
-Pixmap ximageToPixmap();
-void freeXImage();
+void sendXImage(XImageInfo* ximageinfo, int src_x, int src_y, int dst_x, int dst_y, unsigned int w, unsigned int h); /* send.c */
+XImageInfo* imageToXImage(Display* disp, int scrn, Visual* visual, unsigned int ddepth, Image* image, unsigned int private_cmap, unsigned int fit, unsigned int verbose);
+Pixmap ximageToPixmap(Display* disp, Window parent, XImageInfo* ximageinfo);
+void freeXImage(Image* image, XImageInfo* ximageinfo);
 
-Visual* getBestVisual(); /* visual.c */
+Visual* getBestVisual(Display* disp, int scrn, XVisualInfo* vinfo_ret); /* visual.c */
 
-int visualClassFromName(); /* window.c */
-char* nameOfVisualClass();
-void cleanUpWindow();
+int visualClassFromName(char* name); /* window.c */
+char* nameOfVisualClass(int vclass);
+void cleanUpWindow(Display* disp);
 /*char imageInWindow();*/
-XImageInfo* imageInWindow();
+XImageInfo* imageInWindow(Display* disp, int scrn, Image* image, char* user_geometry, unsigned int fullscreen, unsigned int install, unsigned int private_cmap, unsigned int fit, unsigned int use_pixmap, unsigned int delay, int visual_class, int argc, char* argv[], unsigned int verbose);
 
 int loadImgLib();
 int initImg();

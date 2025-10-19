@@ -99,9 +99,7 @@ static void initHexTable() {
 /* read a hex value and return its value
  */
 
-static int nextInt(zf)
-ZFILE* zf;
-{
+static int nextInt(ZFILE* zf) {
     int c;
     int value = 0;
     int shift = 0;

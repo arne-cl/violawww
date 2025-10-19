@@ -27,11 +27,6 @@
 #include <Xm/RowColumn.h>
 #include <Xm/SeparatoG.h>
 
-Widget buildMenus();
-Widget buildPulldownMenu();
-void genericCallback();
-void quitCallback();
-
 typedef struct menuItemStruct {
     char* label;
     WidgetClass* class;
@@ -51,6 +46,11 @@ typedef struct menuStruct {
     MenuItem* menuItems;
 } Menu;
 
+Widget buildMenus(Menu* menus, MenuItem* helpMenuItems, Widget parent, Widget helpLabel, void* shellInfo);
+Widget buildPulldownMenu(Widget parent, char* menuTitle, char* menuMnemonic, MenuItem* items, Widget helpLabel, void* shellInfo);
+void genericCallback(Widget thing, XtPointer clientData, XtPointer callData);
+void quitCallback(Widget widget, XtPointer client, XtPointer call);
+
 #define BOOKMARK_MENU_NAME "Marked Documents"
 
-#endif _MENU_H_
+#endif /* _MENU_H_ */

@@ -40,10 +40,7 @@ static void delayAlarmHandler() { AlarmWentOff = 1; }
  * - mfc 90/10/08
  */
 
-static int getNextEventWithTimeout(disp, event)
-Display* disp;
-XEvent* event;
-{
+static int getNextEventWithTimeout(Display* disp, XEvent* event) {
     fd_set rmask;
     int nfound;
 
@@ -234,9 +231,7 @@ Visual* visual;
 /* this attempts to convert an image title into a reasonable icon name
  */
 
-static char* iconName(s)
-char* s;
-{
+static char* iconName(char* s) {
     static char buf[BUFSIZ];
     char* t;
 
@@ -274,9 +269,7 @@ static struct visual_class_name {
                        GrayScale,   "GrayScale",   StaticGray,  "StaticGray",
                        StaticGray,  "StaticGrey",  -1,          NULL};
 
-int visualClassFromName(name)
-char* name;
-{
+int visualClassFromName(char* name) {
     int a;
     char *s1, *s2;
     int class = -1;
@@ -304,9 +297,7 @@ char* name;
     return (class);
 }
 
-char* nameOfVisualClass(class)
-int class;
-{
+char* nameOfVisualClass(int class) {
     int a;
 
     for (a = 0; VisualClassName[a].name; a++)

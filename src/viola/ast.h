@@ -139,9 +139,9 @@ extern char* ASTTypeStr[];
 
 #define clearASTStack() ASTStackIdx = 0
 
-extern int init_ast();
-extern int countASTSiblings();
-extern AST* makeAST();
-extern long getIdent();
+extern int init_ast(void);
+extern int countASTSiblings(AST* ast);
+extern AST* makeAST(int type);
+extern long getIdent(char* str);
 extern int yyparse();
 void printAST(AST* ast, int tab);

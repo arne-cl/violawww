@@ -142,10 +142,7 @@ unsigned int verbose;
 /* normalize an image.
  */
 
-Image* normalize(image, verbose)
-Image* image;
-unsigned int verbose;
-{
+Image* normalize(Image* image, unsigned int verbose) {
     unsigned int a, x, y;
     unsigned int min, max;
     Pixel pixval;

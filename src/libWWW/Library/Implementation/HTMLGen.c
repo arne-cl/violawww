@@ -57,7 +57,7 @@ struct _HTStructured {
 **	------------
 */
 PRIVATE void HTMLGen_flush ARGS1(HTStructured*, me) {
-    (*me->targetClass.put_block)(me->target, me->buffer, me->write_pointer - me->buffer);
+    (*me->targetClass.put_block)(me->target, me->buffer, (int)(me->write_pointer - me->buffer));
     me->write_pointer = me->buffer;
     me->line_break = me->buffer;
     me->cleanness = 0;
@@ -94,7 +94,7 @@ PRIVATE void HTMLGen_put_character ARGS2(HTStructured*, me, char, c) {
             strcpy(delims, ",;:."); /* @@ english bias */
             p = strchr(delims, me->write_pointer[-2]);
             if (p)
-                new_cleanness = p - delims + 2;
+                new_cleanness = (int)(p - delims + 2);
         }
         if (new_cleanness >= me->cleanness) {
             me->line_break = me->write_pointer - 1; /* Point to space */
@@ -112,7 +112,7 @@ PRIVATE void HTMLGen_put_character ARGS2(HTStructured*, me, char, c) {
             if (me->delete_line_break_char)
                 saved++;
             me->line_break[0] = '\n';
-            (*me->targetClass.put_block)(me->target, me->buffer, me->line_break - me->buffer + 1);
+            (*me->targetClass.put_block)(me->target, me->buffer, (int)(me->line_break - me->buffer + 1));
             me->line_break[0] = line_break_char;
             { /* move next line in */
                 char* p = saved;

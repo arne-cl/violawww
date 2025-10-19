@@ -189,9 +189,7 @@ static char * dot [] = {\n\
     }
 }
 
-char eventChar(e)
-XEvent* e;
-{
+char eventChar(XEvent* e) {
     KeySym keysym;
     long ret;
     char keybuf[10];

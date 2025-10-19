@@ -23,9 +23,7 @@
 extern void* malloc(unsigned long);
 extern void free(void*);
 
-Box* cloneBox(box)
-Box* box;
-{
+Box* cloneBox(Box* box) {
     Box *newone = NULL, *bp;
 
     if (!box)
@@ -48,9 +46,7 @@ Box* box;
     return newone;
 }
 
-void putInBox(box, item) Box** box;
-void* item;
-{
+void putInBox(Box** box, void* item) {
     if (!item) {
         return;
     } else {
@@ -68,12 +64,7 @@ void* item;
     }
 }
 
-void* getFromBox(box, key, compare, findFirstOne)
-Box** box;
-void* key;
-CompareFunction compare;
-Boolean findFirstOne;
-{
+void* getFromBox(Box** box, void* key, CompareFunction compare, Boolean findFirstOne) {
     static int whichOne = 1;
     int i = 0;
     Box* bp = *box;
@@ -101,12 +92,7 @@ Boolean findFirstOne;
     }
 }
 
-void deleteFromBox(box, key, compare, freeData, deleteAllItems) Box** box;
-void* key;
-CompareFunction compare;
-FreeFunction freeData;
-Boolean deleteAllItems;
-{
+void deleteFromBox(Box** box, void* key, CompareFunction compare, FreeFunction freeData, Boolean deleteAllItems) {
     Box* bp = *box;
     Box* prev = NULL;
 
@@ -134,15 +120,12 @@ Boolean deleteAllItems;
     } while (bp && deleteAllItems);
 }
 
-void deleteBox(box, freeData) Box* box;
-FreeFunction freeData;
-{
+void deleteBox(Box* box, FreeFunction freeData) {
     if (!box)
         return;
     deleteFromBox(&box, NULL, alwaysTrue, freeData, TRUE);
 }
 
-Boolean alwaysTrue(vkey, vdata) void *vkey, *vdata;
-{
+Boolean alwaysTrue(void *vkey, void *vdata) {
     return (TRUE);
 }

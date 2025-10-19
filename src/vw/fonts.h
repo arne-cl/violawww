@@ -16,5 +16,5 @@
  * This software is provided ``as is'' without express or implied warranty.
  */
 
-XFontStruct* loadFont();
-XmFontList loadFonts();
+XFontStruct* loadFont(Display* display, char** fontNames);
+XmFontList loadFonts(Display* display);

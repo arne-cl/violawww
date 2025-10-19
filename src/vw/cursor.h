@@ -26,8 +26,8 @@ extern Cursor busyCursor;
 #define setIdleCursor(dvi)                                                                         \
     XUndefineCursor(XtDisplay((dvi)->topMostWidget), XtWindow((dvi)->topMostWidget))
 
-void initCursors();
-void busyCursorMH();
-void idleCursorMH();
+void initCursors(Display* display);
+void busyCursorMH(char* arg[], int argc, void* clientData);
+void idleCursorMH(char* arg[], int argc, void* clientData);
 
-#endif _CURSOR_H_
+#endif /* _CURSOR_H_ */

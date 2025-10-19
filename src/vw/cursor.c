@@ -24,23 +24,16 @@
 
 Cursor busyCursor;
 
-void initCursors(display) Display* display;
-{
+void initCursors(Display* display) {
     busyCursor = XCreateFontCursor(display, XC_watch);
 }
 
-void busyCursorMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void busyCursorMH(char* arg[], int argc, void* clientData) {
     /*    fprintf(stderr, "VW: busyCursor\n");*/
     setBusyCursor((DocViewInfo*)clientData);
 }
 
-void idleCursorMH(arg, argc, clientData) char* arg[];
-int argc;
-void* clientData;
-{
+void idleCursorMH(char* arg[], int argc, void* clientData) {
     /*    fprintf(stderr, "VW: idleCursor\n");*/
     setIdleCursor((DocViewInfo*)clientData);
 }
