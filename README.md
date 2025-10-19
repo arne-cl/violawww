@@ -383,13 +383,12 @@ ViolaWWW is provided as-is for educational and research purposes. The original s
 ## Contact
 
 ### Historical
-- Original Author: Pei-Yuan Wei (wei@ora.com)
-- Mailing List: viola@ora.com (historical)
+- Original Author: Pei-Yuan Wei (`wei@ora.com`)
+- Mailing List: `viola@ora.com` (historical)
 
 ### Current Maintainer
 - Developer: Evgeny Stepanischev
-- Email: imbolk@gmail.com
-- Repository: [Project URL]
+- Email: `imbolk@gmail.com`
 
 ---
 
