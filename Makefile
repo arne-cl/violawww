@@ -372,3 +372,24 @@ check-libwww:
 		cd $(LIBWWW_DIR) && $(MAKE) -f ../../All/darwin/Makefile.include; \
 	fi
 
+# Unit tests
+.PHONY: test test_htcharset
+test: test_htcharset
+
+test_htcharset: test_htcharset.c src/libWWW/Library/darwin/HTCharset.o
+	@echo "Building HTCharset unit tests..."
+ifeq ($(ICU_AVAILABLE),yes)
+	$(CC) $(CFLAGS) $(ICU_INCLUDES) -Isrc/libWWW/Library/Implementation \
+		-o test_htcharset test_htcharset.c \
+		src/libWWW/Library/darwin/HTCharset.o \
+		$(ICU_LIBS)
+	@echo "Running tests..."
+	@./test_htcharset
+else
+	@echo "⚠ ICU not available - skipping HTCharset tests"
+endif
+
+.PHONY: clean-test
+clean-test:
+	rm -f test_htcharset
+
