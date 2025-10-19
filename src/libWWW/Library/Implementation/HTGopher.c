@@ -228,7 +228,7 @@ PRIVATE void parse_menu ARGS2(CONST char*, arg, HTParentAnchor*, anAnchor) {
                 } else { /* If parsed ok */
                     char* q;
                     char* p;
-                    sprintf(address, "//%s/%c", host, gtype);
+                    sprintf(address, "gopher://%s%s/%c", host, port, gtype);
                     q = address + strlen(address);
                     for (p = selector; *p; p++) { /* Encode selector string */
                         if (acceptable[*p])
