@@ -1037,13 +1037,13 @@ int fontID;
 
     TFCShiftStr(theEditLN->linep, tf->current_col, 1);
     tfc.c = c;
-    tfc.fontID = fontID;
+    tfc.fontID = (char)fontID;
     tfc.tagID = 0;
     tfc.flags = 0;
     TFCCopy(theEditLN->linep + tf->current_col, &tfc);
 
     if (theEditLN->maxFontHeight < FontMaxHeight(fontID))
-        theEditLN->maxFontHeight = FontMaxHeight(fontID);
+        theEditLN->maxFontHeight = (short)FontMaxHeight(fontID);
     theEditLN->length++;
     tf->current_col++;
     tf->current_col_sticky = tf->current_col;
@@ -1275,7 +1275,7 @@ TFStruct* tf;
             }
             if (eraseSpan) {
                 if (verbose)
-                    fprintf(stdout, "tfed: 1 XClearArea w=%x %d %d %d %d\n", TFWINDOW, tf->xUL,
+                    fprintf(stdout, "tfed: 1 XClearArea w=%lx %d %d %d %d\n", (unsigned long)TFWINDOW, tf->xUL,
                             tf->yLR - eraseSpan, tf->width, eraseSpan);
                 XClearArea(display, TFWINDOW, tf->xUL, tf->yLR - eraseSpan, tf->width, eraseSpan,
                            False);
@@ -1352,7 +1352,7 @@ TFStruct* tf;
             }
             if (eraseSpan) {
                 if (verbose)
-                    fprintf(stdout, "tfed: 2 XClearArea w=%x %d %d %d %d\n", TFWINDOW, tf->xUL,
+                    fprintf(stdout, "tfed: 2 XClearArea w=%lx %d %d %d %d\n", (unsigned long)TFWINDOW, tf->xUL,
                             tf->yLR - eraseSpan, tf->width, eraseSpan);
                 XClearArea(display, TFWINDOW, tf->xUL, tf->yLR - eraseSpan, tf->width, eraseSpan,
                            False);
@@ -1633,7 +1633,7 @@ TFStruct* tf;
     TFCFlags(tf->currentp->linep + tf->currentp->length) |= MASK_NL;
 
     if (tf->currentp) {
-        after1_breakc = tf->currentp->breakc = countBreaks(tf->currentp->linep);
+        after1_breakc = tf->currentp->breakc = (short)countBreaks(tf->currentp->linep);
     }
     /*
     printf("*** after1_breakc = %d\n", after1_breakc);
@@ -1683,7 +1683,7 @@ TFStruct* tf;
 
     TFCShiftStr(theEditLN->linep, 0, -start);
     theEditLN->length -= start;
-    theEditLN->breakc = setBreaks(tf, theEditLN);
+    theEditLN->breakc = (short)setBreaks(tf, theEditLN);
     after2_breakc = theEditLN->breakc;
     /*
     printf("*** after2_breakc = %d\n", after2_breakc);
@@ -1727,7 +1727,7 @@ TFStruct* tf;
         /* clear space for right/lower half of the split line to be */
         if (eraseSpan) {
             if (verbose)
-                fprintf(stdout, "tfed: 3 XClearArea w=%x %d %d %d %d\n", TFWINDOW, tf->xUL,
+                fprintf(stdout, "tfed: 3 XClearArea w=%lx %d %d %d %d\n", (unsigned long)TFWINDOW, tf->xUL,
                         tf->yUL + upper, tf->width, eraseSpan);
 
             XClearArea(display, TFWINDOW, tf->xUL, tf->yUL + upper, tf->width, eraseSpan, False);

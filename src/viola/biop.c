@@ -191,22 +191,22 @@ void (*opft_or[4][4])() = {
     float_or, float_or, float_or, str_or, str_or, str_or,  str_or,   str_or,
 };
 
-ConvIdx biOpConvIdx[] = {{opft_plus, conv1},
-                         {opft_minus, conv1},
-                         {opft_mod, conv2},
-                         {opft_mult, conv1},
-                         {opft_div, conv1},
-                         {opft_eq, conv1},
-                         {opft_ne, conv1},
-                         {opft_lt, conv1},
-                         {opft_le, conv1},
-                         {opft_gt, conv1},
-                         {opft_ge, conv1},
+ConvIdx biOpConvIdx[] = {{&opft_plus, &conv1},
+                         {&opft_minus, &conv1},
+                         {&opft_mod, &conv2},
+                         {&opft_mult, &conv1},
+                         {&opft_div, &conv1},
+                         {&opft_eq, &conv1},
+                         {&opft_ne, &conv1},
+                         {&opft_lt, &conv1},
+                         {&opft_le, &conv1},
+                         {&opft_gt, &conv1},
+                         {&opft_ge, &conv1},
                          {
-                             opft_and, conv2 /*?*/
+                             &opft_and, &conv2 /*?*/
                          },
                          {
-                             opft_or, conv2 /*?*/
+                             &opft_or, &conv2 /*?*/
                          }};
 
 int biOp(op, p1, p2)

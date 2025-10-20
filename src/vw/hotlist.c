@@ -213,7 +213,7 @@ Widget createHotlistDialog(DocViewInfo* dvi) {
     XtSetArg(args[n], XmNautoUnmanage, FALSE);
     n++;
 
-    form = XmCreateFormDialog(dvi->shell, "Hotlist Manager", args, n);
+    form = XmCreateFormDialog(dvi->shell, "Hotlist Manager", args, (Cardinal)n);
     XtVaSetValues(form, XmNhorizontalSpacing, 6, XmNverticalSpacing, 6, NULL);
 
     actionForm = XtVaCreateManagedWidget(
@@ -254,7 +254,7 @@ Widget createHotlistDialog(DocViewInfo* dvi) {
     {
         HotListItem* hip;
         dvi->nHotlistItems = theHotListCount;
-        xmsList = (XmStringTable)malloc(dvi->nHotlistItems * sizeof(XmString));
+        xmsList = (XmStringTable)malloc((size_t)dvi->nHotlistItems * sizeof(XmString));
         for (i = 0, hip = theHotList; hip; i++, hip = hip->next) {
             xmsList[i] = XmStringCreateSimple(hip->comment);
         }
@@ -289,7 +289,7 @@ Widget createHotlistDialog(DocViewInfo* dvi) {
     n++;
     XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT);
     n++;
-    dvi->hotlistListWidget = list = XmCreateScrolledList(form, "hotlistList", args, n);
+    dvi->hotlistListWidget = list = XmCreateScrolledList(form, "hotlistList", args, (Cardinal)n);
     XtAddCallback(list, XmNbrowseSelectionCallback, hotlistSelectCB, (XtPointer)dvi);
     XtAddCallback(list, XmNdefaultActionCallback, hotlistSelectCB, (XtPointer)dvi);
     XtManageChild(list);

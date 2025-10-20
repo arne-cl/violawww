@@ -314,7 +314,7 @@ XtPointer clientData, callData;
     address = XmTextFieldGetString(ms->addressText);
     subject = XmTextFieldGetString(ms->subjectText);
     letter = XmTextGetString(ms->letterText);
-    length = strlen(mailCommand) + strlen(address) + strlen(subject) + 20;
+    length = (int)(strlen(mailCommand) + strlen(address) + strlen(subject) + 20);
     sprintf(fullCommand, "%s %s %s", mailCommand, subject, address);
     sprintf(dlogMessage, "Sending your letter using the following command:\n\n%s\n\nIs this OK?",
             fullCommand);

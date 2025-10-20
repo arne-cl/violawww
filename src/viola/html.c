@@ -229,7 +229,7 @@ int init_html() {
 
     current_addr = saveString(default_default);
 
-    srcBuff = (char*)malloc(sizeof(char) * srcBuffSize);
+    srcBuff = (char*)malloc(sizeof(char) * (size_t)srcBuffSize);
     if (!srcBuff)
         return 0;
     srcBuffi = 0;
@@ -521,8 +521,8 @@ void split_line ARGS2(HText*, text, int, split) {
     newp->maxPixelExtentX = 0;
     newp->maxPixelExtentY = 0;
 
-    text->tfstruct->building_maxFontHeight = newp->maxFontHeight = text->maxFontHeight;
-    text->tfstruct->building_maxFontDescent = newp->maxFontDescent = text->maxFontDescent;
+    text->tfstruct->building_maxFontHeight = newp->maxFontHeight = (short)text->maxFontHeight;
+    text->tfstruct->building_maxFontDescent = newp->maxFontDescent = (short)text->maxFontDescent;
 
     text->maxFontHeight = FontMaxHeight(fontID);
     text->maxFontDescent = FontDescent(fontID);
@@ -545,29 +545,29 @@ void split_line ARGS2(HText*, text, int, split) {
 
     /* make linep
      */
-    size = sizeof(struct TFChar) * (split + patch + 1);
+    size = sizeof(struct TFChar) * (size_t)(split + patch + 1);
 
     newp->linep = (TFChar*)malloc(size);
     if (!newp->linep) {
         fprintf(stderr, "malloc failed\n");
         return;
     }
-    bcopy(text->tbuff, newp->linep, size);
+    bcopy(text->tbuff, newp->linep, (size_t)size);
     TFCClear(newp->linep + newp->length);
     TFCFlags(newp->linep + newp->length) = MASK_NL;
 
     /* make tagInfo
      */
-    newp->tagInfo = (TagInfo*)malloc(sizeof(struct TagInfo) * newp->tagInfoCount);
-    bzero(newp->tagInfo, sizeof(struct TagInfo) * newp->tagInfoCount);
+    newp->tagInfo = (TagInfo*)malloc(sizeof(struct TagInfo) * (size_t)newp->tagInfoCount);
+    bzero(newp->tagInfo, sizeof(struct TagInfo) * (size_t)newp->tagInfoCount);
 
-    bcopy(text->tbuffTagInfo, newp->tagInfo, sizeof(struct TagInfo) * newp->tagInfoCount);
+    bcopy(text->tbuffTagInfo, newp->tagInfo, sizeof(struct TagInfo) * (size_t)newp->tagInfoCount);
 
     bzero(text->tbuffTagInfo, sizeof(struct TagInfo) * TAGINFO_SIZE);
 
     if (patch) {
-        anchorPatch[anchorPatchIdx++] = &(newp->tagInfo[text->tagID].info);
-        TFCTagID(newp->linep + newp->length - 1) = text->tagID;
+        anchorPatch[anchorPatchIdx++] = (int**)&(newp->tagInfo[text->tagID].info);
+        TFCTagID(newp->linep + newp->length - 1) = (char)text->tagID;
     }
 
 #ifdef VERBOSE_SPLIT_LINE

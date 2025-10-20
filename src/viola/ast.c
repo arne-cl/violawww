@@ -95,8 +95,9 @@ int my_yyinput(buf, max_size)
 char* buf;
 int max_size;
 {
-    int n, l = strlen(yyscript + yyscriptidx);
-    n = max_size < l ? max_size : l;
+    int n;
+    size_t l = strlen(yyscript + yyscriptidx);
+    n = (max_size < (int)l) ? max_size : (int)l;
     if (n > 0) {
         memcpy(buf, yyscript + yyscriptidx, n);
         yyscriptidx += n;
@@ -121,7 +122,7 @@ int init_ast() {
             return 0;
         }
 
-        ASTStack = (AST*)malloc(ASTStackSize * sizeof(struct AST));
+        ASTStack = (AST*)malloc((size_t)ASTStackSize * sizeof(struct AST));
         if (!ASTStack) {
             ASTStackSize = ASTStackSize / 2;
             fprintf(stderr, "trying to malloc for AST stack (size=%d)\n", ASTStackSize);
@@ -183,7 +184,7 @@ int tab;
         switch (ast->type) {
         case AST_CALL:
         case AST_REF:
-            fprintf(stderr, "info=%d", ast->attribute.info.i);
+            fprintf(stderr, "info=%ld", ast->attribute.info.i);
             break;
 
         case AST_STRING:

@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <X11/Xlib.h>
+#include <X11/Intrinsic.h>
 
 #ifdef hpux
 #include <time.h>
@@ -101,16 +102,16 @@ long init_cexec() {
 long incrementExecStack() {
     Packet* newStack;
 
-    newStack = (Packet*)malloc(sizeof(struct Packet) * (execStackSize + EXEC_STACK_SIZE_INCREMENT));
+    newStack = (Packet*)malloc(sizeof(struct Packet) * (size_t)(execStackSize + EXEC_STACK_SIZE_INCREMENT));
     if (!newStack) {
         return 0;
     }
     if (execStackSize > 0) {
         fprintf(stderr, "WARNING: pcode execution stack overflow. Errors may occur\n");
-        bcopy(execStack, newStack, execStackSize * sizeof(struct Packet));
+        bcopy(execStack, newStack, (size_t)execStackSize * sizeof(struct Packet));
         /*	free(execStack);*/
     } else {
-        bzero(newStack, (execStackSize + EXEC_STACK_SIZE_INCREMENT) * sizeof(struct Packet));
+        bzero(newStack, (size_t)(execStackSize + EXEC_STACK_SIZE_INCREMENT) * sizeof(struct Packet));
     }
     execStackSize = execStackSize + EXEC_STACK_SIZE_INCREMENT;
     execStackSizeCheck = execStackSize - 100; /* 100 as arbitrary margin */
@@ -124,12 +125,12 @@ Attr* attrp;
 {
     for (i = 0, attrp2 = (Attr*)((Packet*)(attrp->val))->info.a; attrp2; attrp2 = attrp2->next)
         i++;
-    return i;
+    return (int)i;
 }
 
 dumpStack() {
     for (i = 0; i < stackExecIdx; i++) {
-        printf(": %d\t ", i);
+        printf(": %ld\t ", i);
         dumpPacket(&execStack[i]);
         printf("\n");
     }
@@ -367,7 +368,7 @@ void dumpVarList(varlist) Attr* varlist;
     int i = 0;
 
     for (attrp = varlist; attrp; attrp = attrp->next) {
-        printf("%d) id=%d=\"%s\", val=%ld ", i, attrp->id,
+        printf("%d) id=%ld=\"%s\", val=%ld ", i, attrp->id,
                (char*)symID2Str->get(symID2Str, attrp->id), attrp->val);
         packetp = (Packet*)attrp->val;
         if (packetp) {
@@ -511,7 +512,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                 if (packetp) {
                     copyPacket(&reg1, packetp);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -605,7 +606,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                 /* if funcid isn't a known symbol, it can't be a
                  * method. So, don't bother searching for it
                  */
-                if (allmhp.bits[funcid % allmhp.bitsSize] & (1 << funcid % sizeof(long))) {
+                if (allmhp.bits[funcid % allmhp.bitsSize] & (1UL << (funcid % sizeof(long)))) {
                     ClassInfo* cip = GET__classInfo(self);
 
                     /* make sure object exists */
@@ -1063,7 +1064,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                 varCount_TMP = varCount;
 
                 varlist = GET__varList(self);
-                *varVectorp = (Attr**)malloc(sizeof(Attr*) * varCount);
+                *varVectorp = (Attr**)malloc(sizeof(Attr*) * (size_t)varCount);
                 while (varCount--) {
                     varID = (*pcode++).i;
                     /*
@@ -1190,7 +1191,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_DIV, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1265,7 +1266,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_PLUS, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1330,7 +1331,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_MINUS, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1393,7 +1394,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_MULT, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1456,7 +1457,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_MOD, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1519,7 +1520,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_AND, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1582,7 +1583,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_OR, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1648,7 +1649,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_EQ, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1737,7 +1738,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_NE, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1810,7 +1811,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_LT, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1883,7 +1884,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_LE, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -1963,7 +1964,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_GT, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -2036,7 +2037,7 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
                     copyPacket(&reg2, packetp);
                     biOp(CODE_GE, &reg1, &reg2);
                 } else {
-                    fprintf(stderr, "obj=%s: undefined list item, id=%d\n", GET_name(self),
+                    fprintf(stderr, "obj=%s: undefined list item, id=%ld\n", GET_name(self),
                             reg1.info.i);
                 }
                 continue;
@@ -2060,12 +2061,12 @@ Packet* codeExec(VObj* self, union PCode* pcode, union PCode* pcode_end, Attr** 
             case CODE_NE:
             case CODE_LOAD:
             case CODE_STMTS:
-                fprintf(stderr, "pc=%d, unimplemented pcode=%d\n", pcode - pcode_start - 1,
-                        (*(pcode - 1)).x);
+                fprintf(stderr, "pc=%ld, unimplemented pcode=%ld\n", (long)(pcode - pcode_start - 1),
+                        (long)(*(pcode - 1)).x);
                 continue;
             default:
-                fprintf(stderr, "pc=%d, unknown pcode=%lx (decimal=%ld, shifted=%lx)\n",
-                        pcode - pcode_start - 1, (*(pcode - 1)).x, (*(pcode - 1)).x,
+                fprintf(stderr, "pc=%ld, unknown pcode=%lx (decimal=%ld, shifted=%lx)\n",
+                        (long)(pcode - pcode_start - 1), (*(pcode - 1)).x, (*(pcode - 1)).x,
                         ((*(pcode - 1)).x & 0x0fff0000) >> 16);
                 fprintf(stderr, "  This is likely a bug or unimplemented instruction\n");
                 continue;
@@ -2082,7 +2083,7 @@ VObj* obj;
 
     if (!pcode) {
         extern AST* theAST;
-        int size;
+        size_t size;
         int pc_limit = 0;
         FILE* fp;
         char* tmpfile;
@@ -2181,7 +2182,7 @@ VObj* obj;
         printPCode(&pcode[PCODE_IDX_INSTR], &pc, pcode[PCODE_IDX_SIZE].i);
     }
     codeExec(obj, &pcode[PCODE_IDX_INSTR], &pcode[PCODE_IDX_INSTR] + pcode[PCODE_IDX_SIZE].i,
-             PTR__scriptVV(obj));
+             (Attr***)PTR__scriptVV(obj));
 
     return &reg1;
 }
@@ -2191,7 +2192,7 @@ Packet* execObjClassScript(VObj* obj, Packet* result) {
 
     if (!pcode) {
         extern AST* theAST;
-        int size;
+        size_t size;
         int pc_limit = 0;
         FILE* fp;
         char* tmpfile;
@@ -2285,7 +2286,7 @@ Packet* execObjClassScript(VObj* obj, Packet* result) {
         printPCode(&pcode[PCODE_IDX_INSTR], &pc, pcode[PCODE_IDX_SIZE].i);
     }
     codeExec(obj, &pcode[PCODE_IDX_INSTR], &pcode[PCODE_IDX_INSTR] + pcode[PCODE_IDX_SIZE].i,
-             PTR__classScriptVV(obj));
+             (Attr***)PTR__classScriptVV(obj));
 
     if (&reg1 != result) {
         copyPacket(result, &reg1);
@@ -2302,7 +2303,7 @@ char* script;
 {
     union PCode* pcode;
     extern AST* theAST;
-    int size;
+    size_t size;
     int pc_limit = 0;
     FILE* fp;
     char* tmpfile;
@@ -2368,7 +2369,7 @@ char* script;
         printPCode(&pcode[PCODE_IDX_INSTR], &pc, pcode[PCODE_IDX_SIZE].i);
     }
     codeExec(obj, &pcode[PCODE_IDX_INSTR], &pcode[PCODE_IDX_INSTR] + pcode[PCODE_IDX_SIZE].i,
-             PTR__tempScriptVV(obj));
+             (Attr***)PTR__tempScriptVV(obj));
 
     if (&reg1 != result) {
         copyPacket(result, &reg1);

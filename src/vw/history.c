@@ -138,7 +138,7 @@ void setHistoryList(DocViewInfo* dvi, char* newList[], int numItems) {
      */
     freeHistoryList(dvi);
     dvi->historySize = (numItems + HISTORY_CHUNK);
-    dvi->historyList = (char**)malloc(dvi->historySize * sizeof(char*));
+    dvi->historyList = (char**)malloc((size_t)dvi->historySize * sizeof(char*));
     for (i = 0; i < numItems; i++)
         dvi->historyList[i] = makeString(newList[i]);
     dvi->nHistoryItems = numItems;
@@ -147,7 +147,7 @@ void setHistoryList(DocViewInfo* dvi, char* newList[], int numItems) {
      * Set the items in the history list widget.
      */
     if (dvi->historyListWidget) {
-        listItems = (XmStringTable)malloc(numItems * sizeof(XmString));
+        listItems = (XmStringTable)malloc((size_t)numItems * sizeof(XmString));
         for (i = 0; i < numItems; i++)
             listItems[i] = XmStringCreateSimple(newList[i]);
         XtVaSetValues(dvi->historyListWidget, XmNitemCount, numItems, XmNitems, listItems, NULL);
@@ -170,7 +170,7 @@ void freeHistoryList(DocViewInfo* dvi) {
 
 void growHistoryList(DocViewInfo* dvi) {
     int i;
-    char** newList = (char**)malloc((dvi->historySize + HISTORY_CHUNK) * sizeof(char*));
+    char** newList = (char**)malloc((size_t)(dvi->historySize + HISTORY_CHUNK) * sizeof(char*));
     dvi->historySize += HISTORY_CHUNK;
 
     for (i = 0; i < dvi->nHistoryItems; i++)
@@ -229,7 +229,7 @@ Widget createHistoryDialog(DocViewInfo* dvi) {
 
     n = 0;
     if (dvi->nHistoryItems) {
-        xmsList = (XmStringTable)malloc(dvi->nHistoryItems * sizeof(XmString));
+        xmsList = (XmStringTable)malloc((size_t)dvi->nHistoryItems * sizeof(XmString));
         for (i = 0; i < dvi->nHistoryItems; i++)
             xmsList[i] = XmStringCreateSimple(dvi->historyList[i]);
         XtSetArg(args[n], XmNitems, xmsList);
@@ -263,7 +263,7 @@ Widget createHistoryDialog(DocViewInfo* dvi) {
     n++;
     XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT);
     n++;
-    dvi->historyListWidget = list = XmCreateScrolledList(form, "historyList", args, n);
+    dvi->historyListWidget = list = XmCreateScrolledList(form, "historyList", args, (Cardinal)n);
     XtAddCallback(list, XmNsingleSelectionCallback, historySelectCB, (XtPointer)dvi);
     XtAddCallback(list, XmNdefaultActionCallback, historySelectCB, (XtPointer)dvi);
     XtManageChild(list);
