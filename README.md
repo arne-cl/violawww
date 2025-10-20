@@ -1,6 +1,6 @@
 # ViolaWWW Version 4.0 Beta
 
-**January 2025**
+**October 2025**
 
 ---
 
