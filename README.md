@@ -360,11 +360,16 @@ violawww2/
 │   ├── libWWW/Library/Implementation/  # WWW protocol library
 │   │   ├── HTTP.c, HTTPS.c             # HTTP/HTTPS clients
 │   │   ├── HTSSL.c                     # SSL/TLS wrapper
+│   │   ├── HTKeepAlive.c               # Connection manager
 │   │   ├── HTWayback.c                 # Archive integration
 │   │   ├── HTCharset.c                 # Character encoding
 │   │   └── HTAccess.c                  # Access manager
-│   ├── viola/                          # Pure X11 browser
-│   └── vw/                             # Motif browser
+│   ├── libIMG/                         # Image handling (GIF, XBM, XPM, etc)
+│   ├── libStyle/                       # Stylesheet processing
+│   ├── libXPA/                         # X Pixmap Applets
+│   ├── libXPM/                         # X Pixmap library
+│   ├── viola/                          # Viola toolkit & core browser
+│   └── vw/                             # ViolaWWW Motif frontend
 ├── test/                               # Unit tests
 ├── Makefile                            # Main build file
 └── README.md                           # This file
