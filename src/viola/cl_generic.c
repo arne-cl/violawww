@@ -206,6 +206,7 @@ MethodInfo meths_generic[] = {
         STR_SGMLSetStyle,
         meth_generic_SGMLSetStyle,
     },
+    {STR_HTMLMathUpdateWindow, meth_generic_HTMLMathUpdateWindow},
     {
         STR_SGMLTableFormater,
         meth_generic_SGMLTableFormater,
@@ -1660,6 +1661,10 @@ long meth_generic_SGMLMathFormater(VObj* self, Packet* result, int argc, Packet 
         return HTMLMathFormater(self, &argv[0], &argv[1], (int)PkInfo2Int(&argv[2]));
     }
     return 0;
+}
+
+long meth_generic_HTMLMathUpdateWindow(VObj* self, Packet* result, int argc, Packet argv[]) {
+    return HTMLMathUpdateWindow(self);
 }
 
 /*

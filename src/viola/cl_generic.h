@@ -42,6 +42,7 @@ long meth_generic_SGMLBuildDoc_span(VObj* self, Packet* result, int argc, Packet
 long meth_generic_SGMLFindAnchorOffset(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_generic_SGMLGetStyle(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_generic_SGMLMathFormater(VObj* self, Packet* result, int argc, Packet argv[]);
+long meth_generic_HTMLMathUpdateWindow(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_generic_SGMLReBuildDoc(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_generic_SGMLSetStyle(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_generic_SGMLTableFormater(VObj* self, Packet* result, int argc, Packet argv[]);

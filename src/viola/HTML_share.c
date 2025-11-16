@@ -594,6 +594,8 @@ done:
             if (mat->type & TABLE_CELL_TYPE_THTD) {
                 mat->x = x;
                 mat->width = (float)xspan * mat->colSpan - 1;
+                /* fprintf(stderr, "HTMLTableFormater: TD %s col=%d row=%d SET_x=%d width=%d\n",
+                        GET_name(mat->obj), col, row, (int)x, (int)mat->width); */
                 SET_x(mat->obj, x);
                 SET_width(mat->obj, mat->width);
 

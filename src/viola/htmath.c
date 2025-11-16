@@ -66,11 +66,13 @@ XPoint fpathPts[MAX_PTS];
 #define MINFO_RBRACK 18
 #define MINFO_INTEGRAL 19
 #define MINFO_SUM 20
+#define MINFO_INFIN 21
 
 char* MInfoStr[] = {
     "?",    "BEGIN",  "DATA",   "ENTITY", "HDIV",   "S_BOX",    "E_BOX",
     "HBOX", "VBOX",   "S_SUB",  "E_SUB",  "SUB",    "S_SUP",    "E_SUP",
     "SUP",  "LPAREN", "RPAREN", "LBRACK", "RBRACK", "INTEGRAL", "SUM",
+    "INFIN",
 };
 
 typedef struct minfo {
@@ -411,6 +413,10 @@ MInfo sample_over[] = {MINFO_HBOX,
 #define INTEGRAL_WIDTH 17
 #define GAP_AFTER_INTEGRAL 5
 #define GAP_INTEGRAL 20
+#define SUM_WIDTH 17
+#define GAP_AFTER_SUM 5
+#define GAP_SUM 20
+#define INFIN_WIDTH 17
 #define PAREN_WIDTH 5
 #define BRACK_WIDTH 5
 
@@ -683,6 +689,35 @@ int level;
         mast->width = maxWidth + INTEGRAL_WIDTH + GAP_AFTER_INTEGRAL;
         mast->height = vspan;
         break;
+    case MINFO_SUM:
+        vspan = 0;
+        maxWidth = 0;
+        cmast = mast->children;
+        if (cmast && cmast->type == MINFO_S_SUP) {
+            cmast->y = vspan;
+            tile(cmast, level + 1);
+            vspan += cmast->height;
+            if (maxWidth < cmast->width)
+                maxWidth = cmast->width;
+            cmast = cmast->next;
+        }
+        vspan += GAP_SUM;
+        if (cmast && cmast->type == MINFO_S_SUB) {
+            cmast->y = vspan;
+            tile(cmast, level + 1);
+            vspan += cmast->height;
+            if (maxWidth < cmast->width)
+                maxWidth = cmast->width;
+        }
+        mast->width = maxWidth + SUM_WIDTH + GAP_AFTER_SUM;
+        mast->height = vspan;
+        break;
+    case MINFO_INFIN:
+        /* Width and height for infinity symbol */
+        mast->width = INFIN_WIDTH;
+        /* Set height to match typical text height for math symbols */
+        mast->height = 18; /* Default height for infinity symbol (matches font ascent+descent) */
+        break;
     case MINFO_BEGIN:
         tile(mast->next, level);
         break;
@@ -803,6 +838,24 @@ void expandables(self) MAST* self;
                 cmast->y = mast->height - cmast->height;
                 expandables(cmast);
             }
+            break;
+        case MINFO_SUM:
+            mast->height = mast->parent->height;
+            cmast = mast->children;
+            if (cmast && cmast->type == MINFO_S_SUP) {
+                cmast->x = SUM_WIDTH;
+                cmast->y = 0;
+                expandables(cmast);
+                cmast = cmast->next;
+            }
+            if (cmast && cmast->type == MINFO_S_SUB) {
+                cmast->x = SUM_WIDTH;
+                cmast->y = mast->height - cmast->height;
+                expandables(cmast);
+            }
+            break;
+        case MINFO_INFIN:
+            mast->height = mast->parent->height;
             break;
         case MINFO_ENTITY:
         case MINFO_DATA:
@@ -1208,6 +1261,58 @@ Window w;
             FLUSH;
             drawMAST(mast->children, level + 1, w);
         } break;
+        case MINFO_SUM: {
+            /* Draw a large Sigma shape within SUM_WIDTH x mast->height */
+            int yt, yb, ym, xl, xm, xr;
+            int xpad = 1;
+            yt = mast->ry + 1;
+            yb = mast->ry + mast->height - 2;
+            ym = (yt + yb) / 2;
+            xl = mast->rx + xpad;
+            xr = mast->rx + SUM_WIDTH - xpad;
+            xm = (xl + xr) / 2;
+            /* Top horizontal stroke */
+            XDrawLine(display, w, gc_fg, xl, yt, xr, yt);
+            /* Top diagonal */
+            XDrawLine(display, w, gc_fg, xr, yt, xm, ym);
+            /* Bottom diagonal */
+            XDrawLine(display, w, gc_fg, xm, ym, xr, yb);
+            /* Bottom horizontal stroke */
+            XDrawLine(display, w, gc_fg, xr, yb, xl, yb);
+            FLUSH;
+            drawMAST(mast->children, level + 1, w);
+        } break;
+        case MINFO_INFIN: {
+            /* Draw an infinity symbol: two circles side by side */
+            int rx = mast->rx;
+            int ry = mast->ry;
+            int mw = mast->width;
+            int mh = mast->height;
+            
+            /* Calculate circle diameter to fit nicely */
+            int diameter = (mh < mw/2) ? mh : mw/2;
+            if (diameter < 4) diameter = 4;
+            
+            /* Center the symbol vertically and horizontally */
+            int y_offset = (mh - diameter) / 2;
+            int x_offset = (mw - diameter * 2) / 2;
+            
+            /* Left circle */
+            XDrawArc(display, w, gc_fg, 
+                    rx + x_offset, 
+                    ry + y_offset, 
+                    diameter, diameter, 
+                    0, 360 * 64);
+            
+            /* Right circle */
+            XDrawArc(display, w, gc_fg, 
+                    rx + x_offset + diameter, 
+                    ry + y_offset, 
+                    diameter, diameter, 
+                    0, 360 * 64);
+            
+            FLUSH;
+        } break;
         case MINFO_RBRACK: {
             int yt, yb, xl, xr;
             yt = mast->ry + 1;
@@ -1322,6 +1427,12 @@ int HTMLMathFormater(VObj* self, Packet* tokenListPk, Packet* dataListPk, int li
 
     make(minfoBuff);
 
+    /* Don't set coordinates here - will be set in HTMLMathDraw based on object position */
+    fprintf(stderr, "HTMLMathFormater: obj xy=(%d,%d) width=%d height=%d\n",
+            GET_x(self), GET_y(self),
+            handle->next ? handle->next->width : 0,
+            handle->next ? handle->next->height : 0);
+
     SET_width(self, handle->next->width + 3);
     SET_height(self, handle->next->height + 3);
     SET__content(self, handle);
@@ -1331,9 +1442,76 @@ int HTMLMathFormater(VObj* self, Packet* tokenListPk, Packet* dataListPk, int li
 int HTMLMathDraw(VObj* self)
 {
     MAST* mast = (MAST*)(GET__content(self));
-    Window w = GET_window(self);
+    Window w;
+    VObj* parent = GET__parent(self);
+    int offset_x = 0, offset_y = 0;
+
+    if (GET_window(self)) {
+        /* Object has its own window - draw from (0,0) in local coordinates */
+        w = GET_window(self);
+        offset_x = 0;
+        offset_y = 0;
+        /* Calculate absolute position by accumulating X,Y from ancestors without windows */
+        int abs_x = GET_x(self);
+        int abs_y = GET_y(self);
+        VObj* ancestor = parent;
+        
+        while (ancestor && !GET_window(ancestor)) {
+            abs_x += GET_x(ancestor);
+            abs_y += GET_y(ancestor);
+            ancestor = GET__parent(ancestor);
+        }
+        
+        /* Make sure window is at correct position */
+        /* Add small offset to avoid being covered by table borders */
+        XWindowChanges wc;
+        wc.x = abs_x;
+        wc.y = abs_y;
+        wc.width = (int)GET_width(self);
+        wc.height = (int)GET_height(self);
+        
+        XConfigureWindow(display, w, CWX | CWY | CWWidth | CWHeight, &wc);
+    } else if (parent) {
+        /* Object shares parent's window - draw at object's position */
+        w = GET_window(parent);
+        offset_x = GET_x(self);
+        offset_y = GET_y(self);
+    } else {
+        return 0;
+    }
+
+    if (!w) return 0;
 
     GLPrepareObjColor(self);
+    /* Add padding to avoid drawing right at window edges */
+    /* The window size includes +3 padding (see HTMLMathFormater), so draw content offset by that */
+    if (GET_window(self)) {
+        /* Own window: draw with internal padding from (0,0) */
+        if (mast) frameCoords(mast, 2, 2); /* 2px padding inside window */
+    } else {
+        /* Shared parent window: use object's position */
+        if (mast) frameCoords(mast, offset_x, offset_y);
+    }
     drawMAST(mast, 0, w);
+    return 1;
+}
+
+int HTMLMathUpdateWindow(VObj* self)
+{
+    Window w = GET_window(self);
+    fprintf(stderr, "HTMLMathUpdateWindow: obj=%s window=%lu x=%d y=%d w=%d h=%d\n",
+            GET_name(self), (unsigned long)w, (int)GET_x(self), (int)GET_y(self),
+            (int)GET_width(self), (int)GET_height(self));
+    if (w) {
+        XWindowChanges wc;
+        wc.x = (int)GET_x(self);
+        wc.y = (int)GET_y(self);
+        wc.width = (int)GET_width(self);
+        wc.height = (int)GET_height(self);
+        fprintf(stderr, "HTMLMathUpdateWindow: calling XConfigureWindow\n");
+        XConfigureWindow(display, w, CWX | CWY | CWWidth | CWHeight, &wc);
+    } else {
+        fprintf(stderr, "HTMLMathUpdateWindow: NO WINDOW!\n");
+    }
     return 1;
 }

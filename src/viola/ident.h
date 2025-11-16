@@ -85,6 +85,7 @@ enum {
     STR_SGMLGetStyle,
     STR_SGMLMathFormater,
     STR_SGMLMathRender,
+    STR_HTMLMathUpdateWindow,
     STR_SGMLReBuildDoc,
     STR_SGMLSetStyle,
     STR_SGMLTableFormater,

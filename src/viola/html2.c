@@ -598,10 +598,11 @@ int dataLength;
     }
     parent_bstate = &SBI.stack[SBI.stacki - 1];
     bstate = &SBI.stack[SBI.stacki];
-    /*
-            printf("SPECIAL ENTITY: self=%s entity#=%d\n",
-                    GET_name(bstate->obj), entity_number);
-    */
+	fprintf(stderr, "CB_HTML_special_entity: entity#=%d stacki=%d parent_obj=%s self_obj=%s dataLen=%d\n",
+	        entity_number, SBI.stacki,
+	        (SBI.stacki > 0 && SBI.stack[SBI.stacki - 1].obj) ? GET_name(SBI.stack[SBI.stacki - 1].obj) : "(null)",
+	        (SBI.stacki >= 0 && SBI.stack[SBI.stacki].obj) ? GET_name(SBI.stack[SBI.stacki].obj) : "(null)",
+	        dataLength);
 
     if (bstate->obj && parent_bstate && parent_bstate->tmi &&
         (parent_bstate->tmi->flushAlwaysP || parent_bstate->tmi->flushOnSubTagP)) {
@@ -624,7 +625,9 @@ int dataLength;
         /*
                         span = getVSpan(bstate->obj, STR_F);
         */
-        sendMessage1N1int(bstate->obj, "entity", entity_number);
+		fprintf(stderr, "CB_HTML_special_entity: send 'entity' #%d to obj=%s\n",
+		        entity_number, GET_name(bstate->obj));
+		sendMessage1N1int(bstate->obj, "entity", entity_number);
     }
 }
 

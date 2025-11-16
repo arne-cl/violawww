@@ -831,9 +831,11 @@ fprintf(stderr, "### HTML\t)%s\n",
  */
 PRIVATE void HTML_put_entity ARGS2(HTStructured*, me, int, entity_number) {
 #ifdef VIOLA
-    /*XXX major drag. Must be smarter than this */
-    if (entity_number == 50 /*infin*/ || entity_number == 51 /*integral*/ ||
-        entity_number == 65 /*sigma*/) {
+	/* Special-case math entities: use callback to Viola side */
+	/* Note: indices are per HTMLDTD.c; see logs for exact mapping */
+	if (entity_number == 51 /*infin*/ ||
+	    entity_number == 52 /*integral*/ ||
+	    entity_number == 67 /*sigma*/) {
         majorBuff[majorBuffi] = '\0';
         CB_HTML_special_entity(entity_number, majorBuff, majorBuffi);
         majorBuffi = 0;

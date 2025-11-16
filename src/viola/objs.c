@@ -6065,7 +6065,7 @@ static SlotStruct objDesc_HTML_listing[] = {
     {"format", _slotValue_HTML_listing6}, {(char*)0, (char*)0},
 };
 
-static char _slotValue_HTML_math0[] = "field";
+static char _slotValue_HTML_math0[] = "txtDisp";
 static char _slotValue_HTML_math1[] = "HTML_math";
 static char _slotValue_HTML_math2[] = {
 #include "embeds/HTML_math_script.v.h"

@@ -5,6 +5,9 @@ for (i=0; i<arg[]; i++) print("arg", i, " = ", arg[i], "\n");
 print("^^^^^^^end\n");
 
 	switch (arg[0]) {
+case "clone":
+		return code_HTML_txt(arg);
+break;
 	case "entity":
 print("ENTITY FLUSH MATH label>>>>>", get("label"), "<<<\n");
 		if (isBlank(get("label"))) return 0;
@@ -12,13 +15,16 @@ print("ENTITY FLUSH MATH label>>>>>", get("label"), "<<<\n");
 		data[tokCount] = get("label");
 		tokCount++;
 
-		entity_number = arg[1];
-		if (entity_number == 50) {/*infin*/
-		} else if (entity_number == 51) { /*integral*/
-			tok[tokCount] = 19; /*MINFO_INTEGRAL*/
-			data[tokCount] = "";
-			tokCount++;
-		} else if (entity_number == 65) { /*sigma*/
+	entity_number = arg[1];
+	if (entity_number == 51) {/*infin*/
+		tok[tokCount] = 21; /*MINFO_INFIN*/
+		data[tokCount] = "";
+		tokCount++;
+	} else if (entity_number == 52) { /*integral*/
+		tok[tokCount] = 19; /*MINFO_INTEGRAL*/
+		data[tokCount] = "";
+		tokCount++;
+		} else if (entity_number == 67) { /*sigma*/
 			tok[tokCount] = 20; /*MINFO_SUM*/
 			data[tokCount] = "";
 			tokCount++;
