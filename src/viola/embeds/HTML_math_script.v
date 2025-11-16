@@ -87,22 +87,22 @@
 		return;
 	break;
 	case "F":
-		/* Just transfer data from buffer to label, don't add to tokens yet */
+		/* Transfer data from buffer to label and add to tokens NOW (before children) */
 		SGMLBuildDoc_setBuff(-1);
+		if (isBlank(get("label")) == 0) {
+			tok[tokCount] = 2; /* MINFO_DATA */
+			data[tokCount] = get("label");
+			tokCount++;
+			set("label", "");
+		}
 		return -1;
 	break;
 	case "D":
+		/* Transfer any remaining data after children to label and add to tokens */
 		SGMLBuildDoc_setBuff(0);
-		/* Add label at the BEGINNING of token array if present */
 		if (isBlank(get("label")) == 0) {
-			/* Shift existing tokens to make room */
-			for (i = tokCount; i > 0; i--) {
-				tok[i] = tok[i-1];
-				data[i] = data[i-1];
-			}
-			/* Insert label at position 0 */
-			tok[0] = 2; /* MINFO_DATA */
-			data[0] = get("label");
+			tok[tokCount] = 2; /* MINFO_DATA */
+			data[tokCount] = get("label");
 			tokCount++;
 			set("label", "");
 		}
