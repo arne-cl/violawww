@@ -1329,12 +1329,12 @@ Window w;
             xm = (xl + xr) / 2;
             /* Top horizontal stroke */
             XDrawLine(display, w, gc_fg, xl, yt, xr, yt);
-            /* Top diagonal */
-            XDrawLine(display, w, gc_fg, xr, yt, xm, ym);
-            /* Bottom diagonal */
-            XDrawLine(display, w, gc_fg, xm, ym, xr, yb);
+            /* Top diagonal - from left to middle */
+            XDrawLine(display, w, gc_fg, xl, yt, xm, ym);
+            /* Bottom diagonal - from middle to left */
+            XDrawLine(display, w, gc_fg, xm, ym, xl, yb);
             /* Bottom horizontal stroke */
-            XDrawLine(display, w, gc_fg, xr, yb, xl, yb);
+            XDrawLine(display, w, gc_fg, xl, yb, xr, yb);
             FLUSH;
             drawMAST(mast->children, level + 1, w);
         } break;
