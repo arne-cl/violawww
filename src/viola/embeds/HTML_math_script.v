@@ -120,11 +120,6 @@
 			set("label", "");
 		}
 
-		for (i = 0; i < tokCount; i++) {
-			print("math_tok ", i, ":   type=", tok[i], 
-				"data={", data[i], "}\n");
-		}
-
 /*		tagPtr = STG_tagPtr("MATH");
 		if (tagPtr) {
 			i = STG_attr(tagPtr, "BGColor");

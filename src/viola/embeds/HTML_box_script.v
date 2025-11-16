@@ -1,15 +1,10 @@
 
 
-print("HTML_box: self=", self(), ": ");
-for (i=0; i<arg[]; i++) print("arg", i, " = ", arg[i], "\n");
-print("^^^^^^^end\n");
-
 	switch (arg[0]) {
 case "clone":
 		return code_HTML_txt(arg);
 break;
 	case "entity":
-print("ENTITY FLUSH MATH label>>>>>", get("label"), "<<<\n");
 		/* Add any pending label text first */
 		if (isBlank(get("label")) == 0) {
 			tok[tokCount] = 2;
@@ -80,7 +75,6 @@ print("ENTITY FLUSH MATH label>>>>>", get("label"), "<<<\n");
 		return;
 	break;
 	case "F":
-print("F BOX--- label-{", get("label"), "}\n");
 		if (isBlank(get("label"))) return -1;
 		tok[tokCount] = 2;
 		data[tokCount] = get("label");
@@ -90,7 +84,6 @@ print("F BOX--- label-{", get("label"), "}\n");
 	break;
 	case "D":
 		SGMLBuildDoc_setBuff(0);
-print("D BOX--- label-{", get("label"), "}\n");
 		/* Add label at the BEGINNING of token array if present */
 		if (isBlank(get("label")) == 0) {
 			/* Shift existing tokens to make room */
@@ -106,11 +99,6 @@ print("D BOX--- label-{", get("label"), "}\n");
 		}
 
 		send(parent(), "tok", 5/*BOX_BEGIN*/);
-
-		for (i = 0; i < tokCount; i++) {
-			print("XXX box_tok ", i, ":   type=", tok[i], 
-				"  data={", data[i], "}\n");
-		}
 
 		for (i = 0; i < tokCount; i++) {
 			send(parent(), "tok&data", tok[i], data[i]);
