@@ -82,6 +82,7 @@ static CONST char* entities[] = {
     "oslash",   /* small o, slash */
     "otilde",   /* small o, tilde */
     "ouml",     /* small o, dieresis or umlaut mark */
+    "pi",       /* pi -- special case */
     "quote",    /* quote */
     "rdquo",    /* right double quote */
     "sigma",    /* sigma -- special case */

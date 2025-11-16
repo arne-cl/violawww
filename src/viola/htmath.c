@@ -67,12 +67,13 @@ XPoint fpathPts[MAX_PTS];
 #define MINFO_INTEGRAL 19
 #define MINFO_SUM 20
 #define MINFO_INFIN 21
+#define MINFO_PI 22
 
 char* MInfoStr[] = {
     "?",    "BEGIN",  "DATA",   "ENTITY", "HDIV",   "S_BOX",    "E_BOX",
     "HBOX", "VBOX",   "S_SUB",  "E_SUB",  "SUB",    "S_SUP",    "E_SUP",
     "SUP",  "LPAREN", "RPAREN", "LBRACK", "RBRACK", "INTEGRAL", "SUM",
-    "INFIN",
+    "INFIN", "PI",
 };
 
 typedef struct minfo {
@@ -718,6 +719,11 @@ int level;
         /* Set height to match typical text height for math symbols */
         mast->height = 18; /* Default height for infinity symbol (matches font ascent+descent) */
         break;
+    case MINFO_PI:
+        /* Width and height for pi symbol */
+        mast->width = 12; /* Narrower than infinity */
+        mast->height = 18; /* Same height as other math symbols */
+        break;
     case MINFO_BEGIN:
         tile(mast->next, level);
         break;
@@ -855,6 +861,9 @@ void expandables(self) MAST* self;
             }
             break;
         case MINFO_INFIN:
+            mast->height = mast->parent->height;
+            break;
+        case MINFO_PI:
             mast->height = mast->parent->height;
             break;
         case MINFO_ENTITY:
@@ -1312,6 +1321,27 @@ Window w;
                     ry + y_offset, 
                     diameter, diameter, 
                     0, 360 * 64);
+            
+            FLUSH;
+        } break;
+        case MINFO_PI: {
+            /* Draw a pi symbol using lines */
+            int rx = mast->rx;
+            int ry = mast->ry;
+            int mw = mast->width;
+            int mh = mast->height;
+            
+            /* Top horizontal line */
+            int y_top = ry + 2;
+            XDrawLine(display, w, gc_fg, rx + 1, y_top, rx + mw - 2, y_top);
+            
+            /* Left vertical leg */
+            int leg_left = rx + 2;
+            XDrawLine(display, w, gc_fg, leg_left, y_top, leg_left, ry + mh - 2);
+            
+            /* Right vertical leg */
+            int leg_right = rx + mw - 3;
+            XDrawLine(display, w, gc_fg, leg_right, y_top, leg_right, ry + mh - 2);
             
             FLUSH;
         } break;

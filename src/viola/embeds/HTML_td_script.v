@@ -44,11 +44,13 @@
 			}
 		for (i = 0; i < mEntCount; i++) {
 			if (mEnt[i] == 51) {
-				send(mathObj, "tok", 21);
+				send(mathObj, "tok", 21); /* MINFO_INFIN */
 			} else if (mEnt[i] == 52) {
-				send(mathObj, "tok", 19);
-			} else if (mEnt[i] == 67) {
-				send(mathObj, "tok", 20);
+				send(mathObj, "tok", 19); /* MINFO_INTEGRAL */
+			} else if (mEnt[i] == 65) {
+				send(mathObj, "tok", 22); /* MINFO_PI */
+			} else if (mEnt[i] == 68) {
+				send(mathObj, "tok", 20); /* MINFO_SUM */
 			}
 		}
 			mEntCount = 0;

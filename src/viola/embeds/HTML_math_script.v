@@ -29,22 +29,28 @@
 		return -1;
 	break;
 	case "entity":
+		/* Add any pending label text first */
+		if (isBlank(get("label")) == 0) {
+			tok[tokCount] = 2;
+			data[tokCount] = get("label");
+			tokCount++;
+		}
 
-		if (isBlank(get("label"))) return 0;
-		tok[tokCount] = 2;
-		data[tokCount] = get("label");
-		tokCount++;
-
+		/* Then add the entity token */
 		entity_number = arg[1];
-		if (entity_number == 52) {/*infin*/
+		if (entity_number == 51) {/*infin*/
 			tok[tokCount] = 21; /*MINFO_INFIN*/
 			data[tokCount] = "";
 			tokCount++;
-		} else if (entity_number == 51) { /*integral*/
+		} else if (entity_number == 52) { /*integral*/
 			tok[tokCount] = 19; /*MINFO_INTEGRAL*/
 			data[tokCount] = "";
 			tokCount++;
-		} else if (entity_number == 67) { /*sigma*/
+		} else if (entity_number == 65) { /*pi*/
+			tok[tokCount] = 22; /*MINFO_PI*/
+			data[tokCount] = "";
+			tokCount++;
+		} else if (entity_number == 68) { /*sigma*/
 			tok[tokCount] = 20; /*MINFO_SUM*/
 			data[tokCount] = "";
 			tokCount++;
@@ -76,6 +82,16 @@
 		tokCount++;
 		return;
 	break;
+	case "flush":
+		/* Flush any pending label to tok buffer before sub/sup processing */
+		if (isBlank(get("label")) == 0) {
+			tok[tokCount] = 2; /* MINFO_DATA */
+			data[tokCount] = get("label");
+			tokCount++;
+			set("label", "");
+		}
+		return;
+	break;
 	case "F":
 		SGMLBuildDoc_setBuff(-1);
 		if (isBlank(get("label"))) return -1;
@@ -84,15 +100,24 @@
 		tok[tokCount] = 2;
 		data[tokCount] = get("label");
 		tokCount++;
+		set("label", ""); /* Clear label after adding to tokens */
 
 		return -1;
 	break;
 	case "D":
 		SGMLBuildDoc_setBuff(0);
+		/* Add label at the BEGINNING of token array if present */
 		if (isBlank(get("label")) == 0) {
-			tok[tokCount] = 2;
-			data[tokCount] = get("label");
+			/* Shift existing tokens to make room */
+			for (i = tokCount; i > 0; i--) {
+				tok[i] = tok[i-1];
+				data[i] = data[i-1];
+			}
+			/* Insert label at position 0 */
+			tok[0] = 2; /* MINFO_DATA */
+			data[0] = get("label");
 			tokCount++;
+			set("label", "");
 		}
 
 		for (i = 0; i < tokCount; i++) {

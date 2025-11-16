@@ -1,5 +1,27 @@
 
 	switch (arg[0]) {
+	case "entity":
+		/* Handle math entities inside sup */
+		entity_number = arg[1];
+		if (entity_number == 51) {/*infin*/
+			tok[tokCount] = 21; /*MINFO_INFIN*/
+			data[tokCount] = "";
+			tokCount++;
+		} else if (entity_number == 52) { /*integral*/
+			tok[tokCount] = 19; /*MINFO_INTEGRAL*/
+			data[tokCount] = "";
+			tokCount++;
+		} else if (entity_number == 65) { /*pi*/
+			tok[tokCount] = 22; /*MINFO_PI*/
+			data[tokCount] = "";
+			tokCount++;
+		} else if (entity_number == 68) { /*sigma*/
+			tok[tokCount] = 20; /*MINFO_SUM*/
+			data[tokCount] = "";
+			tokCount++;
+		}
+		return;
+	break;
 	case 'i':
 		if (findPattern(parent(), "box") != -1 ||
 		    findPattern(parent(), "math") != -1) {

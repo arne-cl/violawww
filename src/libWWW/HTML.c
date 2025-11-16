@@ -206,6 +206,7 @@ static char* ISO_Latin1[] = {
     "\370",  /* small o, slash */
     "\365",  /* small o, tilde */
     "\366",  /* small o, dieresis or umlaut mark */
+    "",      /* pi -- special case */
     "\042",  /* quote */
     "\042",  /* right double quote (IS NOW ACTUALLY '"') */
     "",      /* sigma -- special case */
@@ -282,6 +283,7 @@ static char* NeXTCharacters[] = {
     "\371", /* small o, slash */
     "\357", /* small o, tilde */
     "\360", /* small o, dieresis or umlaut mark */
+    "",     /* pi -- special case */
     "\373", /* small sharp s, German (sz ligature) */
     "\374", /* small thorn, Icelandic */
     "\363", /* small u, acute accent */
@@ -835,7 +837,8 @@ PRIVATE void HTML_put_entity ARGS2(HTStructured*, me, int, entity_number) {
 	/* Note: indices are per HTMLDTD.c; see logs for exact mapping */
 	if (entity_number == 51 /*infin*/ ||
 	    entity_number == 52 /*integral*/ ||
-	    entity_number == 67 /*sigma*/) {
+	    entity_number == 65 /*pi*/ ||
+	    entity_number == 68 /*sigma*/) {
         majorBuff[majorBuffi] = '\0';
         CB_HTML_special_entity(entity_number, majorBuff, majorBuffi);
         majorBuffi = 0;
