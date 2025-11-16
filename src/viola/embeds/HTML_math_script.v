@@ -1,6 +1,5 @@
 
-print("HTML_math: self=", self(), "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
-for(i=0;i<arg[];i++) print("arg[",i,"]={",arg[i],"}\n");
+/* Debug logging removed */
 
 	switch (arg[0]) {
 	case "clone":
@@ -11,13 +10,10 @@ for(i=0;i<arg[];i++) print("arg[",i,"]={",arg[i],"}\n");
 		return code_HTML_txt(arg);
 	break;
 	case "visible":
-print("MATH: visible arg=", arg[1], " current window=", window(), "\n");
 		usual();
-print("MATH: visible after usual, window=", window(), "\n");
 		return;
 	break;
 	case "config":
-print("CAUGHT CONFIG\n");
 		return;
 	break;
 	case "expose":
@@ -33,7 +29,6 @@ print("CAUGHT CONFIG\n");
 		return -1;
 	break;
 	case "entity":
-print("ENTITY FLUSH MATH label>>>>>", get("label"), "<<<\n");
 
 		if (isBlank(get("label"))) return 0;
 		tok[tokCount] = 2;
@@ -116,12 +111,8 @@ print("ENTITY FLUSH MATH label>>>>>", get("label"), "<<<\n");
 		}
 */
 		SGMLMathFormater(tok, data, tokCount);
-print("MATH: D after1 width=", width(),"\n");
-print("MATH: D after1 height=", height(),"\n");
 		set("width", get("width"));
 		set("height", get("height"));
-print("MATH: D after2 width=", width(),"\n");
-print("MATH: D after2 height=", height(),"\n");
 /*		tokCount = 0;
 */
 		return get("height");
@@ -133,21 +124,15 @@ print("MATH: D after2 height=", height(),"\n");
 		if (style == 0) style = SGMLGetStyle("HTML", "MATH");
 		vspan = style[0];
 		/* Do NOT reset x here; keep x set by 'make' from TD */
-print("MATH: R current x=", get("x"), " styleL=", style[2], " styleR=", style[3], "\n");
 		set("y", arg[1] + vspan);
 		set("width", arg[2] - get("x") - style[3]);
 
-print("MATH: R before  width=", width(),"\n");
-print("MATH: R before  height=", height(),"\n");
 		SGMLMathFormater(tok, data, tokCount);
 
 		vspan += set("height", get("height")) + style[1];
 		
 		/* Render - this will create window and draw */
 		render();
-print("MATH: R after  width=", width(),"\n");
-print("MATH: R after  height=", height(),"\n");
-print("MATH: R result vspan=", vspan,"\n");
 		return vspan;
 	break;
 	case 'b':

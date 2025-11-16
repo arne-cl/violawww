@@ -29,7 +29,6 @@
 			if (mathObj == 0) {
 				mathObj = HTML_math("clone");
 				objectListAppend_children(mathObj);
-				print("TD: D created HTML_math from pending, child=", mathObj, "\n");
 			}
 			/* Ensure math window is created/placed like text objects */
 			if (style_p == 0) style_p = SGMLGetStyle("HTML", "P");
@@ -40,19 +39,15 @@
 				h, makeAnchor);
 			makeAnchor = 0;
 			if (isBlank(get("label")) == 0) {
-				print("TD: D flushing label to math as data (pending): '{", get("label"), "}'\n");
 				send(mathObj, "data", get("label"));
 				set("label", "");
 			}
 		for (i = 0; i < mEntCount; i++) {
 			if (mEnt[i] == 51) {
-				print("TD: D pending tok MINFO_INFIN\n");
 				send(mathObj, "tok", 21);
 			} else if (mEnt[i] == 52) {
-				print("TD: D pending tok MINFO_INTEGRAL\n");
 				send(mathObj, "tok", 19);
 			} else if (mEnt[i] == 67) {
-				print("TD: D pending tok MINFO_SUM\n");
 				send(mathObj, "tok", 20);
 			}
 		}
@@ -74,18 +69,15 @@
 		if (style == 0) style = SGMLGetStyle("HTML", "TD");
 		vspan = 0;
 		n = countChildren();
-		print("TD: D children count=", n, "\n");
 		if (n) {
 			xx = get("width");
 			for (i = 0; i < n; i++) {
 				child = nthChild(i);
 				rv = send(child, 'R', h + vspan, xx);
-				print("TD: D child[", i, "]=", child, " contributed vspan=", rv, "\n");
 				vspan += rv;
 			}
 		}
 		h += vspan;
-		print("TD: D total h=", h, "\n");
 
 		cellType = 16; /* TABLE_CELL_TYPE_TD == 16 */
 		if (send(parent(), 'b')) set("border", 6);
@@ -103,13 +95,11 @@
 		set("width", arg[2] - get("x") - style[3]);
 
 		n = countChildren();
-		print("TD: R start y=", get("y"), " width=", get("width"), " children=", n, "\n");
 		if (n) {
 			xx = get("width");
 			for (i = 0; i < n; i++) {
 				child = nthChild(i);
 				rv = send(child, 'R', vspan, xx);
-				print("TD: R child[", i, "]=", child, " vspan=", rv, "\n");
 				vspan += rv;
 			}
 		}
@@ -166,7 +156,6 @@
 	case "entity":
 		/* Route special entities into an inline HTML_math child to render math */
 		entity_number = arg[1];
-		print("TD: entity received #", entity_number, " label='{", get("label"), "}'\n");
 		/* Buffer entity; create math in D when layout happens */
 		mEnt[mEntCount] = entity_number;
 		mEntCount++;
