@@ -25,7 +25,7 @@
 
 #define DOX 1
 
-#define VERBOSE 1
+/* #define VERBOSE 1 */  /* Uncomment for detailed math layout debugging */
 
 #ifdef DOX
 /***************************** BEGINNING OF X DECLS ************************/
@@ -1394,21 +1394,25 @@ int HTMLMathFormater(VObj* self, Packet* tokenListPk, Packet* dataListPk, int li
     tokAttrp = tokenListPk->info.a;
     dataAttrp = dataListPk->info.a;
 
+#ifdef VERBOSE
     printf("tokList:-------\n");
     dumpVarList(tokAttrp);
     printf("---------------\n");
+#endif
 
     /* dependent on retro list entry order */
     for (i = listSize - 1; i >= 0; i--) {
         tokPk = (Packet*)(tokAttrp->val);
         dataPk = (Packet*)(dataAttrp->val);
 
+#ifdef VERBOSE
         printf("tokPk: ");
         dumpPacket(tokPk);
         printf("\n");
         printf("dataPk: ");
         dumpPacket(dataPk);
         printf("\n");
+#endif
 
         token = PkInfo2Int(tokPk);
         dataStr = PkInfo2Str(dataPk);
@@ -1427,11 +1431,13 @@ int HTMLMathFormater(VObj* self, Packet* tokenListPk, Packet* dataListPk, int li
 
     make(minfoBuff);
 
+#ifdef VERBOSE
     /* Don't set coordinates here - will be set in HTMLMathDraw based on object position */
     fprintf(stderr, "HTMLMathFormater: obj xy=(%d,%d) width=%d height=%d\n",
             GET_x(self), GET_y(self),
             handle->next ? handle->next->width : 0,
             handle->next ? handle->next->height : 0);
+#endif
 
     SET_width(self, handle->next->width + 3);
     SET_height(self, handle->next->height + 3);
