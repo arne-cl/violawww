@@ -32,7 +32,9 @@
 	break;
 	case 'i':
 		if (findPattern(parent(), "box") != -1 ||
-		    findPattern(parent(), "math") != -1) {
+		    findPattern(parent(), "math") != -1 ||
+		    findPattern(parent(), "paren") != -1 ||
+		    findPattern(parent(), "bracket") != -1) {
 			SGMLBuildDoc_setBuff(0);
 			if (isBlank(get("label")) == 0) {
 				tok[tokCount] = 2;
