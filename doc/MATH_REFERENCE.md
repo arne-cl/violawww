@@ -315,7 +315,7 @@ The math engine uses these internal tokens (not directly accessible in HTML):
   - `src/viola/embeds/HTML_below_script.v` - Handles nested `()` and `[]`
 - **Entity Definitions**: `src/libWWW/HTMLDTD.c`, `src/libWWW/HTML.c`
 
-
+---
 
 *Last updated: November 18, 2025*
 
