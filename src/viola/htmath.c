@@ -454,7 +454,7 @@ MAST* makeMAST() {
     return m;
 }
 
-void appendSibling(self, sibling) MAST *self, *sibling;
+void appendSibling(MAST *self, MAST *sibling)
 {
     MAST* mast;
     if (self->next) {
@@ -466,7 +466,7 @@ void appendSibling(self, sibling) MAST *self, *sibling;
     }
 }
 
-void appendChild(parent, child) MAST *parent, *child;
+void appendChild(MAST *parent, MAST *child)
 {
     MAST* mast;
     if (parent->children) {
@@ -478,7 +478,7 @@ void appendChild(parent, child) MAST *parent, *child;
     }
 }
 
-void removeChild(self, child) MAST *self, *child;
+void removeChild(MAST *self, MAST *child)
 {
     MAST* mast;
     if (self->children) {
@@ -493,8 +493,7 @@ void removeChild(self, child) MAST *self, *child;
         }
     }
 }
-void dumpMAST(self, level) MAST* self;
-int level;
+void dumpMAST(MAST* self, int level)
 {
     MAST* mast;
     int i;
@@ -515,8 +514,7 @@ int level;
     }
 }
 
-void frameCoords(self, rx, ry) MAST* self;
-int rx, ry;
+void frameCoords(MAST* self, int rx, int ry)
 {
     MAST* mast;
 
@@ -533,7 +531,7 @@ int rx, ry;
     }
 }
 
-void doOver(self) MAST* self;
+void doOver(MAST* self)
 {
     MAST *mast, *new, *objsToPush, *hbox;
 
@@ -592,8 +590,7 @@ int isInSupOrSub(MAST* mast) {
     return 0;
 }
 
-void tile(self, level) MAST* self;
-int level;
+void tile(MAST* self, int level)
 {
     MAST *mast, *cmast;
     int i, x, y;
@@ -748,8 +745,7 @@ int level;
     }
 }
 
-void center(self, level) MAST* self;
-int level;
+void center(MAST* self, int level)
 {
     MAST *mast, *cmast;
     int i, vspan, hspan;
@@ -816,7 +812,7 @@ int level;
     }
 }
 
-void expandables(self) MAST* self;
+void expandables(MAST* self)
 {
     MAST *mast, *cmast;
 
@@ -1009,7 +1005,7 @@ int fold(MAST* self)
     return 0;
 }
 
-void setMASTSize(mast) MAST* mast;
+void setMASTSize(MAST* mast)
 {
     switch (mast->type) {
     case MINFO_ENTITY:
@@ -1233,9 +1229,7 @@ box
 #ifdef DOX
 /******* X STUFF *******/
 
-void drawMAST(self, level, w) MAST* self;
-int level;
-Window w;
+void drawMAST(MAST* self, int level, Window w)
 {
     MAST* mast;
     int i;
