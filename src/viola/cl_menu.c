@@ -140,7 +140,7 @@ xpa_entrys parse_menu_configuration(VObj*, char*);
 static unsigned long res_color(VObj*, Display*, char*, XColor*);
 int funny_evt(XEvent*);
 xpa_menu make_menu(char*, xpa_entrys*, VObj*);
-char* get_menu_message(xpa_entrys entrys, long* result, int resultn);
+char* get_menu_message(xpa_entrys entrys, int* result, int resultn);
 int set_menuConfig(VObj*);
 
 long meth_menu_config(VObj* self, Packet* result, int argc, Packet argv[]) {
@@ -189,7 +189,8 @@ long meth_menu_initialize(VObj* self, Packet* result, int argc, Packet argv[]) {
 }
 
 long meth_menu_processMouseInput(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long *menu_result, menu_resultn;
+    int* menu_result;
+    long menu_resultn;
     int root_x, root_y;
     char* data;
     xpa_menu menup = (xpa_menu)GET__menu(self);
@@ -714,7 +715,7 @@ xpa_menu make_menu(char* menuSpec, xpa_entrys* ret_menu_entries, VObj* self) {
     return menu;
 }
 
-char* get_menu_message(xpa_entrys entrys, long* result, int resultn) {
+char* get_menu_message(xpa_entrys entrys, int* result, int resultn) {
     char* message = NULL;
     int i;
 
