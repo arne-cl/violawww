@@ -9,7 +9,7 @@
 			set("label", "");
 		}
 		
-		/* Then handle math entities inside sup */
+		/* Then handle math entities inside below */
 		entity_number = arg[1];
 		if (entity_number == 51) {/*infin*/
 			tok[tokCount] = 21; /*MINFO_INFIN*/
@@ -41,16 +41,11 @@
 			}
 			test3();
 			send(parent(), "flush");
-			send(parent(), "tok", 12/*S_SUP*/);
-/*			for (i = 0; i < tokCount; i++) {
-				print("sup_tok ", i, ":   type=", tok[i], 
-					"  data={", data[i], "}\n");
-			}
-*/
+			send(parent(), "tok", 26/*S_BELOW*/);
 			for (i = 0; i < tokCount; i++) {
 				send(parent(), "tok&data", tok[i], data[i]);
 			}
-			send(parent(), "tok", 13/*E_SUP*/);
+			send(parent(), "tok", 27/*E_BELOW*/);
 			tokCount = 0;
 			return "";
 		} else {
@@ -97,3 +92,4 @@
 	break;
 	}
 	usual();
+

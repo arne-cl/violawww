@@ -37,7 +37,6 @@ typedef enum _HTMLElement {
     HTML_BOLD,
     HTML_BOX,
     HTML_BR,
-    HTML_BRACKET,
     HTML_BUTTON, /*vr exp*/
     HTML_BYLINE,
     HTML_CAUTION,
@@ -106,7 +105,6 @@ typedef enum _HTMLElement {
     HTML_OVAL, /*vr exp*/
     HTML_OVER,
     HTML_P,
-    HTML_PAREN,
     HTML_PLAIN,
     HTML_PLAINTEXT,
     HTML_POINT,   /*vr exp*/

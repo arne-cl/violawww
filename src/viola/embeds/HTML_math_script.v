@@ -77,11 +77,47 @@
 	case "flush":
 		/* First, transfer any pending data from global buffer to label */
 		SGMLBuildDoc_setBuff(-1);
-		/* Then flush label to tok buffer before sub/sup processing */
+		/* Then flush label to tok buffer, parsing bracket characters */
 		if (isBlank(get("label")) == 0) {
-			tok[tokCount] = 2; /* MINFO_DATA */
-			data[tokCount] = get("label");
-			tokCount++;
+			label_text = get("label");
+			label_len = strlen(label_text);
+			text_start = 0;
+			
+			for (char_idx = 0; char_idx < label_len; char_idx++) {
+				ch = nthChar(label_text, char_idx);
+				
+				if (ch == '(' || ch == ')' || ch == '[' || ch == ']') {
+					/* Flush accumulated text before bracket */
+					if (char_idx > text_start) {
+						tok[tokCount] = 2; /* MINFO_DATA */
+						data[tokCount] = nthChar(label_text, text_start, char_idx - 1);
+						tokCount++;
+					}
+					
+					/* Add bracket token */
+					if (ch == '(') {
+						tok[tokCount] = 15; /* MINFO_LPAREN */
+					} else if (ch == ')') {
+						tok[tokCount] = 16; /* MINFO_RPAREN */
+					} else if (ch == '[') {
+						tok[tokCount] = 17; /* MINFO_LBRACK */
+					} else if (ch == ']') {
+						tok[tokCount] = 18; /* MINFO_RBRACK */
+					}
+					data[tokCount] = "";
+					tokCount++;
+					
+					text_start = char_idx + 1;
+				}
+			}
+			
+			/* Flush remaining text after last bracket */
+			if (text_start < label_len) {
+				tok[tokCount] = 2; /* MINFO_DATA */
+				data[tokCount] = nthChar(label_text, text_start, label_len - 1);
+				tokCount++;
+			}
+			
 			set("label", "");
 		}
 		return;
@@ -90,9 +126,45 @@
 		/* Transfer data from buffer to label and add to tokens NOW (before children) */
 		SGMLBuildDoc_setBuff(-1);
 		if (isBlank(get("label")) == 0) {
-			tok[tokCount] = 2; /* MINFO_DATA */
-			data[tokCount] = get("label");
-			tokCount++;
+			label_text = get("label");
+			label_len = strlen(label_text);
+			text_start = 0;
+			
+			for (char_idx = 0; char_idx < label_len; char_idx++) {
+				ch = nthChar(label_text, char_idx);
+				
+				if (ch == '(' || ch == ')' || ch == '[' || ch == ']') {
+					/* Flush accumulated text before bracket */
+					if (char_idx > text_start) {
+						tok[tokCount] = 2; /* MINFO_DATA */
+						data[tokCount] = nthChar(label_text, text_start, char_idx - 1);
+						tokCount++;
+					}
+					
+					/* Add bracket token */
+					if (ch == '(') {
+						tok[tokCount] = 15; /* MINFO_LPAREN */
+					} else if (ch == ')') {
+						tok[tokCount] = 16; /* MINFO_RPAREN */
+					} else if (ch == '[') {
+						tok[tokCount] = 17; /* MINFO_LBRACK */
+					} else if (ch == ']') {
+						tok[tokCount] = 18; /* MINFO_RBRACK */
+					}
+					data[tokCount] = "";
+					tokCount++;
+					
+					text_start = char_idx + 1;
+				}
+			}
+			
+			/* Flush remaining text after last bracket */
+			if (text_start < label_len) {
+				tok[tokCount] = 2; /* MINFO_DATA */
+				data[tokCount] = nthChar(label_text, text_start, label_len - 1);
+				tokCount++;
+			}
+			
 			set("label", "");
 		}
 		return -1;
@@ -101,9 +173,46 @@
 		/* Transfer any remaining data after children to label and add to tokens */
 		SGMLBuildDoc_setBuff(0);
 		if (isBlank(get("label")) == 0) {
-			tok[tokCount] = 2; /* MINFO_DATA */
-			data[tokCount] = get("label");
-			tokCount++;
+			label_text = get("label");
+			label_len = strlen(label_text);
+			text_start = 0;
+			
+			for (char_idx = 0; char_idx < label_len; char_idx++) {
+				ch = nthChar(label_text, char_idx);
+				
+				/* Compare with character literals directly */
+				if (ch == '(' || ch == ')' || ch == '[' || ch == ']') {
+					/* Flush accumulated text before bracket */
+					if (char_idx > text_start) {
+						tok[tokCount] = 2; /* MINFO_DATA */
+						data[tokCount] = nthChar(label_text, text_start, char_idx - 1);
+						tokCount++;
+					}
+					
+					/* Add bracket token */
+					if (ch == '(') {
+						tok[tokCount] = 15; /* MINFO_LPAREN */
+					} else if (ch == ')') {
+						tok[tokCount] = 16; /* MINFO_RPAREN */
+					} else if (ch == '[') {
+						tok[tokCount] = 17; /* MINFO_LBRACK */
+					} else if (ch == ']') {
+						tok[tokCount] = 18; /* MINFO_RBRACK */
+					}
+					data[tokCount] = "";
+					tokCount++;
+					
+					text_start = char_idx + 1;
+				}
+			}
+			
+			/* Flush remaining text after last bracket */
+			if (text_start < label_len) {
+				tok[tokCount] = 2; /* MINFO_DATA */
+				data[tokCount] = nthChar(label_text, text_start, label_len - 1);
+				tokCount++;
+			}
+			
 			set("label", "");
 		}
 
