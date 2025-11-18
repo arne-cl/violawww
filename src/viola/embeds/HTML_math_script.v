@@ -21,11 +21,46 @@
 		return;
 	break;
 	case "entity":
-		/* Add any pending label text first */
+		/* Add any pending label text first, parsing brackets */
 		if (isBlank(get("label")) == 0) {
-			tok[tokCount] = 2;
-			data[tokCount] = get("label");
-			tokCount++;
+			label_text = get("label");
+			label_len = strlen(label_text);
+			text_start = 0;
+			
+			for (char_idx = 0; char_idx < label_len; char_idx++) {
+				ch = nthChar(label_text, char_idx);
+				
+				if (ch == '(' || ch == ')' || ch == '[' || ch == ']') {
+					/* Flush accumulated text before bracket */
+					if (char_idx > text_start) {
+						tok[tokCount] = 2; /* MINFO_DATA */
+						data[tokCount] = nthChar(label_text, text_start, char_idx - 1);
+						tokCount++;
+					}
+					
+					/* Add bracket token */
+					if (ch == '(') {
+						tok[tokCount] = 15; /* MINFO_LPAREN */
+					} else if (ch == ')') {
+						tok[tokCount] = 16; /* MINFO_RPAREN */
+					} else if (ch == '[') {
+						tok[tokCount] = 17; /* MINFO_LBRACK */
+					} else if (ch == ']') {
+						tok[tokCount] = 18; /* MINFO_RBRACK */
+					}
+					data[tokCount] = "";
+					tokCount++;
+					
+					text_start = char_idx + 1;
+				}
+			}
+			
+			/* Flush remaining text after last bracket */
+			if (text_start < label_len) {
+				tok[tokCount] = 2; /* MINFO_DATA */
+				data[tokCount] = nthChar(label_text, text_start, label_len - 1);
+				tokCount++;
+			}
 		}
 
 		/* Then add the entity token */
@@ -53,17 +88,94 @@
 		/* arg[1]	token
 		 * arg[2]	data
 		 */
-		tok[tokCount] = arg[1];
-		data[tokCount] = arg[2];
-		tokCount++;
+		/* If token is MINFO_DATA (2), parse brackets in data */
+		if (arg[1] == 2) {
+			label_text = arg[2];
+			label_len = strlen(label_text);
+			text_start = 0;
+			
+			for (char_idx = 0; char_idx < label_len; char_idx++) {
+				ch = nthChar(label_text, char_idx);
+				
+				if (ch == '(' || ch == ')' || ch == '[' || ch == ']') {
+					/* Flush accumulated text before bracket */
+					if (char_idx > text_start) {
+						tok[tokCount] = 2; /* MINFO_DATA */
+						data[tokCount] = nthChar(label_text, text_start, char_idx - 1);
+						tokCount++;
+					}
+					
+					/* Add bracket token */
+					if (ch == '(') {
+						tok[tokCount] = 15; /* MINFO_LPAREN */
+					} else if (ch == ')') {
+						tok[tokCount] = 16; /* MINFO_RPAREN */
+					} else if (ch == '[') {
+						tok[tokCount] = 17; /* MINFO_LBRACK */
+					} else if (ch == ']') {
+						tok[tokCount] = 18; /* MINFO_RBRACK */
+					}
+					data[tokCount] = "";
+					tokCount++;
+					
+					text_start = char_idx + 1;
+				}
+			}
+			
+			/* Flush remaining text after last bracket */
+			if (text_start < label_len) {
+				tok[tokCount] = 2; /* MINFO_DATA */
+				data[tokCount] = nthChar(label_text, text_start, label_len - 1);
+				tokCount++;
+			}
+		} else {
+			/* Non-data token, pass through */
+			tok[tokCount] = arg[1];
+			data[tokCount] = arg[2];
+			tokCount++;
+		}
 		return;
 	break;
 	case "data":
-		/* arg[1]	data
-		 */
-		tok[tokCount] = 2;
-		data[tokCount] = arg[1];
-		tokCount++;
+		/* arg[1]	data - parse brackets */
+		label_text = arg[1];
+		label_len = strlen(label_text);
+		text_start = 0;
+		
+		for (char_idx = 0; char_idx < label_len; char_idx++) {
+			ch = nthChar(label_text, char_idx);
+			
+			if (ch == '(' || ch == ')' || ch == '[' || ch == ']') {
+				/* Flush accumulated text before bracket */
+				if (char_idx > text_start) {
+					tok[tokCount] = 2; /* MINFO_DATA */
+					data[tokCount] = nthChar(label_text, text_start, char_idx - 1);
+					tokCount++;
+				}
+				
+				/* Add bracket token */
+				if (ch == '(') {
+					tok[tokCount] = 15; /* MINFO_LPAREN */
+				} else if (ch == ')') {
+					tok[tokCount] = 16; /* MINFO_RPAREN */
+				} else if (ch == '[') {
+					tok[tokCount] = 17; /* MINFO_LBRACK */
+				} else if (ch == ']') {
+					tok[tokCount] = 18; /* MINFO_RBRACK */
+				}
+				data[tokCount] = "";
+				tokCount++;
+				
+				text_start = char_idx + 1;
+			}
+		}
+		
+		/* Flush remaining text after last bracket */
+		if (text_start < label_len) {
+			tok[tokCount] = 2; /* MINFO_DATA */
+			data[tokCount] = nthChar(label_text, text_start, label_len - 1);
+			tokCount++;
+		}
 		return;
 	break;
 	case "tok":

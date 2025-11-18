@@ -1043,7 +1043,7 @@ void setMASTSize(MAST* mast)
 MAST* build(MAST* self, MAST* parent, MInfo* minfo, int* minfoIdx, int level)
 {
     MInfo* m;
-    MAST *new, *insert, *big_brother = NULL, *child, *ret;
+    MAST *new, *insert, *big_brother = NULL, *child, *ret, *rbrack_node;
     int i;
 
     for (;;) {
@@ -1135,11 +1135,25 @@ MAST* build(MAST* self, MAST* parent, MInfo* minfo, int* minfoIdx, int level)
                 return big_brother;
             break;
         case MINFO_LPAREN:
-        case MINFO_LBRACK:
             child = build(NULL, new, minfo, minfoIdx, level + 1);
             m = &minfo[*minfoIdx];
-            if (m->type == MINFO_RPAREN || m->type == MINFO_RBRACK)
+            if (m->type == MINFO_RPAREN)
                 (*minfoIdx)++;
+            break;
+        case MINFO_LBRACK:
+            /* Build children until RBRACK */
+            child = build(NULL, new, minfo, minfoIdx, level + 1);
+            m = &minfo[*minfoIdx];
+            if (m->type == MINFO_RBRACK) {
+                /* Create RBRACK as last child of LBRACK */
+                (*minfoIdx)++;
+                rbrack_node = makeMAST();
+                rbrack_node->parent = new;
+                rbrack_node->type = MINFO_RBRACK;
+                rbrack_node->s = "";
+                setMASTSize(rbrack_node);
+                appendChild(new, rbrack_node);
+            }
             break;
         case MINFO_HDIV:
             return new;
@@ -1327,6 +1341,21 @@ void drawMAST(MAST* self, int level, Window w)
             FLUSH;
             drawMAST(mast->children, level + 1, w);
         } break;
+        case MINFO_RBRACK: {
+            /* Draw closing bracket using parent's height */
+            int yt, yb, xl, xr;
+            MAST* parent = mast->parent;
+            if (parent && parent->type == MINFO_LBRACK) {
+                yt = parent->ry + 1;
+                yb = parent->ry + parent->height - 2;
+                xl = mast->rx;
+                xr = mast->rx + BRACK_WIDTH - 1;
+                XDrawLine(display, w, gc_fg, xl, yt, xr, yt);
+                XDrawLine(display, w, gc_fg, xr, yt, xr, yb);
+                XDrawLine(display, w, gc_fg, xr, yb, xl, yb);
+                FLUSH;
+            }
+        } break;
         case MINFO_SUM: {
             /* Draw a large Sigma shape within SUM_WIDTH x mast->height */
             int yt, yb, ym, xl, xm, xr;
@@ -1398,17 +1427,6 @@ void drawMAST(MAST* self, int level, Window w)
             int leg_right = rx + mw - 3;
             XDrawLine(display, w, gc_fg, leg_right, y_top, leg_right, ry + mh - 2);
             
-            FLUSH;
-        } break;
-        case MINFO_RBRACK: {
-            int yt, yb, xl, xr;
-            yt = mast->ry + 1;
-            yb = mast->ry + mast->height - 2;
-            xl = mast->rx;
-            xr = mast->rx + BRACK_WIDTH - 1;
-            XDrawLine(display, w, gc_fg, xl, yt, xr, yt);
-            XDrawLine(display, w, gc_fg, xr, yt, xr, yb);
-            XDrawLine(display, w, gc_fg, xr, yb, xl, yb);
             FLUSH;
         } break;
         case MINFO_INTEGRAL: {
