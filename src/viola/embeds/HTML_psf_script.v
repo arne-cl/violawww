@@ -23,8 +23,8 @@
 		 * arg[3]	y
 		 * arg[4]	src
 		 * arg[5]	delayP
-		 * arg[6]	delayWidth
-		 * arg[7]	delayHeight
+		 * arg[6]	width
+		 * arg[7]	height
 		 * arg[8]	ismap
 		 */
 		set("parent", arg[1]);
@@ -44,8 +44,20 @@
 		} else {				
 			localFile = concat(localSource, ".gif");
 
+			w = int(arg[6]);
+			h = int(arg[7]);
+
+			if (w > 0 || h > 0) {
+				if (w < 1) w = "";
+				if (h < 1) h = "";
+
+				resize = concat("-resize '", w, "x", h, "!' ");
+			} else {
+				resize = "";
+			}
+
 			system(concat("magick -density 80 -background white 'ps:",
-				localSource, "' -alpha remove -alpha off -colors 256 '",
+				localSource, "' ", resize, "-alpha remove -alpha off -colors 256 '", 
 				localFile,
 			"'"));
 
