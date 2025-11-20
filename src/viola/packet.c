@@ -149,18 +149,6 @@ void dumpPacket(packet) Packet* packet;
             }
         }
         break;
-        /*
-                case PKT_STRI:
-                        if (packet->info.si) {
-                                if (packet->info.si.s)
-                                        printf("\"%s\"", packet->info.si.s);
-                                else
-                                        printf("(NULL)");
-                        } else {
-                                printf("(NULL)");
-                        }
-                break;
-        */
     default:
         printf("(%ld)", packet->info.i);
         break;

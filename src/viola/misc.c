@@ -383,10 +383,6 @@ char* PkInfo2Str(Packet* pk)
                 sprintf(buff, "%ld ", array->info[n]);
         }
         break;
-        /*	case PKT_STRI:
-                        printf(stderr,"PKT_STRI: NOT IMPLEMENTED XXX\n");
-                break;
-        */
     default:
         buff[0] = '\0';
         break;

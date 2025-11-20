@@ -28,7 +28,6 @@ enum {
     PKT_VLT,        /* 7 */
     PKT_ARY,        /* 8 */
     PKT_TOK,        /* 9 */
-    /*	PKT_STRI,*/ /* 9 */
 };
 
 #define PK_CANFREE_STR 1 /* can free info.s */
@@ -49,7 +48,6 @@ typedef struct Packet {
         struct Attr* a;
         struct Array* y;
         struct VList* l;
-        /*		struct StrInfo *si;*/
     } info;
     char type;
     char canFree; /* regarding .info.s */
