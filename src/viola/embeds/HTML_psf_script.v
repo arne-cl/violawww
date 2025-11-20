@@ -44,10 +44,10 @@
 		} else {				
 			localFile = concat(localSource, ".gif");
 
-			system(concat("magick -density 80 -background white \"",
-				localSource, "\" -alpha remove -alpha off -colors 256 \"",
+			system(concat("magick -density 80 -background white 'ps:",
+				localSource, "' -alpha remove -alpha off -colors 256 '",
 				localFile,
-			"\""));
+			"'"));
 
 			send("wwwSecurity", "rmTmpFile", localSource);
 
