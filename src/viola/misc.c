@@ -11,12 +11,125 @@
 #include "utils.h"
 #include <ctype.h>
 #include <math.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 int cmd_history = 0;
 int verbose = 0;
 
 char strBuff[32];
+
+/* Dynamic packet concatenation buffer.
+ * Note: ViolaWWW is single-threaded (X11 event loop), so no mutex needed.
+ * Initial size is conservative (1KB), grows exponentially as needed.
+ */
+static char* pkinfo_concat_buf = NULL;
+static size_t pkinfo_concat_cap = 0;
+
+typedef struct PkinfoOldBufNode {
+    char* buf;
+    struct PkinfoOldBufNode* next;
+} PkinfoOldBufNode;
+
+static PkinfoOldBufNode* pkinfo_old_buffers = NULL;
+
+#define PKINFO_INITIAL_SIZE 1024
+#define PKINFO_MAX_TMP_SIZE 128
+
+static const char pkinfo_null_repr[] = "(NULL)";
+
+static void remember_old_pkinfo_buffer(char* buf)
+{
+    if (!buf)
+        return;
+
+    PkinfoOldBufNode* node = malloc(sizeof(*node));
+    if (!node) {
+        fprintf(stderr, "PkInfos2Str: unable to track old buffer for cleanup\n");
+        return;
+    }
+    node->buf = buf;
+    node->next = pkinfo_old_buffers;
+    pkinfo_old_buffers = node;
+}
+
+void cleanup_pkinfo_concat(void)
+{
+    free(pkinfo_concat_buf);
+    pkinfo_concat_buf = NULL;
+
+    while (pkinfo_old_buffers) {
+        PkinfoOldBufNode* node = pkinfo_old_buffers;
+        pkinfo_old_buffers = node->next;
+        free(node->buf);
+        free(node);
+    }
+    pkinfo_concat_cap = 0;
+}
+
+static int ensure_pkinfo_capacity(size_t required, size_t preserve_len)
+{
+    if (required <= pkinfo_concat_cap)
+        return 1;
+
+    /* Start small, grow exponentially (2x) for better amortized performance */
+    size_t new_cap = pkinfo_concat_cap ? pkinfo_concat_cap * 2 : PKINFO_INITIAL_SIZE;
+    while (new_cap < required) {
+        /* Protect against integer overflow */
+        if (new_cap > SIZE_MAX / 2) {
+            fprintf(stderr, "PkInfos2Str: required size %zu exceeds maximum\n", required);
+            return 0;
+        }
+        new_cap *= 2;
+    }
+
+    char* new_buf = malloc(new_cap);
+    if (!new_buf) {
+        fprintf(stderr, "PkInfos2Str: failed to grow buffer to %zu bytes\n", new_cap);
+        return 0;
+    }
+
+    if (pkinfo_concat_buf) {
+        size_t copy_len = preserve_len;
+        if (copy_len >= pkinfo_concat_cap && pkinfo_concat_cap > 0)
+            copy_len = pkinfo_concat_cap - 1;
+        if (copy_len > 0) {
+            memmove(new_buf, pkinfo_concat_buf, copy_len);
+            new_buf[copy_len] = pkinfo_concat_buf[copy_len];
+        } else {
+            new_buf[0] = pkinfo_concat_buf[0];
+        }
+        remember_old_pkinfo_buffer(pkinfo_concat_buf);
+    } else {
+        new_buf[0] = '\0';
+    }
+
+    pkinfo_concat_buf = new_buf;
+    pkinfo_concat_cap = new_cap;
+    return 1;
+}
+
+static inline int append_chunk(const char* chunk, size_t len, size_t* used)
+{
+    if (!chunk || len == 0)
+        return 1;
+
+    /* Protect against integer overflow in size calculation */
+    if (*used > SIZE_MAX - len - 1) {
+        fprintf(stderr, "PkInfos2Str: concatenation size overflow\n");
+        return 0;
+    }
+
+    size_t needed = *used + len + 1;
+    if (!ensure_pkinfo_capacity(needed, *used))
+        return 0;
+
+    memmove(pkinfo_concat_buf + *used, chunk, len);
+    *used += len;
+    pkinfo_concat_buf[*used] = '\0';
+    return 1;
+}
 
 /*
  * parse the string and set the numbers onto the array.
@@ -163,56 +276,80 @@ int makeArgv(char* argv[], char* argline)
  */
 char* PkInfos2Str(int argc, Packet argv[])
 {
-    char sbuff[64000]; /*XXX*/
+    size_t used = 0;
+    char tmp[PKINFO_MAX_TMP_SIZE];
 
-    buff[0] = '\0';
+    if (!ensure_pkinfo_capacity(1, 0)) {
+        buff[0] = '\0';
+        return buff;
+    }
+    pkinfo_concat_buf[0] = '\0';
 
     for (int i = 0; i < argc; i++) {
-        switch (argv[i].type) {
+        Packet* pk = &argv[i];
+
+        switch (pk->type) {
         case PKT_STR:
-            sprintf(sbuff, "%s", argv[i].info.s);
+            if (pk->info.s && !append_chunk(pk->info.s, strlen(pk->info.s), &used))
+                goto fail;
             break;
         case PKT_CHR:
-            sprintf(sbuff, "%c", argv[i].info.c);
+            tmp[0] = pk->info.c;
+            if (!append_chunk(tmp, 1, &used))
+                goto fail;
             break;
-        case PKT_INT:
-            sprintf(sbuff, "%ld", argv[i].info.i);
-            break;
-        case PKT_FLT:
-            sprintf(sbuff, "%f", argv[i].info.f);
-            break;
-        case PKT_OBJ:
-            if (argv[i].info.o)
-                sprintf(sbuff, "%s", GET_name(argv[i].info.o));
-            else
-                sprintf(sbuff, "(NULL)");
-            break;
-        case PKT_ARY:
-            if (argv[i].info.y) {
-                int n;
-                Array* array = argv[i].info.y;
-                for (n = 0; n < array->size; n++)
-                    sprintf(sbuff, "%ld ", array->info[n]);
-            }
-            break;
-            /*		case PKT_STRI:
-                                    if (argv[i].info.si) {
-                                            if (argv[i].info.si.s)
-                                                    sprintf("%s", argv[i].info.si.s);
-                                            else
-                                                    *sbuff = '\0';
-                                    } else {
-                                            *sbuff = '\0';
-                                    }
-                            break;
-            */
-        default:
-            sprintf(sbuff, "?");
+        case PKT_INT: {
+            int len = snprintf(tmp, sizeof(tmp), "%ld", pk->info.i);
+            if (len < 0 || (size_t)len >= sizeof(tmp))
+                goto fail;
+            if (!append_chunk(tmp, (size_t)len, &used))
+                goto fail;
             break;
         }
-        /*printf("argc=%d i=%d sbuff=``%s''\n", argc, i, sbuff);*/
-        strcat(buff, sbuff);
+        case PKT_FLT: {
+            int len = snprintf(tmp, sizeof(tmp), "%f", pk->info.f);
+            if (len < 0 || (size_t)len >= sizeof(tmp))
+                goto fail;
+            if (!append_chunk(tmp, (size_t)len, &used))
+                goto fail;
+            break;
+        }
+        case PKT_OBJ:
+            if (pk->info.o) {
+                const char* name = GET_name(pk->info.o);
+                if (name && !append_chunk(name, strlen(name), &used))
+                    goto fail;
+            } else {
+                if (!append_chunk(pkinfo_null_repr, sizeof(pkinfo_null_repr) - 1, &used))
+                    goto fail;
+            }
+            break;
+        case PKT_ARY:
+            if (pk->info.y && pk->info.y->info && pk->info.y->size > 0) {
+                Array* array = pk->info.y;
+                for (int n = 0; n < array->size; n++) {
+                    int len = snprintf(tmp, sizeof(tmp), "%ld", array->info[n]);
+                    if (len < 0 || (size_t)len >= sizeof(tmp))
+                        goto fail;
+                    if (!append_chunk(tmp, (size_t)len, &used))
+                        goto fail;
+                    if (n < array->size - 1) {
+                        if (!append_chunk(" ", 1, &used))
+                            goto fail;
+                    }
+                }
+            }
+            break;
+        default:
+            if (!append_chunk("?", 1, &used))
+                goto fail;
+            break;
+        }
     }
+    return pkinfo_concat_buf;
+
+fail:
+    buff[0] = '\0';
     return buff;
 }
 

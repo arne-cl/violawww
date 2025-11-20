@@ -368,6 +368,12 @@ void freeViolaResources() {
     free_fonts();
     freeAllObjects();
     freeGLibResources();
+    
+    /* Free packet concatenation buffer */
+    {
+        extern void cleanup_pkinfo_concat(void);
+        cleanup_pkinfo_concat();
+    }
 }
 
 /* Scott: moved this code from the former main.c into this file

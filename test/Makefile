@@ -24,7 +24,7 @@ VIOLA_DIR := $(PROJECT_ROOT)/src/viola
 LIBWWW_DIR := $(PROJECT_ROOT)/src/libWWW
 
 # All tests (add new tests here!)
-TESTS := test-stg-minors test-stg-context test-xpm-injection test-htcharset test-wayback-detection test-biop test-hash-memory test-mystrings
+TESTS := test-stg-minors test-stg-context test-xpm-injection test-htcharset test-wayback-detection test-biop test-hash-memory test-mystrings test-pkinfo-concat
 
 .PHONY: all test clean $(TESTS)
 
@@ -48,6 +48,7 @@ test:
 	-@$(MAKE) test-biop >$(BUILD_DIR)/test-biop.log 2>&1 && echo "PASS" >> $(BUILD_DIR)/results.txt && echo "  ✓ test-biop: PASS" || (echo "FAIL" >> $(BUILD_DIR)/results.txt && echo "  ✗ test-biop: FAIL")
 	-@$(MAKE) test-hash-memory >$(BUILD_DIR)/test-hash-memory.log 2>&1 && echo "PASS" >> $(BUILD_DIR)/results.txt && echo "  ✓ test-hash-memory: PASS" || (echo "FAIL" >> $(BUILD_DIR)/results.txt && echo "  ✗ test-hash-memory: FAIL")
 	-@$(MAKE) test-mystrings >$(BUILD_DIR)/test-mystrings.log 2>&1 && echo "PASS" >> $(BUILD_DIR)/results.txt && echo "  ✓ test-mystrings: PASS" || (echo "FAIL" >> $(BUILD_DIR)/results.txt && echo "  ✗ test-mystrings: FAIL")
+	-@$(MAKE) test-pkinfo-concat >$(BUILD_DIR)/test-pkinfo-concat.log 2>&1 && echo "PASS" >> $(BUILD_DIR)/results.txt && echo "  ✓ test-pkinfo-concat: PASS" || (echo "FAIL" >> $(BUILD_DIR)/results.txt && echo "  ✗ test-pkinfo-concat: FAIL")
 	@echo ""
 	@echo "======================================="
 	@echo "Test Suite Summary"
@@ -141,6 +142,14 @@ test-mystrings: test_mystrings.c $(PROJECT_ROOT)/src/viola/hash.o $(PROJECT_ROOT
 	@$(CC) $(CFLAGS) -I$(PROJECT_ROOT)/src/viola -o $(BUILD_DIR)/test_mystrings test_mystrings.c \
 		$(PROJECT_ROOT)/src/viola/hash.o $(PROJECT_ROOT)/src/viola/mystrings.o
 	@./$(BUILD_DIR)/test_mystrings
+
+test-pkinfo-concat: test_pkinfo_concat.c $(PROJECT_ROOT)/src/viola/misc.o $(PROJECT_ROOT)/src/viola/mystrings.o
+	@echo ""
+	@echo "Building packet-info concat tests..."
+	@mkdir -p $(BUILD_DIR)
+	@$(CC) $(CFLAGS) -I$(PROJECT_ROOT)/src/viola -o $(BUILD_DIR)/test_pkinfo_concat test_pkinfo_concat.c \
+		$(PROJECT_ROOT)/src/viola/misc.o $(PROJECT_ROOT)/src/viola/mystrings.o
+	@./$(BUILD_DIR)/test_pkinfo_concat
 
 # Clean test artifacts
 clean:

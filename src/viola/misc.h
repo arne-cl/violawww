@@ -17,6 +17,7 @@ void setDependShownInfo();
 int makeArgv(char**, char*);
 
 char* PkInfos2Str(int, Packet*);
+void cleanup_pkinfo_concat(void);
 
 char* PkInfo2Str(Packet* pk);
 char PkInfo2Char(Packet* pk);
