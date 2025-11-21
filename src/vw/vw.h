@@ -26,7 +26,7 @@
 /* --- CONSTANTS ----------------------------------------------------------- */
 #define VIOLA_OBJ_NAME "mvw"
 #define SBAR_MAGNITUDE 100
-#define GLOBE_TIME 30000
+#define GLOBE_TIME 5000
 #define TITLE_ICON_WIDTH 50
 #define TITLE_ICON_HEIGHT 50
 #define TOOLBAR_HEIGHT 38
