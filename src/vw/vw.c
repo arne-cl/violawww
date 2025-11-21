@@ -95,7 +95,6 @@ int toolBarHeight = TOOLBAR_HEIGHT;
 XmFontList titleFontList;
 
 /* --- Prototypes ---------------------------------------------------------- */
-Widget makeButtons(Widget form, Widget helpLabel, DocViewInfo* docViewInfo);
 void checkForDebugOutput(int argc, char* argv[]);
 DocViewInfo* makeBrowserInterface(Widget shell, char* shellName, DocViewInfo* parentInfo, int argc, char* argv[]);
 DocViewInfo* makeClonePageInterface(Widget shell, char* shellName, DocViewInfo* parentInfo);
@@ -357,7 +356,6 @@ DocViewInfo* makeBrowserInterface(Widget shell, char* shellName, DocViewInfo* pa
     Widget messageText;
     Widget searchLabel;
     Widget searchField;
-    Widget buttonBox;
     Pixel bg;
     Dimension th, tw;
     XmString xms;
@@ -450,15 +448,12 @@ DocViewInfo* makeBrowserInterface(Widget shell, char* shellName, DocViewInfo* pa
     docViewInfo->currentHotlistItem = -1;
     docViewInfo->hotlistSize = 0; /* size of the list allocated */
 
-    /* Quick action buttons at bottom of interface. */
-    buttonBox = makeButtons(form, messageText, docViewInfo);
-
     /* Search region.  Only becomes active when a document is searchable. */
     searchLabel = XtVaCreateWidget("Index: ",
                                 xmLabelWidgetClass, form,
                                 XmNleftAttachment, XmATTACH_FORM,
                                 XmNbottomAttachment, XmATTACH_WIDGET,
-                                XmNbottomWidget, buttonBox,
+                                XmNbottomWidget, messageText,
                                 XmNrecomputeSize, FALSE,
                                 XmNheight, SEARCH_HEIGHT,
                                 NULL);
@@ -473,12 +468,11 @@ DocViewInfo* makeBrowserInterface(Widget shell, char* shellName, DocViewInfo* pa
                                 XmNleftWidget, searchLabel,
                                 XmNrightAttachment, XmATTACH_FORM,
                                 XmNbottomAttachment, XmATTACH_WIDGET,
-                                XmNbottomWidget, buttonBox,
+                                XmNbottomWidget, messageText,
                                 NULL);
     
     XtVaSetValues(messageText,
-                  XmNbottomAttachment, XmATTACH_WIDGET,
-                  XmNbottomWidget, buttonBox,
+                  XmNbottomAttachment, XmATTACH_FORM,
                   NULL);
     setHelp(searchLabel, messageText, "Index entry field.");
     setHelp(searchField, messageText, "Index entry field.");
@@ -702,83 +696,6 @@ DocViewInfo* makeBrowserInterface(Widget shell, char* shellName, DocViewInfo* pa
     putInBox(&docViews, docViewInfo);
 
     return (docViewInfo);
-}
-
-Widget makeButtons(Widget form, Widget helpLabel, DocViewInfo* docViewInfo)
-{
-    Widget buttonBox, button;
-    ClientData* clientData;
-    XmString xms;
-    int nbuttons = 5;
-
-    buttonBox = XtVaCreateManagedWidget(
-        "buttonBox", xmFormWidgetClass, form, XmNbottomAttachment, XmATTACH_FORM, XmNleftAttachment,
-        XmATTACH_FORM, XmNrightAttachment, XmATTACH_FORM, XmNfractionBase, nbuttons, XmNnavigationType, XmNONE, NULL);
-
-    xms = XmStringCreateSimple("Back Up");
-    button = XtVaCreateManagedWidget("Back Up", xmPushButtonWidgetClass, buttonBox,
-                                     XmNleftAttachment, XmATTACH_FORM, XmNrightAttachment,
-                                     XmATTACH_POSITION, XmNrightPosition, 1, XmNlabelString, xms,
-                                     XmNtraversalOn, FALSE, XmNnavigationType, XmNONE, NULL);
-    XmStringFree(xms);
-    clientData = (ClientData*)calloc(1, sizeof(ClientData));
-    clientData->data = (XtPointer) "Back Up";
-    clientData->shellInfo = (void*)docViewInfo;
-    XtAddCallback(button, XmNactivateCallback, navigateBackUp, (XtPointer)clientData);
-    setHelp(button, helpLabel, "Backup to the previous document.");
-
-    xms = XmStringCreateSimple("Previous");
-    button = XtVaCreateManagedWidget(
-        "Previous", xmPushButtonWidgetClass, buttonBox, XmNleftAttachment, XmATTACH_WIDGET,
-        XmNleftWidget, button, XmNrightAttachment, XmATTACH_POSITION, XmNrightPosition, 2,
-        XmNlabelString, xms, XmNtraversalOn, FALSE, XmNnavigationType, XmNONE, NULL);
-    XmStringFree(xms);
-    clientData = (ClientData*)calloc(1, sizeof(ClientData));
-    clientData->data = (XtPointer) "Previous";
-    clientData->shellInfo = (void*)docViewInfo;
-    XtAddCallback(button, XmNactivateCallback, navigatePrev, (XtPointer)clientData);
-
-    setHelp(button, helpLabel,
-            "Go the the previous document but keep the current document in memory.");
-
-    xms = XmStringCreateSimple("Next");
-    button = XtVaCreateManagedWidget("Next", xmPushButtonWidgetClass, buttonBox, XmNleftAttachment,
-                                     XmATTACH_WIDGET, XmNleftWidget, button, XmNrightAttachment,
-                                     XmATTACH_POSITION, XmNrightPosition, 3, XmNlabelString, xms,
-                                     XmNtraversalOn, FALSE, XmNnavigationType, XmNONE, NULL);
-    XmStringFree(xms);
-    clientData = (ClientData*)calloc(1, sizeof(ClientData));
-    clientData->data = (XtPointer) "Next";
-    clientData->shellInfo = (void*)docViewInfo;
-    XtAddCallback(button, XmNactivateCallback, navigateNext, (XtPointer)clientData);
-
-    setHelp(button, helpLabel, "Go to the next document in the history list.");
-
-    xms = XmStringCreateSimple("Show Source");
-    button = XtVaCreateManagedWidget(
-        "Show Source", xmPushButtonWidgetClass, buttonBox, XmNleftAttachment, XmATTACH_WIDGET,
-        XmNleftWidget, button, XmNrightAttachment, XmATTACH_POSITION, XmNrightPosition, 4,
-        XmNlabelString, xms, XmNtraversalOn, FALSE, XmNnavigationType, XmNONE, NULL);
-    XmStringFree(xms);
-    clientData = (ClientData*)calloc(1, sizeof(ClientData));
-    clientData->data = NULL;
-    clientData->shellInfo = (void*)docViewInfo;
-    XtAddCallback(button, XmNactivateCallback, showSourceCB, (XtPointer)clientData);
-    setHelp(button, helpLabel, "View the SGML source of the current document.");
-
-    xms = XmStringCreateSimple("Clone Page");
-    button = XtVaCreateManagedWidget(
-        "Clone Page", xmPushButtonWidgetClass, buttonBox, XmNleftAttachment, XmATTACH_WIDGET,
-        XmNleftWidget, button, XmNrightAttachment, XmATTACH_FORM,
-        XmNlabelString, xms, XmNtraversalOn, FALSE, XmNnavigationType, XmNONE, NULL);
-    XmStringFree(xms);
-    clientData = (ClientData*)calloc(1, sizeof(ClientData));
-    clientData->data = NULL;
-    clientData->shellInfo = (void*)docViewInfo;
-    XtAddCallback(button, XmNactivateCallback, clonePageCB, (XtPointer)clientData);
-    setHelp(button, helpLabel, "Duplicate the current document for navigation.");
-
-    return (buttonBox);
 }
 
 void closeAppShell(DocViewInfo* docViewInfo) {
