@@ -5080,7 +5080,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                             GLDisplayXBM(w, segpx + 2, localYOffset + 1, pic->width, pic->height,
                                          (Pixmap)pic->data);
 
-                        } else if (pic->type == TFPic_GIF || pic->type == TFPic_XBM) {
+                        } else if (pic->type == TFPic_GIF || pic->type == TFPic_XBM || pic->type == TFPic_XPM) {
                             GLGIFDraw(w, pic->data, segpx + 2, localYOffset + 1, pic->width,
                                       pic->height);
                         }
@@ -6750,13 +6750,13 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                 break;
             }
         }
-        if (!strcmp(ext, ".xbm"))
+        if (!strcmp(ext, ".xbm")) {
             pic->type = TFPic_XBM;
-        else if (!strcmp(ext, ".gif"))
+        } else if (!strcmp(ext, ".gif")) {
             pic->type = TFPic_GIF;
-        else if (!strcmp(ext, ".xpm"))
+        } else if (!strcmp(ext, ".xpm")) {
             pic->type = TFPic_XPM;
-        else {
+        } else {
             /* play dumb and put no the dunsel icon */
             pic->type = TFPic_XBML;
             pic->id = dunselPic->id;
@@ -6783,7 +6783,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
             /* clean up mess created by HTTPGet() in HMML_img */
             tfed_registerTmpFileToFree(src);
             /*		unlink(src);*/
-        } else if (pic->type == TFPic_XBM || pic->type == TFPic_GIF) {
+        } else if (pic->type == TFPic_XBM || pic->type == TFPic_GIF || pic->type == TFPic_XPM) {
             XImage* theImage;
             int width, height;
 

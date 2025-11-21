@@ -59,6 +59,6 @@ struct {
                   pcxIdent,       pcxLoad,       "PC Paintbrush Image",
                   imgIdent,       imgLoad,       "GEM Bit Image",
                   macIdent,       macLoad,       "MacPaint Image",
-                  xpixmapIdent,   xpixmapLoad,   "X Pixmap",
+                  xpixmapIdent,   xpixmapLoad,   "X Pixmap (XPM1)",
                   xbitmapIdent,   xbitmapLoad,   "X Bitmap",
                   NULL,           NULL,          NULL};

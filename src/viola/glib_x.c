@@ -2850,9 +2850,48 @@ ImgNode* imgNodeRefInc(char* id, char* filename)
     } else {
         ip->next = NULL;
     }
+    
+    /* Check if this is an XPM file (by checking original id, not temp file) - try direct load with libXPM first */
+    char* ext = strrchr(id, '.');
+    if (ext && !strcmp(ext, ".xpm")) {
+        /* Try loading XPM format 3 directly using XpmReadFileToImage */
+        XpmAttributes attributes;
+        XImage *ximage = NULL, *shapemask = NULL;
+        int status;
+        
+        memset(&attributes, 0, sizeof(XpmAttributes));
+        attributes.valuemask = XpmReturnPixels | XpmReturnInfos;
+        
+        status = XpmReadFileToImage(display, localFilePath, &ximage, &shapemask, &attributes);
+        
+        if (status == XpmSuccess && ximage) {
+            /* XPM format 3 loaded successfully via libXPM */
+            ip->ximageinfo = (XImageInfo*)malloc(sizeof(XImageInfo));
+            ip->ximageinfo->ximage = ximage;
+            ip->width = attributes.width;
+            ip->height = attributes.height;
+            
+            XpmFreeAttributes(&attributes);
+            if (shapemask)
+                XDestroyImage(shapemask);
+            
+            imgNodes = ip;
+            return ip;
+        } else {
+            /* XpmReadFileToImage failed (possibly XPM format 1) - try via loadImg */
+            XpmFreeAttributes(&attributes);
+            /* Don't free ip yet, we'll try the standard path below */
+        }
+    }
+    
+    /* Load other formats through loadImg */
     stat = loadImg(ip->filename, &(ip->ximageinfo), &(ip->width), &(ip->height));
-    if (stat == 0)
+    if (stat == 0) {
+        free(ip->id);
+        free(ip->filename);
+        free(ip);
         return NULL;
+    }
     imgNodes = ip;
     return ip;
 }
