@@ -40,7 +40,7 @@ PUBLIC float HTMaxLength = 1e10; /* No effective limit */
 #include <unistd.h>
 
 /* Forward declarations */
-extern void http_progress_notify();
+extern int http_progress_notify(int n);
 
 /*	Streams and structured streams which we use:
  */

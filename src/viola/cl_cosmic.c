@@ -802,7 +802,7 @@ long meth_cosmic_test3(VObj* self, Packet* result, int argc, Packet argv[]) {
 }
 
 long meth_cosmic_test4(VObj* self, Packet* result, int argc, Packet argv[]) {
-    HTMLMathDraw(self, GET__content2(self));
+    HTMLMathDraw(self);
     return 0;
 }
 

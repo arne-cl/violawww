@@ -24,4 +24,4 @@ char PkInfo2Char(Packet* pk);
 long PkInfo2Int(Packet* pk);
 float PkInfo2Flt(Packet* pk);
 VObj* PkInfo2Obj(Packet* pk);
-VObj* getObject();
+VObj* getObject(char* objName);

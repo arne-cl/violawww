@@ -26,12 +26,14 @@
 #include <string.h>
 
 /* Forward declarations */
-void dithermap();
-int rle_get_setup();
-int rle_getrow();
-void make_gamma();
-void bw_m_line();
-void c_m_line();
+void dithermap(int levels, double gamma, int rgbmap[][3], int divN[256], int modN[256], int magic[16][16]);
+int rle_get_setup(struct sv_globals* globals);
+int rle_getrow(struct sv_globals* globals, rle_pixel* scanline[]);
+void make_gamma(double gamma, int gammamap[256]);
+void bw_m_line(unsigned char* dp, int number);
+void c_m_line(unsigned char* dp, int number, int line);
+rle_pixel** buildmap(struct sv_globals* globals, int minmap, double gamma);
+char* rle_getcom(char* name, struct sv_globals* globals);
 
 /* input file stuff */
 static int ptype;            /* picture type : */

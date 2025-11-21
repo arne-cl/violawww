@@ -32,7 +32,7 @@
 #include "utils.h"
 #include <ctype.h>
 
-extern int replaceNodeLine();
+extern int replaceNodeLine(TFLineNode* to, TFLineNode* from, int freeOldSpaceP, MemoryGroup* mg);
 
 /* delete to left and pull
  */

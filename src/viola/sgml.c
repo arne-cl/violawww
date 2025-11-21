@@ -38,8 +38,8 @@
 #include "HTML_style.h"
 
 extern void stgcall_init();
-extern char* vl_expandPath();
-extern char* loadFile();
+extern char* vl_expandPath(char* path, char* buffer);
+extern int loadFile(char* fileName, char** strp);
 
 /*#define malloc(s) printf("malloc(%d)\t%s:%d\n",s,__FILE__,__LINE__);malloc(s)*/
 /*#define free(s) printf("free(%d)\t%s:%d\n",s,__FILE__,__LINE__);free(s)*/
@@ -129,8 +129,7 @@ int SGMLInit(void) {
     return 1;
 }
 
-void SGMLBuildDoc_insertObj(obj, width) VObj* obj;
-int width;
+void SGMLBuildDoc_insertObj(VObj* obj, int width)
 {
     insert_obj = obj;
     insert_width = width;
@@ -427,7 +426,7 @@ VObj* SGMLBuildDoc(char* srcp, char* url, VObj* parent, char* name, int width, c
     return docObj;
 }
 
-void loadTemplateObjectNMethod(tmi) SGMLTagMappingInfo* tmi;
+void loadTemplateObjectNMethod(SGMLTagMappingInfo* tmi)
 {
     Packet argv[1];
     /*

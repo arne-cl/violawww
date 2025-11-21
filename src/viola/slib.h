@@ -1,2 +1,2 @@
-extern int SLBellVolume();
-extern int SLBell();
+extern int SLBellVolume(int percent);
+extern int SLBell(void);

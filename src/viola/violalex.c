@@ -874,14 +874,14 @@ int iskeyword(char* name)
     return (unsigned long)tb[0];
 }
 
-void set_parsing_string(s) char* s;
+void set_parsing_string(char* s)
 {
     lexsource = FROMSTRING;
     langstring = s;
     clear_lexbuf();
 }
 
-void parse_file(filename) char* filename;
+void parse_file(char* filename)
 {
     /*
      * Do some file opening stuff

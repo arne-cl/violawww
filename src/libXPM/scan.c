@@ -449,7 +449,7 @@ static int GetImagePixels8(XImage* image, unsigned int width, unsigned int heigh
  * scan pixels of a 1-bit depth Z image data structure
  */
 
-static int GetImagePixels1(XImage* image, unsigned int width, unsigned int height, PixelsMap* pmap, int (*storeFunc)())
+static int GetImagePixels1(XImage* image, unsigned int width, unsigned int height, PixelsMap* pmap, int (*storeFunc)(Pixel, PixelsMap*, unsigned int*))
 {
     Pixel pixel;
     unsigned char bit;

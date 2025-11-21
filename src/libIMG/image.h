@@ -145,15 +145,15 @@ void goodImage(Image* image, char* func);
 Image* merge(Image* dest, Image* src, int atx, int aty, unsigned int verbose); /* merge.c */
 
 extern unsigned long DepthToColorsTable[]; /* new.c */
-unsigned long colorsToDepth();
+unsigned long colorsToDepth(unsigned long ncolors);
 char* dupString(char* s);
 Image* newBitImage(unsigned int width, unsigned int height);
 Image* newRGBImage(unsigned int width, unsigned int height, unsigned int depth);
 Image* newTrueImage(unsigned int width, unsigned int height);
 void freeImage(Image* image);
 void freeImageData(Image* image);
-void newRGBMapData();
-void freeRGBMapData();
+void newRGBMapData(RGBMap* rgb, unsigned int size);
+void freeRGBMapData(RGBMap* rgb);
 byte* lcalloc(unsigned int size);
 byte* lmalloc(unsigned int size);
 void lfree(byte* area);
@@ -161,7 +161,7 @@ void lfree(byte* area);
 #define depthToColors(n) DepthToColorsTable[((n) < 32 ? (n) : 32)]
 
 Image* reduce(Image* image, unsigned int n, unsigned int verbose); /* reduce.c */
-Image* expand();
+Image* expand(Image* image);
 
 Image* rotate(Image* simage, int rotate, unsigned int verbose); /* rotate.c */
 

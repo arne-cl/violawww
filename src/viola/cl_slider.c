@@ -31,7 +31,7 @@
 #include "utils.h"
 #include <ctype.h>
 
-extern void process_event();
+extern void process_event(XEvent* ep, int tool);
 
 SlotInfo cl_slider_NCSlots[] = {{0}};
 SlotInfo cl_slider_NPSlots[] = {

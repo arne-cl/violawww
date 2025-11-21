@@ -14,15 +14,15 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <strings.h>
-
-extern long setMember();
-extern char* vl_expandPath();
-extern char* loadFile();
-extern int transferNumList2Array();
-extern void dumpVarList();
 #include "attr.h"
 #include "class.h"
 #include "classlist.h"
+
+extern void setMember(MHInfo* mhp, long val);
+extern char* vl_expandPath(char* path, char* buffer);
+extern int loadFile(char* fileName, char** strp);
+extern int transferNumList2Array(char* str, int* array, int size);
+extern void dumpVarList(Attr* varlist);
 #include "glib.h"
 #include "hash.h"
 #include "ident.h"
@@ -41,7 +41,7 @@ int loadClassScriptsP = 0;
 extern char* saveString(const char*);
 extern long storeIdent(char*);
 
-long initSlot();
+long initSlot(VObj* self, long* slotp, SlotInfo* sip, long val);
 
 MHInfo allmhp;
 
@@ -65,8 +65,7 @@ int initSlotOffsetInfo(ClassInfo* cip, int section)
     return offset;
 }
 
-void dumpSlotInfo(cip, section) ClassInfo* cip;
-int section;
+void dumpSlotInfo(ClassInfo* cip, int section)
 {
     SlotInfo* sip;
     int i, offset;
@@ -84,8 +83,7 @@ int section;
     }
 }
 
-void dumpSlotLookup(sip, size) SlotInfo** sip;
-int size;
+void dumpSlotLookup(SlotInfo** sip, int size)
 {
     int i;
 
@@ -123,10 +121,7 @@ int initSlotLookUpTable(ClassInfo* cip, int section, SlotInfo** slookup)
 /*
  * ``section'' can only be 0 or 1 (new common or private slots)
  */
-void overRideSlotLookUpTable(cip, section, slookup, slookup_size) ClassInfo* cip;
-int section;
-SlotInfo** slookup;
-int slookup_size;
+void overRideSlotLookUpTable(ClassInfo* cip, int section, SlotInfo** slookup, int slookup_size)
 {
     SlotInfo* sip;
     int slookupi;
@@ -150,7 +145,7 @@ int init_class() {
     SlotInfo* sip;
     VObj* obj;
     int offset, i, j;
-    int load_classScripts();
+    int load_classScripts(char* classScriptPath);
     char classScriptPathBuff[128];
 
     /*	extern StrInfo init_obj_script;*/
@@ -518,9 +513,7 @@ VObj* buildObjWithLoadedSlots(ClassInfo* cip, long slotv[100][2], int slotc)
     return obj;
 }
 
-long* searchSlot(slotv, slotc, key) long (*slotv)[100][2];
-int slotc;
-int key;
+long* searchSlot(long (*slotv)[100][2], int slotc, int key)
 {
     int i;
 
@@ -531,8 +524,7 @@ int key;
     return 0;
 }
 
-VObj* instantiateObj(slotv, slotc) long (*slotv)[100][2];
-int* slotc;
+VObj* instantiateObj(long (*slotv)[100][2], int* slotc)
 {
     long* slotp;
     int i;

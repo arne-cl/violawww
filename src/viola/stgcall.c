@@ -6,7 +6,7 @@
 #include "utils.h"
 #include <string.h>
 
-extern char* loadFile();
+extern int loadFile(char* fileName, char** strp);
 
 STGLib* stgLib;
 STGGroup* stgGroup;

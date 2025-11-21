@@ -24,7 +24,7 @@
 #include <strings.h>
 
 /* Forward declarations */
-extern void http_progress_notify();
+extern int http_progress_notify(int n);
 
 #define INVALID (-1)
 

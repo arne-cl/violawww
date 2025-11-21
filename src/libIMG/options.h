@@ -80,4 +80,4 @@ typedef struct option_array {
     char* description;  /* description of this option */
 } OptionArray;
 
-OptionId optionNumber(); /* options.c */
+OptionId optionNumber(char* arg); /* options.c */

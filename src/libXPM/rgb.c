@@ -118,8 +118,7 @@ char* xpmGetRgbName(xpmRgbName rgbn[], int rgbn_max, int red, int green, int blu
 /*
  * Free the strings which have been malloc'ed in xpmReadRgbNames
  */
-void xpmFreeRgbNames(rgbn, rgbn_max) xpmRgbName rgbn[];
-int rgbn_max;
+void xpmFreeRgbNames(xpmRgbName rgbn[], int rgbn_max)
 
 {
     int i;

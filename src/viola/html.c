@@ -34,8 +34,8 @@
 #include "sys.h"
 #include "tfed.h"
 
-extern void freeNodeLines();
-extern void renderTF();
+extern void freeNodeLines(TFStruct* tf);
+extern int renderTF(TFStruct* tf);
 #include "html.h"
 #include "html2.h"
 

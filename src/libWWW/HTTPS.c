@@ -30,7 +30,7 @@
 #include <sys/time.h>
 
 /* Forward declarations */
-extern void http_progress_notify();
+extern int http_progress_notify(int n);
 
 /* Read chunked transfer encoding data */
 PRIVATE int read_chunked_data ARGS3(

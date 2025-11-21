@@ -22,7 +22,7 @@ char	*yyobjcontext;
 int	yyscriptcontext;
 
 extern void reportError();
-extern void regListRef();
+extern void regListRef(AST* ast);
 extern int yylex();
 
 %}

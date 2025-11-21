@@ -202,8 +202,8 @@ void Runputdata(rle_pixel* buf, int n, struct sv_globals* globals);
 void Runputrun(int color, int n, int last, struct sv_globals* globals);
 void RunputEof(struct sv_globals* globals);
 
-void DefaultBlockHook();
-void NullputEof();
+void DefaultBlockHook(struct sv_globals* globals);
+void NullputEof(struct sv_globals* globals);
 
 struct sv_dispatch_tab sv_DTable[] = {
     {" OB", RunSetup, RunSkipBlankLines, RunSetColor, RunSkipPixels, RunNewScanLine, Runputdata,

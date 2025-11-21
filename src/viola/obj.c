@@ -47,7 +47,7 @@ int init_obj() {
     return 1;
 }
 
-void dumpVObjList(olist) VObjList* olist;
+void dumpVObjList(VObjList* olist)
 {
     fprintf(stderr, "{");
     while (olist) {

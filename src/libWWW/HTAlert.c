@@ -15,14 +15,14 @@
 #include <ctype.h> /* for toupper - should be in tcp.h */
 
 /* Forward declarations */
-extern void user_alert();
-extern void user_message();
-extern int user_message_confirm();
-extern BOOL user_confirmation();
-extern char* user_prompt();
-extern char* user_prompt_default();
-extern char* user_prompt_password();
-extern void user_prompt_username_and_password();
+extern void user_alert(char* message);
+extern void user_message(char* message);
+extern int user_message_confirm(char* message);
+extern BOOL user_confirmation(void);
+extern char* user_prompt(char* message);
+extern char* user_prompt_default(char* message, char* deflt);
+extern char* user_prompt_password(char* message);
+extern void user_prompt_username_and_password(char* message, char** username, char** password);
 
 PUBLIC void HTAlert ARGS1(CONST char*, Msg) {
 #ifdef NeXTStep

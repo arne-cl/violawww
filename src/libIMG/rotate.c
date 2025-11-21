@@ -12,12 +12,12 @@
 /* rotate_bitmap()
  * converts an old bitmap bit position into a new one
  */
-void rotate_bitmap(num, pos, width, height, new_num, new_pos) int num; /* Source byte number */
-int pos;      /* Source bit position      */
-int width;    /* Width of source bitmap   */
-int height;   /* Height of source bitmap  */
-int* new_num; /* Destination byte number  */
-int* new_pos; /* Destination bit position */
+void rotate_bitmap(int num,      /* Source byte number */
+                    int pos,      /* Source bit position      */
+                    int width,    /* Width of source bitmap   */
+                    int height,   /* Height of source bitmap  */
+                    int* new_num, /* Destination byte number  */
+                    int* new_pos) /* Destination bit position */
 {
     int slen; /* Length of source line      */
     int dlen; /* Length of destination line */

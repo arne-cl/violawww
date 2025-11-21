@@ -39,7 +39,7 @@ bytes in the wrong order 07/03/90   2 nazgul	Added recovery for premature EOF
 #include "image.h"
 
 /* Forward declarations */
-extern int g3_rawgetbit();
+extern int g3_rawgetbit(ZFILE* fd);
 extern int g3_bitson(bit* b, int c, int n);
 
 /* SUPPRESS 530 */

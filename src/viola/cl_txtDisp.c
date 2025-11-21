@@ -35,7 +35,7 @@
 #include "vlist.h"
 #include <ctype.h>
 
-extern int replaceNodeLine();
+extern int replaceNodeLine(TFLineNode* to, TFLineNode* from, int freeOldSpaceP, MemoryGroup* mg);
 #include "event_x.h"
 #include "html2.h"
 #include "sgml.h"

@@ -27,6 +27,7 @@
 #include "glib.h"
 #include "hash.h"
 #include "ident.h"
+#include <stdlib.h>
 #include "membership.h"
 #include "misc.h"
 #include "mystrings.h"
@@ -159,9 +160,11 @@ ClassInfo class_socket = {
 long meth_socket__startClient(VObj* self, Packet* result, int argc, Packet argv[])
 {
     int fd;
-    int socket_open();
+    int socket_open(char* proto, char* host, int port);
+    char* port_str = GET_port(self);
+    int port_num = port_str ? atoi(port_str) : 0;
 
-    fd = socket_open("tcp", GET_host(self), GET_port(self));
+    fd = socket_open("tcp", GET_host(self), port_num);
 
     result->type = PKT_INT;
     result->canFree = 0;

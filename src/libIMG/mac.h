@@ -14,6 +14,8 @@
  *
  ****************************************************************/
 
+#include "image.h"
+
 #define MAC_MAGIC 0x0
 
 typedef unsigned char BYTE; /* 8 bits unsigned		*/
@@ -32,8 +34,8 @@ typedef unsigned char BYTE; /* 8 bits unsigned		*/
 #define MACIN_ERR_NFO -7     /* no file open */
 #define MACIN_ERR_NIO -8     /* no image open */
 
-static int macin_open_image();
-static int macin_close_file();
+static int macin_open_image(ZFILE* s);
+static int macin_close_file(void);
 #if 0
 static int macin_fatal();
 #endif

@@ -312,7 +312,7 @@ static int key_string(char* buf, int key)
     return len;
 }
 
-static void set_pb_sym(disp) Display* disp;
+static void set_pb_sym(Display* disp)
 /*
  * Loads the XPA_PB_FONT font.  Determines the size of the XPA_PB_SYM
  * character.  Sets these up in globals pb_sym_font, pb_sym_w, pb_sym_h.
@@ -335,9 +335,8 @@ static void set_pb_sym(disp) Display* disp;
  * Allocator functions for each context table type
  */
 
-static xpa_pane* new_pane(win, level)
-Window win; /* Pane window        */
-int level;  /* Level in heirarchy */
+static xpa_pane* new_pane(Window win, /* Pane window        */
+                          int level)   /* Level in heirarchy */
 /* Creates a new pane structure */
 {
     xpa_pane* result = XPA_MEM(xpa_pane);
@@ -350,19 +349,17 @@ int level;  /* Level in heirarchy */
     return result;
 }
 
-static xpa_item* new_item(win, name, key_idx, level, idx, iw, ih, baseline, fromtop, key_off,
-                          sub_pane, pb)
-Window win;      /* Item window              */
-char* name;      /* Name of item 	    */
-int key_idx;     /* Accelerator key          */
-int level;       /* Level in hierarchy 	    */
-int idx;         /* Offset in pane 	    */
-int iw, ih;      /* Physical size 	    */
-int baseline;    /* Offset to baseline       */
-int fromtop;     /* Distance from top        */
-int key_off;     /* End of accelerator       */
-Window sub_pane; /* Posted sub-pane (if any) */
-xpa_pb* pb;      /* Pullbox info             */
+static xpa_item* new_item(Window win,      /* Item window              */
+                          char* name,      /* Name of item             */
+                          int key_idx,     /* Accelerator key          */
+                          int level,       /* Level in hierarchy       */
+                          int idx,         /* Offset in pane           */
+                          int iw, int ih,  /* Physical size            */
+                          int baseline,    /* Offset to baseline       */
+                          int fromtop,     /* Distance from top        */
+                          int key_off,     /* End of accelerator       */
+                          Window sub_pane, /* Posted sub-pane (if any) */
+                          xpa_pb* pb)      /* Pullbox info             */
 /*
  * Creates a new item structure - automatically copies `name'.
  * Automatically expands `key_idx' into a textual representation.
@@ -474,11 +471,10 @@ static void out_detail(XEvent* evt, char* str)
  * Handle graphics contexts
  */
 
-static GC fg_gc(disp, win, font, fg)
-Display* disp;     /* X Connection       */
-Window win;        /* What window to use */
-XFontStruct* font; /* Font to use        */
-unsigned long fg;  /* Foreground color   */
+static GC fg_gc(Display* disp,      /* X Connection       */
+                Window win,         /* What window to use */
+                XFontStruct* font, /* Font to use        */
+                unsigned long fg)  /* Foreground color   */
 /*
  * Creates or modifies a static graphics context to have the
  * specified values.  This one is generally used for drawing
@@ -562,10 +558,7 @@ static int depth(xpa_entry* entrys)
     return max + 1;
 }
 
-static void dispatch(win, intern, data, callback) Window win; /* Window id             */
-xpa_intern* intern;                                           /* Internal view of menu */
-xpa_data* data;                                               /* Data itself           */
-int (*callback)();                                            /* Function to call      */
+static void dispatch(Window win, xpa_intern* intern, xpa_data* data, int (*callback)(XEvent*, xpa_intern*, xpa_data*))
 /*
  * This routine adds a new item to the context table of
  * menu `intern'.  The `data' and `callback' information
@@ -586,8 +579,8 @@ int (*callback)();                                            /* Function to cal
     }
 }
 
-static void item_draw(intern, item) xpa_intern* intern; /* Internal view of menu */
-xpa_item* item;                                         /* Item to turn on       */
+static void item_draw(xpa_intern* intern, /* Internal view of menu */
+                     xpa_item* item)      /* Item to turn on       */
 /*
  * Draws the specified item.  Checks to see if it is currently
  * selected.  If so,  the window is redrawn highlighted.  Now
@@ -784,10 +777,9 @@ static void title_draw(xpa_intern* intern, xpa_title* title)
  * Callback functions begin on this page.
  */
 
-static int cb_pane(evt, intern, data)
-XEvent* evt;        /* X Event causing callback */
-xpa_intern* intern; /* Internal view of menu    */
-xpa_data* data;     /* Specific instance data   */
+static int cb_pane(XEvent* evt,        /* X Event causing callback */
+                  xpa_intern* intern, /* Internal view of menu    */
+                  xpa_data* data)     /* Specific instance data   */
 /*
  * This function is called when an event occurs on a pane.  Right
  * now,  only a leave event is recognized.  The data is (xpa_pane *).
@@ -831,10 +823,9 @@ xpa_data* data;     /* Specific instance data   */
     return rv;
 }
 
-static int cb_item(evt, intern, data)
-XEvent* evt;        /* X Event causing callback */
-xpa_intern* intern; /* Internal view of menu    */
-xpa_data* data;     /* Specific instance data   */
+static int cb_item(XEvent* evt,        /* X Event causing callback */
+                  xpa_intern* intern, /* Internal view of menu    */
+                  xpa_data* data)     /* Specific instance data   */
 /*
  * This function is called when an event occurs in an item.
  * Two events are processed: entry and exposure.  Upon entry,
@@ -865,10 +856,9 @@ xpa_data* data;     /* Specific instance data   */
     return 0;
 }
 
-static int cb_pb(evt, intern, data)
-XEvent* evt;        /* X Event causing callback */
-xpa_intern* intern; /* Internal view of menu    */
-xpa_data* data;     /* Specific instance data   */
+static int cb_pb(XEvent* evt,        /* X Event causing callback */
+                xpa_intern* intern, /* Internal view of menu    */
+                xpa_data* data)     /* Specific instance data   */
 /*
  * This function is called when events occur on the
  * pullbox.  Entering this window posts the subpane of
@@ -899,10 +889,9 @@ xpa_data* data;     /* Specific instance data   */
     return 0;
 }
 
-static int cb_title(evt, intern, data)
-XEvent* evt;        /* X Event causing callback */
-xpa_intern* intern; /* Internal view of menu    */
-xpa_data* data;     /* Specific instance data   */
+static int cb_title(XEvent* evt,        /* X Event causing callback */
+                   xpa_intern* intern, /* Internal view of menu    */
+                   xpa_data* data)     /* Specific instance data   */
 /*
  * This function is called when events occur in a title.  Entering
  * this item turns off the currently selected item.  Exposure redraws
@@ -932,16 +921,16 @@ xpa_data* data;     /* Specific instance data   */
 #define SAVEUNDER 0x01
 #define OVERRIDE 0x02
 
-static Window make_window(disp, parent, x, y, width, height, bwidth, bor, bg, cur, events, options)
-Display* disp;         /* X Connection  */
-Window parent;         /* Parent window */
-int x, y;              /* Location      */
-int width, height;     /* Size          */
-int bwidth;            /* Border width  */
-unsigned long bor, bg; /* Border and background pixels */
-Cursor cur;            /* Window cursor (or None)      */
-long events;           /* Interesting events           */
-int options;           /* SAVEUNDER, OVERRIDE          */
+static Window make_window(Display* disp,         /* X Connection  */
+                          Window parent,         /* Parent window */
+                          int x, int y,         /* Location      */
+                          int width, int height, /* Size          */
+                          int bwidth,           /* Border width  */
+                          unsigned long bor,    /* Border and background pixels */
+                          unsigned long bg,
+                          Cursor cur,           /* Window cursor (or None)      */
+                          long events,          /* Interesting events           */
+                          int options)          /* SAVEUNDER, OVERRIDE          */
 /*
  * Makes a new window and returns its handle.  Basically,  this
  * is a convenient way to call XCreateWindow.  Saveunder will be
@@ -965,15 +954,14 @@ int options;           /* SAVEUNDER, OVERRIDE          */
                          CopyFromParent, wamask, &attr);
 }
 
-static void item_size(font, name, sub_flag, ac_font, ac_key, rw, rh, basel,
-                      ac_off) XFontStruct* font; /* Font for display     */
-char* name;                                      /* Name of item         */
-int sub_flag;                                    /* Does it have submenu */
-XFontStruct* ac_font;                            /* Accelerator font     */
-int ac_key;                                      /* Accelerator key      */
-int *rw, *rh;                                    /* Returned size        */
-int* basel;                                      /* Returned baseline    */
-int* ac_off;                                     /* End of accelerator   */
+static void item_size(XFontStruct* font, /* Font for display     */
+                     char* name,         /* Name of item         */
+                     int sub_flag,       /* Does it have submenu */
+                     XFontStruct* ac_font, /* Accelerator font     */
+                     int ac_key,         /* Accelerator key      */
+                     int *rw, int *rh,   /* Returned size        */
+                     int* basel,         /* Returned baseline    */
+                     int* ac_off)        /* End of accelerator   */
 /*
  * Computes the minimal size for an item given its font, name,
  * whether it has a submenu, and the key and font of the character
@@ -1012,9 +1000,9 @@ int* ac_off;                                     /* End of accelerator   */
     *rh = *basel + largest + XPA_VERPAD;
 }
 
-static void title_size(font, title, rw, rh) XFontStruct* font; /* Font for display */
-char* title;                                                   /* Title itself     */
-int *rw, *rh;                                                  /* Returned size    */
+static void title_size(XFontStruct* font, /* Font for display */
+                      char* title,         /* Title itself     */
+                      int *rw, int *rh)   /* Returned size    */
 /*
  * Computes a suitable bounding box for `title'.
  */
@@ -1023,12 +1011,11 @@ int *rw, *rh;                                                  /* Returned size 
     *rh = 2 * XPA_VERPAD + font->ascent + font->descent;
 }
 
-static struct xpa_pb_defn* make_pullbox(intern, parent, item, x, height)
-xpa_intern* intern; /* Internal view of menu */
-Window parent;      /* Parent of pullbox     */
-xpa_item* item;     /* Associated item       */
-int x;              /* Horizontal location   */
-int height;         /* Height of pullbox     */
+static struct xpa_pb_defn* make_pullbox(xpa_intern* intern, /* Internal view of menu */
+                                        Window parent,      /* Parent of pullbox     */
+                                        xpa_item* item,     /* Associated item       */
+                                        int x,              /* Horizontal location   */
+                                        int height)         /* Height of pullbox     */
 /*
  * Creates a new window under `parent' for the pullbox.  This
  * window has no border and its background is an arrow bitmap.
@@ -1048,13 +1035,12 @@ int height;         /* Height of pullbox     */
     return (struct xpa_pb_defn*)pb;
 }
 
-static int make_title(intern, parent, title_str, lev, width, yspot)
-xpa_intern* intern; /* Internval view of menu */
-Window parent;      /* Parent window          */
-char* title_str;    /* Title string           */
-int lev;            /* Level in Hierarchy     */
-int width;          /* Width of item          */
-int yspot;          /* Y location             */
+static int make_title(xpa_intern* intern, /* Internval view of menu */
+                     Window parent,        /* Parent window          */
+                     char* title_str,      /* Title string           */
+                     int lev,              /* Level in Hierarchy     */
+                     int width,            /* Width of item          */
+                     int yspot)            /* Y location             */
 /*
  * Creates a subwindow of `parent' that displays a the title
  * string `title_str'.  `width' specifies the width of the
@@ -1081,17 +1067,9 @@ int yspot;          /* Y location             */
 }
 
 /* Forward declaration */
-static Window make_pane();
+static Window make_pane(xpa_intern* intern, char* title, xpa_entry* entrys, int lev);
 
-static int make_item(intern, parent, entry, lev, idx, width, yspot, key_off)
-xpa_intern* intern; /* Internal view of menu */
-Window parent;      /* Parent window         */
-xpa_entry* entry;   /* Entry itself          */
-int lev;            /* Level in heirarchy    */
-int idx;            /* Numerical index       */
-int width;          /* Width of item         */
-int yspot;          /* Y location            */
-int key_off;        /* End of accelerator    */
+static int make_item(xpa_intern* intern, Window parent, xpa_entry* entry, int lev, int idx, int width, int yspot, int key_off)
 /*
  * Creates a subwindow of `parent' that displays the item
  * `entry'.  The width of the item is given by `width'
@@ -1144,11 +1122,7 @@ int key_off;        /* End of accelerator    */
     return exp_h;
 }
 
-static Window make_pane(intern, title, entrys, lev)
-xpa_intern* intern; /* Internal view of menu */
-char* title;        /* Title (zero if none)  */
-xpa_entry* entrys;  /* Menu itself           */
-int lev;            /* Level in heirarchy    */
+static Window make_pane(xpa_intern* intern, char* title, xpa_entry* entrys, int lev)
 /*
  * Makes a pane and inserts it into the context
  * table.  Also makes any submenu panes.
@@ -1204,14 +1178,7 @@ int lev;            /* Level in heirarchy    */
     return result;
 }
 
-static XFontStruct* def_font(disp, mask, bit, new, defmask, defvalue, fontspec)
-Display* disp;          /* X Connection  */
-int mask;               /* Passed mask   */
-int bit;                /* Bit to check  */
-XFontStruct* new;       /* User value    */
-int* defmask;           /* Default mask  */
-XFontStruct** defvalue; /* Default value */
-char* fontspec;         /* Font specif.  */
+static XFontStruct* def_font(Display* disp, int mask, int bit, XFontStruct* new, int* defmask, XFontStruct** defvalue, char* fontspec)
 /*
  * Handles default handling for a font.  If `bit' is set in `mask',
  * `new' is returned, otherwise `defValue' is returned.  If `bit'
@@ -1233,14 +1200,13 @@ char* fontspec;         /* Font specif.  */
     return *defvalue;
 }
 
-static unsigned long def_pixel(disp, mask, bit, new, defmask, defvalue, clrspec)
-Display* disp;           /* X Connection  */
-int mask;                /* Passed mask   */
-int bit;                 /* Bit to check  */
-unsigned long new;       /* User value    */
-int* defmask;            /* Default mask  */
-unsigned long* defvalue; /* Default value */
-char* clrspec;           /* Color specif. */
+static unsigned long def_pixel(Display* disp,          /* X Connection  */
+                               int mask,                /* Passed mask   */
+                               int bit,                 /* Bit to check  */
+                               unsigned long new,       /* User value    */
+                               int* defmask,            /* Default mask  */
+                               unsigned long* defvalue, /* Default value */
+                               char* clrspec)           /* Color specif. */
 /*
  * Handles default handling for a color.  Similar to def_font().
  * Color specification only handles "white" and "black".  Later
@@ -1264,10 +1230,9 @@ char* clrspec;           /* Color specif. */
 
 #define PF(ptr, field) (ptr ? ptr->field : 0)
 
-static xpa_appearance* def_appearance(disp, mask, passed)
-Display* disp;          /* X Connection    */
-int mask;               /* Appearance mask */
-xpa_appearance* passed; /* Passed values   */
+static xpa_appearance* def_appearance(Display* disp,          /* X Connection    */
+                                     int mask,                /* Appearance mask */
+                                     xpa_appearance* passed)  /* Passed values   */
 /*
  * Returns an appearance where values are filled from default values
  * unless the appropriate bit in `mask' is set.  If the bit is
@@ -1303,12 +1268,11 @@ xpa_appearance* passed; /* Passed values   */
     return &rtn_app;
 }
 
-xpa_menu xpa_create(disp, title, entrys, mask, appearance)
-Display* disp;              /* X Connection            */
-char* title;                /* Top pane title          */
-xpa_entry* entrys;          /* Menu contents           */
-int mask;                   /* Display attr mask       */
-xpa_appearance* appearance; /* Menu display attributes */
+xpa_menu xpa_create(Display* disp,              /* X Connection            */
+                    char* title,                /* Top pane title          */
+                    xpa_entry* entrys,          /* Menu contents           */
+                    int mask,                   /* Display attr mask       */
+                    xpa_appearance* appearance) /* Menu display attributes */
 /*
  * Creates a new multi-level menu and returns a handle to it.
  * Those display attributes whose mask appears in `mask' will
@@ -1361,9 +1325,8 @@ static int* res_ary = (int*)0;
 static int res_len = 0;
 static int res_alloc = 0;
 
-int response(intern, ary)
-xpa_intern* intern; /* Internal view of menu */
-int** ary;          /* Returned array        */
+int response(xpa_intern* intern, /* Internal view of menu */
+            int** ary)          /* Returned array        */
 /*
  * Compiles a static array of offsets for returning to
  * the user.  If no selections made,  returns zero.
@@ -1394,11 +1357,11 @@ int** ary;          /* Returned array        */
     return res_len;
 }
 
-void xpa_post(menu, x, y, depth, vals, opt) xpa_menu menu; /* Menu to post 	*/
-int x, y;                                                  /* Location     	*/
-int depth;                                                 /* Depth                */
-int* vals;                                                 /* Array values         */
-int opt;                                                   /* XPA_PRESS            */
+void xpa_post(xpa_menu menu, /* Menu to post 	*/
+              int x, int y,  /* Location     	*/
+              int depth,     /* Depth                */
+              int* vals,     /* Array values         */
+              int opt)       /* XPA_PRESS            */
 /*
  * Shows menu at location (x,y).  If `depth' is greater than
  * zero,  the menu pops up with the selection given by
@@ -1423,7 +1386,7 @@ int opt;                                                   /* XPA_PRESS         
     pane_on(intern, intern->top, 0, x, y, (xpa_item*)0);
 }
 
-void xpa_unpost(menu) xpa_menu menu; /* Menu to turn off */
+void xpa_unpost(xpa_menu menu) /* Menu to turn off */
 /*
  * Unposts `menu'.  This includes all of its subpanes.  Does
  * not effect menu state.
@@ -1439,10 +1402,7 @@ void xpa_unpost(menu) xpa_menu menu; /* Menu to turn off */
     }
 }
 
-int xpa_filter(evt, menu, result)
-XEvent* evt;    /* Event to handle */
-xpa_menu* menu; /* Returned menu   */
-int** result;   /* Returned choice */
+int xpa_filter(XEvent* evt, xpa_menu* menu, int** result)
 /*
  * This routine handles events for the xpa menu package.
  * Possible return codes:
@@ -1480,14 +1440,13 @@ int** result;   /* Returned choice */
     }
 }
 
-int xpa_moded(menu, x, y, depth, vals, opt, handler, result)
-xpa_menu menu;    /* Menu to post       */
-int x, y;         /* Screen coordinates */
-int depth;        /* Depth of spec      */
-int* vals;        /* Starting spot      */
-int opt;          /* XPA_PRESS or none  */
-int (*handler)(XEvent*); /* Event handler      */
-int** result;     /* Returned result    */
+int xpa_moded(xpa_menu menu,    /* Menu to post       */
+              int x, int y,     /* Screen coordinates */
+              int depth,        /* Depth of spec      */
+              int* vals,        /* Starting spot      */
+              int opt,          /* XPA_PRESS or none  */
+              int (*handler)(XEvent*), /* Event handler      */
+              int** result)     /* Returned result    */
 /*
  * Posts a moded menu.  This is basically a wrapper around
  * xpa_post, xpa_filter, and xpa_unpost.  However,  it
@@ -1540,7 +1499,7 @@ int** result;     /* Returned result    */
     return val;
 }
 
-void xpa_destroy(menu) xpa_menu menu; /* Menu to destroy */
+void xpa_destroy(xpa_menu menu) /* Menu to destroy */
 /*
  * Frees all resources associated with a menu.
  */

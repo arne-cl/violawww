@@ -16,9 +16,7 @@
 static VMsgHandlerStruct* ViolaMessageHandlers = NULL;
 static int deletedFirstMH = 0;
 
-void ViolaRegisterMessageHandler(msgName, msgHandler, clientData) char* msgName;
-VMsgHandler msgHandler;
-void* clientData;
+void ViolaRegisterMessageHandler(char* msgName, VMsgHandler msgHandler, void* clientData)
 {
     if (!msgName || !msgHandler) {
         return;
@@ -50,9 +48,7 @@ void* clientData;
     }
 }
 
-void ViolaDeleteMessageHandler(msgName, msgHandler, clientData) char* msgName;
-VMsgHandler msgHandler;
-void* clientData;
+void ViolaDeleteMessageHandler(char* msgName, VMsgHandler msgHandler, void* clientData)
 {
     if (!msgName || !msgHandler || !ViolaMessageHandlers) {
         return;
@@ -83,8 +79,7 @@ void* clientData;
     }
 }
 
-void ViolaInvokeMessageHandler(arg, argc) char* arg[];
-int argc;
+void ViolaInvokeMessageHandler(char* arg[], int argc)
 {
     int i;
 

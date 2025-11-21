@@ -16,8 +16,7 @@
 /* SUPPRESS 558 */
 /* SUPPRESS 560 */
 
-static void babble(name, header) char* name;
-struct rheader* header;
+static void babble(char* name, struct rheader* header)
 {
     printf("%s is a", name);
     switch (memToVal(header->type, 4)) {
@@ -101,10 +100,7 @@ int sunRasterIdent(char* fullname, char* name)
 /* read either rl-encoded or normal image data
  */
 
-static void sunread(zf, buf, len, enc) ZFILE* zf;
-byte* buf;
-unsigned int len;
-unsigned int enc; /* true if encoded file */
+static void sunread(ZFILE* zf, byte* buf, unsigned int len, unsigned int enc) /* enc: true if encoded file */
 {
     static byte repchar, remaining = 0;
 

@@ -25,7 +25,7 @@
 #include <string.h>
 #include <strings.h>
 
-extern int drawLineOffset();
+extern int drawLineOffset(TFStruct* tf, int linesOffset, int clearBG);
 
 /* a collection of C routines to replace script version of HTML tag handlers.
  * Placed here to be shared by various HTML tag handlers accelerators.
@@ -390,9 +390,7 @@ float getColSpan(VObj* self)
     return 1.0;
 }
 
-void dumpMatrix(matrix, matCols, matRows, mode) TableMatrixCell* matrix;
-int matCols, matRows;
-int mode;
+void dumpMatrix(TableMatrixCell* matrix, int matCols, int matRows, int mode)
 {
     int i, j;
     TableMatrixCell* mat;

@@ -81,7 +81,7 @@ void returnPacket() {
         free(packetp->info.s); /* suspect */
 }
 
-void returnPackets(n) int n;
+void returnPackets(int n)
 {
     while (n-- > 0) {
         if (packetStackIdx < 0) {
@@ -96,7 +96,7 @@ void returnPackets(n) int n;
     }
 }
 
-void dumpPacket(packet) Packet* packet;
+void dumpPacket(Packet* packet)
 {
 
     printf("(%d %s) ", packet->type, packetTypeStr[packet->type]);
@@ -189,8 +189,7 @@ Packet* clearPacket(Packet* packet)
 
 int checkleak = 0;
 
-void _copyPacket(packetTo, packetFrom) Packet* packetTo;
-Packet* packetFrom;
+void _copyPacket(Packet* packetTo, Packet* packetFrom)
 {
     /*	char *savep;
             int leaks;

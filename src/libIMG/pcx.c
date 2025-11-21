@@ -32,7 +32,7 @@
 
 #define PCX_MAGIC 0x0a /* first byte in a PCX image file */
 
-static void PCX_LoadImage(); /* Routine to load a PCX file */
+static void PCX_LoadImage(ZFILE* zf, int bytes_per_row, Image* image, int rows); /* Routine to load a PCX file */
 
 /*
 **  pcxIdent

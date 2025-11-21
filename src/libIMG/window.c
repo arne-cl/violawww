@@ -74,11 +74,11 @@ static int getNextEventWithTimeout(Display* disp, XEvent* event) {
     return (0);
 }
 
-static void setCursor(disp, window, iw, ih, ww, wh, cursor) Display* disp;
-Window window;
-unsigned int iw, ih;
-unsigned int ww, wh;
-Cursor* cursor;
+static void setCursor(Display* disp,
+                     Window window,
+                     unsigned int iw, unsigned int ih,
+                     unsigned int ww, unsigned int wh,
+                     Cursor* cursor)
 {
     XSetWindowAttributes swa;
 
@@ -98,9 +98,10 @@ Cursor* cursor;
 /* place an image
  */
 
-static void placeImage(disp, width, height, winwidth, winheight, rx, ry) Display* disp;
-unsigned int width, height, winwidth, winheight;
-int *rx, *ry; /* supplied and returned */
+static void placeImage(Display* disp,
+                      unsigned int width, unsigned int height,
+                      unsigned int winwidth, unsigned int winheight,
+                      int *rx, int *ry) /* supplied and returned */
 {
     int pixx, pixy;
 
@@ -131,9 +132,9 @@ int *rx, *ry; /* supplied and returned */
 /* blit an image
  */
 
-static void blitImage(ximageinfo, width, height, x, y, w, h) XImageInfo* ximageinfo;
-unsigned int width, height;
-int x, y, w, h;
+static void blitImage(XImageInfo* ximageinfo,
+                     unsigned int width, unsigned int height,
+                     int x, int y, int w, int h)
 {
     if (w > width)
         w = width;
@@ -163,7 +164,7 @@ int x, y, w, h;
 /* clean up static window if we're through with it
  */
 
-void cleanUpWindow(disp) Display* disp;
+void cleanUpWindow(Display* disp)
 {
     if (ImageWindow)
         XDestroyWindow(disp, ImageWindow);
@@ -176,12 +177,12 @@ void cleanUpWindow(disp) Display* disp;
 /* clean up after displaying an image
  */
 
-static void cleanUpImage(disp, scrn, cursor, pixmap, image, ximageinfo) Display* disp;
-int scrn;
-Cursor cursor;
-Pixmap pixmap;
-Image* image;
-XImageInfo* ximageinfo;
+static void cleanUpImage(Display* disp,
+                        int scrn,
+                        Cursor cursor,
+                        Pixmap pixmap,
+                        Image* image,
+                        XImageInfo* ximageinfo)
 {
     XFreeCursor(disp, cursor);
     if (pixmap != None)
@@ -193,9 +194,9 @@ XImageInfo* ximageinfo;
  * viewport.
  */
 
-void setViewportColormap(disp, scrn, visual) Display* disp;
-int scrn;
-Visual* visual;
+void setViewportColormap(Display* disp,
+                        int scrn,
+                        Visual* visual)
 {
     XSetWindowAttributes swa;
     static Atom cmap_atom = None;
@@ -335,11 +336,11 @@ static Visual* bestVisualOfClassAndDepth(Display* disp, int scrn, int class, uns
  * image
  */
 
-static void bestVisual(disp, scrn, image, rvisual, rdepth) Display* disp;
-int scrn;
-Image* image;
-Visual** rvisual;
-unsigned int* rdepth;
+static void bestVisual(Display* disp,
+                      int scrn,
+                      Image* image,
+                      Visual** rvisual,
+                      unsigned int* rdepth)
 {
     unsigned int depth, a;
     Screen* screen;
@@ -446,12 +447,12 @@ unsigned int* rdepth;
  * any visual of that type at any depth
  */
 
-void bestVisualOfClass(disp, scrn, image, visual_class, rvisual, rdepth) Display* disp;
-int scrn;
-Image* image;
-int visual_class;
-Visual** rvisual;
-unsigned int* rdepth;
+void bestVisualOfClass(Display* disp,
+                      int scrn,
+                      Image* image,
+                      int visual_class,
+                      Visual** rvisual,
+                      unsigned int* rdepth)
 {
     Visual* visual;
     Screen* screen;
@@ -480,22 +481,20 @@ unsigned int* rdepth;
 }
 
 /*char*/
-XImageInfo* imageInWindow(disp, scrn, image, user_geometry, fullscreen, install, private_cmap, fit,
-                          use_pixmap, delay, visual_class, argc, argv, verbose)
-Display* disp;
-int scrn;
-Image* image;
-char* user_geometry;
-unsigned int fullscreen;
-unsigned int install;
-unsigned int private_cmap;
-unsigned int fit;
-unsigned int use_pixmap;
-unsigned int delay;
-int visual_class; /* visual class user wants (or -1) */
-int argc;
-char* argv[];
-unsigned int verbose;
+XImageInfo* imageInWindow(Display* disp,
+                          int scrn,
+                          Image* image,
+                          char* user_geometry,
+                          unsigned int fullscreen,
+                          unsigned int install,
+                          unsigned int private_cmap,
+                          unsigned int fit,
+                          unsigned int use_pixmap,
+                          unsigned int delay,
+                          int visual_class, /* visual class user wants (or -1) */
+                          int argc,
+                          char* argv[],
+                          unsigned int verbose)
 {
     Pixmap pixmap = None;
     XImageInfo* ximageinfo;

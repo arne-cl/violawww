@@ -12,12 +12,12 @@
 #include "HTML.h"
 
 /* Forward declarations */
-extern int CB_HTML_data();
-extern int CB_HTML_stag();
-extern int CB_HTML_etag();
-extern int CB_HTML_special_entity();
-extern int CB_HTML_end();
-extern void http_progress_notify();
+extern int CB_HTML_data(char* str, int size);
+extern int CB_HTML_stag(int element_number, BOOL* present, char** value, HTTag* tagInfo);
+extern int CB_HTML_etag(int element_number);
+extern int CB_HTML_special_entity(int entity_number, char* data, int dataLength);
+extern int CB_HTML_end(void);
+extern int http_progress_notify(int n);
 
 /* #define CAREFUL		 Check nesting here notreally necessary */
 

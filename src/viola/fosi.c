@@ -21,16 +21,12 @@
 
 void CB_FOSI_new() { printf("CB_FOSI_new() called\n"); }
 
-void CB_FOSI_data(str, size) char* str;
-int size;
+void CB_FOSI_data(char* str, int size)
 {
     printf("CB_FOSI_data() called\n");
 }
 
-void CB_FOSI_stag(element_number, present, value, tagInfo) int element_number;
-BOOL* present;
-char** value;
-HTTag* tagInfo;
+void CB_FOSI_stag(int element_number, BOOL* present, char** value, HTTag* tagInfo)
 {
     char* tag = FOSI_dtd.tags[element_number].name;
 
@@ -74,9 +70,9 @@ HTTag* tagInfo;
     fprintf(stderr, "### FOSI\t(%s\n", FOSI_dtd.tags[element_number].name);
 }
 
-void CB_FOSI_etag(element_number) int element_number;
+void CB_FOSI_etag(int element_number)
 {
     printf("CB_FOSI_etag() called\n");
 }
 
-void CB_FOSI_end() { printf("CB_FOSI_end() called\n"); }
+void CB_FOSI_end(void) { printf("CB_FOSI_end() called\n"); }

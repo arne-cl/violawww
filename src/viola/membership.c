@@ -26,8 +26,7 @@ int isMember(MHInfo* mhp, long val)
     /*	return byte & (1 << nthBits);*/
 }
 
-void setMember(mhp, val) MHInfo* mhp;
-long val;
+void setMember(MHInfo* mhp, long val)
 {
     mhp->refc++;
     /*

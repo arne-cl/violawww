@@ -9,6 +9,8 @@
  * "kljcpyrght.h" for complete copyright information)
  */
 
+#include "image.h"
+
 /*
  * gifin return codes
  */
@@ -39,17 +41,17 @@
 
 typedef unsigned char BYTE;
 
-static int gifin_open_file();
-static int gifin_open_image();
-static int gifin_get_pixel();
-static int gifin_close_image();
-static int gifin_close_file();
-static int gifin_load_cmap();
-static int gifin_skip_extension();
-static int gifin_read_data_block();
-static int gifin_push_string();
-static int gifin_add_string();
-static int gifin_fatal();
+static int gifin_open_file(ZFILE* s);
+static int gifin_open_image(void);
+static int gifin_get_pixel(int* pel);
+static int gifin_close_image(void);
+static int gifin_close_file(void);
+static int gifin_load_cmap(BYTE cmap[3][256], int ncolors);
+static int gifin_skip_extension(void);
+static int gifin_read_data_block(void);
+static int gifin_push_string(int code);
+static int gifin_add_string(int p, int e);
+static int gifin_fatal(char* msg);
 
 /* #defines, typedefs, and such
  */

@@ -247,7 +247,7 @@ char* expandPath(char* p)
     int var;
     char* ptr;
 
-    char* getenv();
+    /* getenv is declared in stdlib.h */
 
     buf1[0] = '\0';
     buf2[0] = '\0';

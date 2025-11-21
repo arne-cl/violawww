@@ -75,8 +75,7 @@ char* dupString(char* s) {
     return (d);
 }
 
-void newRGBMapData(rgb, size) RGBMap* rgb;
-unsigned int size;
+void newRGBMapData(RGBMap* rgb, unsigned int size)
 {
     rgb->used = 0;
     rgb->size = size;
@@ -86,7 +85,7 @@ unsigned int size;
     rgb->blue = (Intensity*)lmalloc(sizeof(Intensity) * size);
 }
 
-void freeRGBMapData(rgb) RGBMap* rgb;
+void freeRGBMapData(RGBMap* rgb)
 {
     lfree((byte*)rgb->red);
     lfree((byte*)rgb->green);

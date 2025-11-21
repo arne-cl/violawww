@@ -695,9 +695,7 @@ imageToXImage: XAllocColor failed on a TrueColor/Directcolor visual\n");
  * to the drawable.
  */
 
-void sendXImage(ximageinfo, src_x, src_y, dst_x, dst_y, w, h) XImageInfo* ximageinfo;
-int src_x, src_y, dst_x, dst_y;
-unsigned int w, h;
+void sendXImage(XImageInfo* ximageinfo, int src_x, int src_y, int dst_x, int dst_y, unsigned int w, unsigned int h)
 {
     XGCValues gcv;
 
@@ -721,8 +719,7 @@ unsigned int w, h;
 /* free up anything cached in the local Ximage structure.
  */
 
-void freeXImage(image, ximageinfo) Image* image;
-XImageInfo* ximageinfo;
+void freeXImage(Image* image, XImageInfo* ximageinfo)
 {
     if (ximageinfo->gc)
         XFreeGC(ximageinfo->disp, ximageinfo->gc);

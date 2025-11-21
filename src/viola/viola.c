@@ -50,8 +50,8 @@ extern int init_tfed();
 extern long init_cexec();
 extern int init_html();
 extern int SGMLInit();
-extern int meth_generic_cli();
-extern int tfed_FreeTmpFileToFree();
+extern long meth_generic_cli(VObj* self, Packet* result, int argc, Packet argv[]);
+extern void tfed_FreeTmpFileToFree(int freeP);
 extern void XtToolkitInitialize();
 
 #define DFLT_USR_WWW_HOME "WWW" /* patched */

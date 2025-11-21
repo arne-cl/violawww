@@ -15,7 +15,7 @@
 #include <strings.h>
 
 /* Forward declarations */
-extern int findImage();
+extern int findImage(char* name, char* fullname);
 #include "imagetypes.h"
 #include <errno.h>
 

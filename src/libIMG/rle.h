@@ -139,17 +139,12 @@ extern struct sv_globals {
 /*
  * buildmap - build a more usable colormap from data in globals struct.
  */
-extern rle_pixel** buildmap();
-/* ( globals, minmap, gamma )
- * struct sv_globals * globals;
- * int minmap;
- * double gamma;
- */
+extern rle_pixel** buildmap(struct sv_globals* globals, int minmap, double gamma);
 
 /*
  * rle_getcom - get a specific comment from the image comments.
  */
-extern char* rle_getcom();
+extern char* rle_getcom(char* name, struct sv_globals* globals);
 /* ( name, globals )
  * char * name;
  * struct sv_globals * globals;

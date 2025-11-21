@@ -497,8 +497,7 @@ void CB_HTML_new() {
     bstate->insert = NULL;
 }
 
-void CB_HTML_data(str, size) char* str;
-int size;
+void CB_HTML_data(char* str, int size)
 {
     SGMLBuildInfoState* bstate;
     char tempbuf[8192];
@@ -576,9 +575,7 @@ int size;
     */
 }
 
-void CB_HTML_special_entity(entity_number, data, dataLength) int entity_number;
-char* data;
-int dataLength;
+void CB_HTML_special_entity(int entity_number, char* data, int dataLength)
 {
     SGMLBuildInfoState* bstate;
     SGMLBuildInfoState* parent_bstate;
@@ -621,10 +618,7 @@ int dataLength;
     }
 }
 
-void CB_HTML_stag(element_number, present, value, tagInfo) int element_number;
-BOOL* present;
-char** value;
-HTTag* tagInfo;
+void CB_HTML_stag(int element_number, BOOL* present, char** value, HTTag* tagInfo)
 {
     SGMLBuildInfoState* parent_parent_bstate;
     SGMLBuildInfoState* parent_bstate;
@@ -1184,7 +1178,7 @@ HTTag* tagInfo;
     }
 }
 
-void CB_HTML_etag(element_number) int element_number;
+void CB_HTML_etag(int element_number)
 {
     SGMLBuildInfoState* parent_bstate;
     SGMLBuildInfoState* bstate;
@@ -1799,7 +1793,7 @@ int http_progress_notify(int n)
     }
 }
 
-void user_message(message) char* message;
+void user_message(char* message)
 {
     if (!mesgObj)
         mesgObj = findObject(getIdent("www.mesg.tf"));
@@ -1807,7 +1801,7 @@ void user_message(message) char* message;
         sendMessage1N1str(mesgObj, "show", message);
 }
 
-void user_alert(message) char* message;
+void user_alert(char* message)
 {
     if (!mesgObj)
         mesgObj = findObject(getIdent("www.mesg.tf"));
@@ -1881,9 +1875,7 @@ char* user_prompt_password(char* message)
     return s;
 }
 
-void user_prompt_username_and_password(message, username, password) char* message;
-char** username;
-char** password;
+void user_prompt_username_and_password(char* message, char** username, char** password)
 {
     Packet* result = makePacket();
     char *ret, *s, buff[200];

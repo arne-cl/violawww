@@ -54,15 +54,15 @@
 #include <sys/select.h>
 #endif
 
-void handle_KeyPress();
+void handle_KeyPress(XKeyEvent* ep);
 void handle_KeyRelease(XKeyEvent* ep);
-long handle_EnterNotify();
-long handle_LeaveNotify();
-long handle_ButtonPress();
-long handle_ButtonRelease();
-long handle_MotionNotify();
-long handle_ResizeRequest();
-long handle_ConfigureNotify();
+long handle_EnterNotify(XEnterWindowEvent* ep, VObj** dragObjp, int tool, int* mouseDown);
+long handle_LeaveNotify(XLeaveWindowEvent* ep, VObj** dragObjp, int tool, int* mouseDown);
+long handle_ButtonPress(XButtonEvent* ep, VObj** dragObjp, int tool, int* resize_corner, int* mouseDown, int * from_x, int * from_y);
+long handle_ButtonRelease(XButtonEvent* ep, VObj** dragObjp, int tool, int* resize_corner, int* mouseDown);
+long handle_MotionNotify(XEvent* ep, VObj** dragObjp, int tool, int* resize_corner, int* mouseDown, int * from_x, int * from_y);
+long handle_ResizeRequest(XResizeRequestEvent* ep);
+long handle_ConfigureNotify(XConfigureEvent* ep);
 
 static int signal_fatal[] = {SIGBUS, SIGFPE, SIGEMT, SIGILL, SIGSEGV, SIGSYS, 0};
 static int signal_nonfatal[] = {SIGHUP, SIGINT, SIGPIPE, SIGQUIT, SIGTERM, SIGUSR1, SIGUSR2, 0};
@@ -110,11 +110,11 @@ TimeInfo* firstTimeInfo = NULL;
 int async_event = 0;
 
 /* forward decl */
-char* eventChar();
+char* eventChar(XKeyEvent* e);
 void processPeekKeys();
-int checkParam();
-void process_event();
-void signalHandler();
+int checkParam(VObj* self, int resize_corner);
+void process_event(XEvent* ep, int tool);
+void signalHandler(int sig);
 
 VObj* reparented_obj = NULL;
 VObj* floatingObject = NULL;
@@ -162,7 +162,7 @@ int init_event() {
     return 1;
 }
 
-void signalHandler(sig) int sig;
+void signalHandler(int sig)
 {
     static int exiting = 0;
 
@@ -211,7 +211,7 @@ void signalHandler(sig) int sig;
  * For Viola in library mode where calling program has its own event loop.
  * This routine processes the event passed by the calling program.
  */
-void violaProcessEvent(e) XEvent* e;
+void violaProcessEvent(XEvent* e)
 {
     VObj *topObj, *obj;
     HashEntry* hentry;
@@ -518,8 +518,7 @@ int eventLoop() {
     }
 }
 
-void process_event(ep, tool) XEvent* ep;
-int tool;
+void process_event(XEvent* ep, int tool)
 {
     static VObj* dragObj = NULL;
     static int resize_corner, mouseDown = 0, from_x, from_y;
@@ -746,7 +745,7 @@ int tool;
     }
 }
 
-void handle_KeyPress(ep) XKeyEvent* ep;
+void handle_KeyPress(XKeyEvent* ep)
 {
     VObj* obj = findWindowObject(ep->window);
     char* keyInfo;

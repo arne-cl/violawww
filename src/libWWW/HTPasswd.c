@@ -23,7 +23,7 @@
 #include "HTUtils.h"
 #include "tcp.h" /* FROMASCII()		*/
 
-extern char* crypt();
+extern char* crypt(const char* key, const char* salt);
 
 PRIVATE char salt_chars[65] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 

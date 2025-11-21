@@ -396,7 +396,7 @@ int initDefaultColor(char* colorname, unsigned long defpixel, unsigned long* pix
 int GLInit(Display* dpy, Screen* scrn)
 {
     Screen* screen;
-    extern double pow();
+    extern double pow(double x, double y);
     char dash_list[2];
     XGCValues gcvalues;
     char *screenResStr = NULL, *resManagerStr;
@@ -1135,7 +1135,7 @@ Window GLOpenWindow(VObj* self, int x, int y, int width, int height, int isGlass
 
 /*
  */
-void GLCloseWindow(w) Window w;
+void GLCloseWindow(Window w)
 {
     if (w)
         XUnmapWindow(display, w);
@@ -1209,8 +1209,7 @@ Window GLQueryWindow() {
 /*
  * calculate an object's position relative to the root window
  */
-void GLRootPosition(w, root_xp, root_yp) Window w;
-int *root_xp, *root_yp;
+void GLRootPosition(Window w, int *root_xp, int *root_yp)
 {
     Window rw, pw, *cw;
     unsigned int i;
@@ -1250,7 +1249,7 @@ Window GLQueryMouse(Window w, int * rootx, int * rooty, int * wx, int * wy)
 /*
  *
  */
-void GLChangeToBusyMouseCursor(w) Window w;
+void GLChangeToBusyMouseCursor(Window w)
 {
     /* using this mouseCursorIsBusy flag prevents different top-level windows
        from cross states
@@ -1264,7 +1263,7 @@ void GLChangeToBusyMouseCursor(w) Window w;
 /*
  *
  */
-void GLChangeToNormalMouseCursor(w) Window w;
+void GLChangeToNormalMouseCursor(Window w)
 {
     /*	if (mouseCursorIsBusy == 0) return;*/
     XDefineCursor(display, w, cursor_arrow);
@@ -1696,10 +1695,7 @@ XImage* GLReadBitmapImage(Window w, XImage* image, char* filename)
 ** widget drawings
 **
 */
-void GLDrawBorder(w, x1, y1, x2, y2, style, relief) Window w;
-int x1, y1, x2, y2;
-int style;
-int relief;
+void GLDrawBorder(Window w, int x1, int y1, int x2, int y2, int style, int relief)
 {
     GC ltGC, dkGC;
 
@@ -1795,9 +1791,7 @@ int relief;
     }
 }
 
-void GLEraseBorder(w, x1, y1, x2, y2, style) Window w;
-int x1, y1, x2, y2;
-int style;
+void GLEraseBorder(Window w, int x1, int y1, int x2, int y2, int style)
 {
 
     switch (style) {
@@ -1844,8 +1838,7 @@ int GLDrawRubberFrame(VObj* self, int x1, int y1, int x2, int y2)
     return 1;
 }
 
-void GLDrawScrollBarH(w, width, start, end, thickness) Window w;
-int width, start, end, thickness;
+void GLDrawScrollBarH(Window w, int width, int start, int end, int thickness)
 {
     /*
             if (BDPixel == BGPixel) {
@@ -1919,8 +1912,7 @@ int width, start, end, thickness;
 #endif
 }
 
-void GLDrawScrollBarV(w, height, start, end, thickness) Window w;
-int height, start, end, thickness;
+void GLDrawScrollBarV(Window w, int height, int start, int end, int thickness)
 {
     /*	if (BDPixel == BGPixel) {
                     XSetForeground(display, gc_dash, FGPixel);
@@ -1998,11 +1990,7 @@ int height, start, end, thickness;
 #endif
 }
 
-void GLDrawDial(w, x, y, radius, degree, style) Window w;
-int x, y;
-int radius;
-int degree;
-int style;
+void GLDrawDial(Window w, int x, int y, int radius, int degree, int style)
 {
     int diameter;
     int tangent_x, tangent_y;
@@ -2032,9 +2020,7 @@ int style;
 /*
 ** widget geometry
 */
-void GLUpdateGeometry(parentWindowIsRoot, w, x, y, width, height) int parentWindowIsRoot;
-Window w;
-int x, y, width, height;
+void GLUpdateGeometry(int parentWindowIsRoot, Window w, int x, int y, int width, int height)
 {
     XWindowChanges wc;
 
@@ -2062,9 +2048,7 @@ int x, y, width, height;
     XConfigureWindow(display, w, CWX | CWY | CWWidth | CWHeight, &wc);
 }
 
-void GLUpdatePosition(parentWindowIsRoot, w, x, y) int parentWindowIsRoot;
-Window w;
-int x, y;
+void GLUpdatePosition(int parentWindowIsRoot, Window w, int x, int y)
 {
     if (parentWindowIsRoot) {
         XSetWindowAttributes attrs;
@@ -2083,9 +2067,7 @@ int x, y;
     }
 }
 
-void GLUpdateSize(parentWindowIsRoot, w, width, height) int parentWindowIsRoot;
-Window w;
-int width, height;
+void GLUpdateSize(int parentWindowIsRoot, Window w, int width, int height)
 {
     if (parentWindowIsRoot) {
         XSetWindowAttributes attrs;
@@ -2715,7 +2697,7 @@ int GLGIFDraw(Window w, XImage* img, int x, int y, int width, int height)
 /*
  * may be called by ../libGIF/xloadgif.c
  */
-void FatalError(identifier) char* identifier;
+void FatalError(char* identifier)
 {
     if (verbose)
         fprintf(stderr, "libGIF: %s: %s\n", cmd, identifier);
@@ -2812,7 +2794,7 @@ ColorStruct* addColorName(char* str)
     return cs;
 }
 
-void releaseColor(colorp) ColorStruct* colorp;
+void releaseColor(ColorStruct* colorp)
 {
     if (--(colorp->refc) <= 0) {
         HashEntry* entry;
@@ -2823,7 +2805,7 @@ void releaseColor(colorp) ColorStruct* colorp;
     }
 }
 
-void releaseColorByString(name) char* name;
+void releaseColorByString(char* name)
 {
     HashEntry* entry;
     ColorStruct* cs;

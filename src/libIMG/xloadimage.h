@@ -74,13 +74,13 @@ void goodImage(Image* image, char* func);
 Image* processImage(Display* disp, int scrn, Image* image, ImageOptions* options, unsigned int verbose);
 int errorHandler(Display* disp, XErrorEvent* error);
 
-char* expandPath(); /* path.c */
-int findImage();
+char* expandPath(char* p); /* path.c */
+int findImage(char* name, char* fullname);
 void listImages();
 void loadPathsAndExts();
 void showPath();
 
-void imageOnRoot(); /* root.c */
+void imageOnRoot(Display* disp, int scrn, Window window, Image* image, unsigned int verbose); /* root.c */
 
 void sendXImage(XImageInfo* ximageinfo, int src_x, int src_y, int dst_x, int dst_y, unsigned int w, unsigned int h); /* send.c */
 XImageInfo* imageToXImage(Display* disp, int scrn, Visual* visual, unsigned int ddepth, Image* image, unsigned int private_cmap, unsigned int fit, unsigned int verbose);

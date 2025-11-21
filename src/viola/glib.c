@@ -9,7 +9,7 @@
 #include "utils.h"
 
 /* Forward declaration */
-extern int GLInit();
+extern int GLInit(Display* dpy, Screen* scrn);
 
 HashTable* window2Obj; /* used to look up object associated with a window */
 
@@ -41,7 +41,7 @@ Window bossWindow(VObj* self)
     return w;
 }
 
-void unMapObject(self) VObj* self;
+void unMapObject(VObj* self)
 {
     Window w = GET_window(self);
 

@@ -1816,8 +1816,8 @@ long meth_generic_accessible(VObj* self, Packet* result, int argc, Packet argv[]
 long meth_generic_activeHelp(VObj* self, Packet* result, int argc, Packet argv[]) {
 #define VW
 #ifdef VW
-    extern void showHelpMessageInMainWindow();
-    extern void blankHelpHandlerInMainWindow();
+    extern void showHelpMessageInMainWindow(char* message);
+    extern void blankHelpHandlerInMainWindow(void);
     char* str;
 
     if (argc == 0) {

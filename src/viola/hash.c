@@ -482,7 +482,7 @@ int removeHashEntry_str(HashTable* ht, char* label)
     return 0;
 }
 
-void dumpHashTable(ht) HashTable* ht;
+void dumpHashTable(HashTable* ht)
 {
     printf("size = %d\n", ht->size);
 

@@ -8,7 +8,7 @@
 #include "xloadimage.h"
 #include <stdlib.h>
 
-char* mc_sensor();
+char* mc_sensor(int sscode);
 
 /*
  * convert from little endian to big endian four byte object
