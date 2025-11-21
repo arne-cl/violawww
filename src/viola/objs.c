@@ -3395,7 +3395,7 @@ static char _slotValue_mvw7[] = {
 static char _slotValue_mvw9[] = "vpane";
 static char _slotValue_mvw10[] = "mvw.doc";
 static char _slotValue_mvw11[] = "mvw";
-static char _slotValue_mvw12[] = "mvw.doc.url mvw.doc.title mvw.doc.view";
+static char _slotValue_mvw12[] = "mvw.doc.view";
 static char _slotValue_mvw13[] = {
 #include "embeds/mvw_script13.v.h"
 };
