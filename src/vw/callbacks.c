@@ -591,9 +591,10 @@ void quitOk(Widget widget, XtPointer clientData, XtPointer call) {
     DocViewInfo* dvi = (DocViewInfo*)cd->shellInfo;
 
     if (dvi->violaDocViewObj) {
+        void* violaObj = dvi->violaDocViewObj;  /* Save before freeing dvi */
         deleteFromBox(&docViews, (void*)&(dvi->shell), compareDocViewShell, freeDocViewInfo, TRUE);
         nshells--;
-        sendMessage1(dvi->violaDocViewObj, "quit");
+        sendMessage1(violaObj, "quit");
     }
     exit(0);
 }
