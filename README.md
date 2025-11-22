@@ -63,6 +63,13 @@ This version brings ViolaWWW into the modern web era while preserving its unique
 - Tested on macOS (Apple Silicon M3)
 - Maintained backward compatibility with build system
 
+#### Interface Restoration
+- Restored original browser appearance from author's drafts and code comments
+- Removed non-functional UI elements and placeholder buttons
+- Fixed window dimensions and layout to match intended design
+- Enabled previously commented-out working features
+- Result: Clean interface matching the original vision for ViolaWWW 3.x
+
 #### HTTPS/TLS Support
 - Native SSL/TLS via OpenSSL 3.x
 - TLS 1.0+ with SNI (Server Name Indication)
