@@ -17,9 +17,9 @@ extern MethodInfo defaultKeyBinding[];
 
 typedef struct TFChar {
     unsigned char c;
-    char fontID;
-    char tagID;
-    char flags;
+    unsigned short fontID;  /* Supports up to 65535 fonts/images */
+    unsigned char tagID;
+    unsigned char flags;
 } TFChar;
 
 /* This should be replaced with generalized viola objects
