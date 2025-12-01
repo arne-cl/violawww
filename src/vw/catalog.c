@@ -54,63 +54,95 @@ static void closeCatalogWindow(Catalog* catalog);
 /* ---- XPM ICONS (embedded) ------------------------------------------- */
 
 /* XPM */
-/* 16x16 folder icon - from HTML__foldIcon folderClosed */
+/* 32x32 folder icon - scaled 2x from HTML__foldIcon folderClosed */
 static char* folderIconXPM[] = {
-"16 16 2 1",
+"32 32 2 1",
 "  c grey75",
 ". c black",
-"                ",
-"           .... ",
-"    .......    .",
-"   .           .",
-"   ........... .",
-"  .          . .",
-"  .          . .",
-"  .          . .",
-"  .          . .",
-"  .          . .",
-"  .          . .",
-"  .           ..",
-"   ............ ",
-"                ",
-"                ",
-"                "};
+"                                ",
+"                                ",
+"                      ........  ",
+"                      ........  ",
+"        ..............        ..",
+"        ..............        ..",
+"      ..                      ..",
+"      ..                      ..",
+"      ......................  ..",
+"      ......................  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                    ..  ..",
+"    ..                      ....",
+"    ..                      ....",
+"      ........................  ",
+"      ........................  ",
+"                                ",
+"                                ",
+"                                ",
+"                                ",
+"                                ",
+"                                "};
 
 /* XPM */
-/* 15x16 link/document icon - original from link.xpm */
+/* 30x32 link/document icon - scaled 2x from link.xpm */
 static char* linkIconXPM[] = {
-"15 16 3 1",
+"30 32 3 1",
 "  c black",
 ". c grey75",
 "X c white",
-"...............",
-".          ....",
-". XXXXXXX X ...",
-". X    XX XX ..",
-". XXXXXXX XXX .",
-". X     X     .",
-". XXXXXXXXXXX .",
-". X         X .",
-". XXXXXXXXXXX .",
-". X         X .",
-". XXXXXXXXXXX .",
-". X         X .",
-". XXXXXXXXXXX .",
-". XXXXXXXXXXX .",
-".             .",
-"..............."};
+"..............................",
+"..............................",
+"..                    ........",
+"..                    ........",
+"..  XXXXXXXXXXXXXX  XX  ......",
+"..  XXXXXXXXXXXXXX  XX  ......",
+"..  XX        XXXX  XXXX  ....",
+"..  XX        XXXX  XXXX  ....",
+"..  XXXXXXXXXXXXXX  XXXXXX  ..",
+"..  XXXXXXXXXXXXXX  XXXXXX  ..",
+"..  XX          XX          ..",
+"..  XX          XX          ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XX                  XX  ..",
+"..  XX                  XX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XX                  XX  ..",
+"..  XX                  XX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XX                  XX  ..",
+"..  XX                  XX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..  XXXXXXXXXXXXXXXXXXXXXX  ..",
+"..                          ..",
+"..                          ..",
+"..............................",
+".............................."};
 
 /* ---- GLOBALS  ------------------------------------------------------- */
 
 static Pixmap defaultFolderIcon = 0;
 static Pixmap defaultFolderMask = 0;
-static short defaultFolderWidth = 16;
-static short defaultFolderHeight = 16;
+static short defaultFolderWidth = 32;
+static short defaultFolderHeight = 32;
 
 static Pixmap defaultLinkIcon = 0;
 static Pixmap defaultLinkMask = 0;
-static short defaultLinkWidth = 15;
-static short defaultLinkHeight = 16;
+static short defaultLinkWidth = 30;
+static short defaultLinkHeight = 32;
 
 static XmFontList catalogFontList = NULL;
 static int iconsInitialized = 0;
@@ -452,7 +484,7 @@ static Folder* parseFolder(FILE* fp, char* headerData, Catalog* catalog) {
     snprintf(countStr, sizeof(countStr), "%d", folder->nItems);
     folder->nItemsXMS = XmStringCreateLocalized(countStr);
     folder->numx = (short)(folder->x + folder->w / 2 - 10);  /* Center in 20px width */
-    folder->numy = (short)(folder->y + folder->h / 2 - 4);   /* Above center */
+    folder->numy = (short)(folder->y + folder->h / 2 - 6);   /* Above center */
 
     return folder;
 }
@@ -740,7 +772,7 @@ static void catalogButtonUpEH(Widget widget, XtPointer clientData, XEvent* event
             if (item->type == FOLDER) {
                 Folder* f = (Folder*)item;
                 f->numx = (short)(f->x + f->w / 2 - 10);
-                f->numy = (short)(f->y + f->h / 2 - 4);
+                f->numy = (short)(f->y + f->h / 2 - 6);
             }
         }
         catalog->modified = 1;
@@ -925,7 +957,7 @@ Folder* createNewFolder(Catalog* catalog, const char* name) {
     folder->nx = folder->x;
     folder->ny = (short)(folder->y + folder->h + 4);
     folder->numx = (short)(folder->x + folder->w / 2 - 10);
-    folder->numy = (short)(folder->y + folder->h / 2 - 4);
+    folder->numy = (short)(folder->y + folder->h / 2 - 6);
 
     if (folder->name) {
         folder->nameXMS = XmStringCreateLocalized(folder->name);
@@ -1530,7 +1562,7 @@ void cleanupFolder(Widget widget, XtPointer clientData, XtPointer callData) {
         if (item->type == FOLDER) {
             Folder* f = (Folder*)item;
             f->numx = (short)(f->x + f->w / 2 - 10);
-            f->numy = (short)(f->y + f->h / 2 - 4);
+            f->numy = (short)(f->y + f->h / 2 - 6);
         }
 
         col++;
