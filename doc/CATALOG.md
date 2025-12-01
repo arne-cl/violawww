@@ -86,8 +86,7 @@ The following elements were present in the original 1994 codebase:
 1. **Data Structures**: `Item`, `Folder`, `Link`, `Catalog` structs in `catalog.h`
 2. **Menu Structure**: Commented-out menu items indicating planned functionality
 3. **Folder Icon**: The 16×16 closed folder icon from `HTML__foldIcon` (used for `<UL FOLD=yes>` tags)
-4. **Link Icon**: The 15×16 document icon from `link.xpm`
-5. **Basic Window Layout**: Shell, canvas, and menu bar setup code
+4. **Basic Window Layout**: Shell, canvas, and menu bar setup code
 
 ### Reconstructed/Added (2024 restoration)
 
@@ -111,6 +110,7 @@ The following features were implemented based on the original design intent:
    - Adaptive selection highlight box
 
 4. **Visual Enhancements**
+   - Link icon: redrawn based on the document image in `reload.xpm`
    - 2× scaled icons (32×32 folder, 30×32 link) for modern displays
    - Item count displayed inside folder icons
    - Grey75 background matching Motif style
