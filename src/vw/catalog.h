@@ -135,6 +135,9 @@ typedef struct catalogStruct {
 
     /* Selection rectangle */
     short selectRectX, selectRectY, selectRectW, selectRectH;
+    
+    /* Grid layout */
+    short cellWidth;  /* calculated based on text width */
 } Catalog;
 
 typedef union ItemStruct {

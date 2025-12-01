@@ -161,6 +161,7 @@ static void saveCatalogCB(Widget widget, XtPointer clientData, XtPointer callDat
 static void goUpFolderCB(Widget widget, XtPointer clientData, XtPointer callData);
 static void selectAllCB(Widget widget, XtPointer clientData, XtPointer callData);
 static void aboutCatalogCB(Widget widget, XtPointer clientData, XtPointer callData);
+static void calculateCellWidth(Catalog* catalog);
 
 /* ---- MENUS  -------------------------------------------------------- */
 
@@ -588,18 +589,36 @@ static void drawItem(Widget canvas, Item* item, Catalog* catalog, int selected) 
 
     /* Draw name centered under icon */
     if (item->nameXMS && catalogFontList) {
-        /* Center text under icon: start at (x - (GRID_X - icon_width)/2) */
-        int textX = item->x - (CATALOG_GRID_X - item->w) / 2;
+        /* Use cellWidth if set, otherwise fall back to CATALOG_GRID_X */
+        int cellW = (catalog && catalog->cellWidth > 0) ? catalog->cellWidth : CATALOG_GRID_X;
+        /* Center text under icon */
+        int textX = item->x - (cellW - item->w) / 2;
         XmStringDraw(display, window, catalogFontList, item->nameXMS, gc,
-                     textX, item->ny, CATALOG_GRID_X,
+                     textX, item->ny, cellW,
                      XmALIGNMENT_CENTER, XmSTRING_DIRECTION_L_TO_R, NULL);
     }
 
     /* Draw selection highlight */
     if (selected || item->state == SELECTED) {
-        XDrawRectangle(display, window, gc,
-                       item->x - 2, item->y - 2,
-                       (unsigned int)(item->w + 4), (unsigned int)(item->h + 20));
+        /* Calculate selection box to encompass icon and text */
+        int selX, selY, selW, selH;
+        int textWidth = 0;
+        
+        if (item->nameXMS && catalogFontList) {
+            textWidth = XmStringWidth(catalogFontList, item->nameXMS);
+        }
+        
+        /* Use max of icon width and text width */
+        int contentWidth = (textWidth > item->w) ? textWidth : item->w;
+        
+        /* Center the selection box */
+        selX = item->x + item->w / 2 - contentWidth / 2 - 2;
+        selY = item->y - 2;
+        selW = contentWidth + 4;
+        selH = item->h + 20;  /* icon + text height */
+        
+        XDrawRectangle(display, window, gc, selX, selY,
+                       (unsigned int)selW, (unsigned int)selH);
     }
 
     /* For folders only, draw item count inside the icon */
@@ -1004,6 +1023,7 @@ void openFolder(Folder* folder, Catalog* catalog) {
         XmStringFree(xms);
     }
 
+    calculateCellWidth(catalog);
     deselectAll(catalog);
     redrawCatalog(catalog);
 }
@@ -1318,6 +1338,7 @@ static void goUpFolderCB(Widget widget, XtPointer clientData, XtPointer callData
             XmStringFree(xms);
         }
 
+        calculateCellWidth(catalog);
         deselectAll(catalog);
         redrawCatalog(catalog);
     }
@@ -1542,6 +1563,28 @@ static int compareItemsByName(const void* a, const void* b) {
     return strcasecmp(nameA, nameB);
 }
 
+/* Calculate cellWidth based on maximum text width in folder */
+static void calculateCellWidth(Catalog* catalog) {
+    if (!catalog || !catalog->currentFolder) return;
+    
+    Folder* folder = catalog->currentFolder;
+    int maxTextWidth = 0;
+    int maxIconWidth = 0;
+    
+    for (int i = 0; i < folder->nItems; i++) {
+        Item* item = folder->items[i];
+        if (item->nameXMS && catalogFontList) {
+            Dimension textWidth = XmStringWidth(catalogFontList, item->nameXMS);
+            if (textWidth > maxTextWidth) maxTextWidth = textWidth;
+        }
+        if (item->w > maxIconWidth) maxIconWidth = item->w;
+    }
+    
+    int cellWidth = (maxTextWidth > maxIconWidth ? maxTextWidth : maxIconWidth) + 20;
+    if (cellWidth < CATALOG_GRID_X) cellWidth = CATALOG_GRID_X;
+    catalog->cellWidth = (short)cellWidth;
+}
+
 void cleanupFolder(Widget widget, XtPointer clientData, XtPointer callData) {
     ClientData* cd = (ClientData*)clientData;
     Catalog* catalog = (Catalog*)cd->shellInfo;
@@ -1549,14 +1592,29 @@ void cleanupFolder(Widget widget, XtPointer clientData, XtPointer callData) {
     if (!catalog || !catalog->currentFolder) return;
 
     Folder* folder = catalog->currentFolder;
+    
+    /* Calculate cell width based on text widths */
+    calculateCellWidth(catalog);
+    int cellWidth = catalog->cellWidth;
+    
+    /* Calculate how many columns fit in the window */
+    Dimension canvasWidth = 400;  /* default */
+    if (catalog->canvas) {
+        XtVaGetValues(catalog->canvas, XmNwidth, &canvasWidth, NULL);
+    }
+    int maxCols = (canvasWidth - 20) / cellWidth;
+    if (maxCols < 1) maxCols = 1;
+    
     int col = 0, row = 0;
-    int maxCols = 5;
 
     for (int i = 0; i < folder->nItems; i++) {
         Item* item = folder->items[i];
-        item->x = (short)(20 + col * CATALOG_GRID_X);
+        /* Center icon in cell */
+        int cellX = 20 + col * cellWidth;
+        item->x = (short)(cellX + (cellWidth - item->w) / 2);
         item->y = (short)(20 + row * CATALOG_GRID_Y);
-        item->nx = item->x;
+        /* Center text under icon */
+        item->nx = (short)cellX;
         item->ny = (short)(item->y + item->h + 4);
 
         if (item->type == FOLDER) {
@@ -1657,6 +1715,9 @@ void showCatalog(char* catalogFile, DocViewInfo* parentDVI) {
 
     /* Read catalog file */
     readCatalog(catalog, catalogFile);
+    
+    /* Calculate initial cell width for layout */
+    calculateCellWidth(catalog);
 
     mainWindow = XmCreateMainWindow(shell, "mainWindow", NULL, 0);
 
