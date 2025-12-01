@@ -165,6 +165,8 @@ static MenuItem fileMenuItems[] = {
      "Show the document source.", TRUE, (MenuItem*)NULL},
     {"Save As", &xmPushButtonWidgetClass, 'A', NULL, NULL,
      vwSaveAsCB, NULL, "Save the current document to a new local file.", TRUE, (MenuItem*)NULL},
+    {"Add to Catalog", &xmPushButtonWidgetClass, 'd', NULL, NULL,
+     addToCatalogCB, NULL, "Add current page to URL Catalog.", TRUE, (MenuItem*)NULL},
     {"", &xmSeparatorGadgetClass, (char)0, NULL, NULL, NULL, NULL, NULL, TRUE, (MenuItem*)NULL},
     {"Quit", &xmPushButtonWidgetClass, 'Q', "Ctrl<Key>Q", "Ctrl-Q", quitCallback, NULL,
      "Quit the entire application.", TRUE, (MenuItem*)NULL},
@@ -225,16 +227,11 @@ static MenuItem fontsMenuItems[] = {
     NULL,
 };
 
-/*
-MenuItem testMenuItems[] = {
-    { "Catalog", &xmPushButtonWidgetClass, 'C', "Ctrl<Key>C",  "Ctrl-C",
-          showCatalogCB, "",
-          "Test of personal URL organizer tool.",
-          TRUE,
-          (MenuItem *) NULL},
+static MenuItem testMenuItems[] = {
+    {"Catalog", &xmPushButtonWidgetClass, 'C', NULL, NULL,
+     showCatalogCB, "", "Personal URL organizer tool.", TRUE, (MenuItem*)NULL},
     NULL,
 };
-*/
 
 MenuItem helpMenuItems[] = {
     {"About ViolaWWW", &xmPushButtonWidgetClass, 'A', NULL, NULL, oneWordMessageCB,
@@ -273,6 +270,7 @@ static Menu mainMenus[] = {
     {"Navigation", 'N', navigationMenuItems},
     {"Fonts", 'o', fontsMenuItems},
     {"Guides", 'S', serversMenuItems},
+    {"Tools", 'T', testMenuItems},
     NULL,
 };
 
@@ -525,7 +523,7 @@ DocViewInfo* makeBrowserInterface(Widget shell, char* shellName, DocViewInfo* pa
         XtVaGetValues(shell, XmNwidth, &width, XmNheight, &height, NULL);
         
         /* Set min and max to current size to prevent resizing */
-        memset(&hints, 0, sizeof(XSizeHints));
+        (&hints, 0, sizeof(XSizeHints));
         hints.flags = PMinSize | PMaxSize;
         hints.min_width = hints.max_width = (int)width;
         hints.min_height = hints.max_height = (int)height;
