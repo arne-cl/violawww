@@ -4,8 +4,8 @@ The Personal URL Catalog is a hierarchical bookmark organizer for ViolaWWW, allo
 
 ## Opening the Catalog
 
-- **Menu:** Tools → Catalog
-- **Add current page:** File → Add to Catalog
+- **Menu:** Navigation → Catalog
+- **Add current page:** Navigation → Add to Catalog
 
 ## Features
 
@@ -46,7 +46,7 @@ The Personal URL Catalog is a hierarchical bookmark organizer for ViolaWWW, allo
 | Command | Shortcut | Description |
 |---------|----------|-------------|
 | Select All | Ctrl+A | Select all items in current folder |
-| Rename | Ctrl+R | Rename the selected item (single selection only) |
+| Edit Label | Ctrl+E | Edit the label of the selected item (single selection only) |
 
 ### Organize Menu
 
@@ -116,9 +116,9 @@ The following features were implemented based on the original design intent:
    - Grey75 background matching Motif style
 
 5. **User Interface**
-   - **Tools menu** added to main menu bar (original had commented-out "Test" menu)
-   - "Add Current Page" integration with browser (File menu)
-   - Rename dialog for items
+   - Catalog added to **Navigation menu** (original had commented-out "Test" menu)
+   - "Add to Catalog" in Navigation menu
+   - Edit Label dialog for renaming items
    - About Catalog dialog
    - Non-resizable window (per original design)
    - Proper window close handling (doesn't quit browser)

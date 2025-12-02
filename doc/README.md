@@ -55,6 +55,16 @@ Topics covered:
 - Applying styles to HTML elements
 - Custom styling examples
 
+### [CATALOG.md](CATALOG.md)
+Personal URL Catalog — a hierarchical bookmark organizer.
+
+Topics covered:
+- Creating and organizing folders and links
+- Navigation and selection
+- Keyboard shortcuts
+- File format specification
+- Implementation notes (original vs. restored code)
+
 ## ViolaWWW HTML Extensions
 
 ViolaWWW implemented many pioneering features that were ahead of their time:
