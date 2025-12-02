@@ -10,7 +10,9 @@
  */
 #include "mystrings.h"
 #include "utils.h"
-#include <strings.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 /*
  * Path to the SGML parser (onsgmls from OpenSP package).
@@ -21,23 +23,20 @@
 #define SGMLS_PATH "/opt/homebrew/bin/onsgmls"
 #endif
 
-int verbose = 0;
+static int verbose = 0;
 
 #define ATTR_STACK_SIZE 512
-char* attrsStack[ATTR_STACK_SIZE];
-int attrsStackIdx = 0;
-
-char lbuff[512];
+static char* attrsStack[ATTR_STACK_SIZE];
 
 #define TAGBUFFSIZE 1024
-char* tagDict[TAGBUFFSIZE];
-int tagDictCount = 0;
+static char* tagDict[TAGBUFFSIZE];
+static int tagDictCount = 0;
 
-int version = 2;
+static const int version = 2;
 
-int outd;
+#define MAX_LINE_SIZE 100000
 
-char* lspaces = "                                                        ";
+static const char* lspaces = "                                                        ";
 
 /*
         version info in ASCII\n
@@ -95,34 +94,31 @@ enum sgmlsAttributeTypes {
     SGMLS_ATTR_NOTATION
 };
 
-emitToken(i) int i;
+static inline void emitToken(int i)
 {
-    fprintf(stdout, "%c", (int)(i & 255));
+    putchar(i & 255);
 }
 
-emitStr(s, n) char* s;
-int n;
+static inline void emitStr(const char* s, int n)
 {
-    int i;
-    for (i = 0; i < n; i++)
-        fprintf(stdout, "%c", s[i]);
+    fwrite(s, 1, (size_t)n, stdout);
 }
 
-emitInt(i) int i;
+static inline void emitInt(int i)
 {
-    fprintf(stdout, "%c", (int)((i >> 24) & 255));
-    fprintf(stdout, "%c", (int)((i >> 16) & 255));
-    fprintf(stdout, "%c", (int)((i >> 8) & 255));
-    fprintf(stdout, "%c", (int)(i & 255));
+    putchar((i >> 24) & 255);
+    putchar((i >> 16) & 255);
+    putchar((i >> 8) & 255);
+    putchar(i & 255);
 }
 
-char* filterCtrl(char* inStr, int* size)
+static char* filterCtrl(const char* inStr, int* size)
 {
     char c, *cp, *outStr;
 
     outStr = cp = (char*)malloc(sizeof(char) * (strlen(inStr) + 1));
 
-    while (c = *inStr++) {
+    while ((c = *inStr++)) {
         if (c == '\\') {
             switch (c = *inStr++) {
             case 'n':
@@ -167,8 +163,8 @@ char* filterCtrl(char* inStr, int* size)
                     *cp = ' ';
                     ++cp;
                 } else {
-                    *(cp - 1) = '\\';
-                    ++cp;
+                    *cp++ = '\\';
+                    *cp++ = c;
                 }
                 continue;
             }
@@ -183,7 +179,7 @@ char* filterCtrl(char* inStr, int* size)
     return outStr;
 }
 
-int findTagID(char* tagName)
+static int findTagID(const char* tagName)
 {
     int i;
 
@@ -194,23 +190,22 @@ int findTagID(char* tagName)
     return -1; /* error! */
 }
 
-buildDict(tag, srcp, level) char* tag;
-char** srcp;
-int level;
+static int buildDict(const char* tag, char** srcp, int level)
 {
     char tagName[100];
-    char line[100000];
+    char line[MAX_LINE_SIZE];
     char* end;
-    int i, endP = 0;
+    int i;
+    bool endP = false;
 
     do {
-        end = index(*srcp, '\n');
+        end = strchr(*srcp, '\n');
         if (!end) {
-            end = index(*srcp, '\0');
+            end = strchr(*srcp, '\0');
             strncpy(line, *srcp, end - *srcp);
             line[end - *srcp] = '\0';
             *srcp = end;
-            endP = 1;
+            endP = true;
 
         } else {
             strncpy(line, *srcp, end - *srcp);
@@ -219,8 +214,7 @@ int level;
         }
 
         if (line[0] == '(') {
-            strcpy(tagName, line + 1);
-            /*			printf("OTAG=\"%s\"\n", tagName);*/
+            snprintf(tagName, sizeof(tagName), "%s", line + 1);
 
             for (i = 0; i < tagDictCount; i++) {
                 if (!strcmp(tagDict[i], tagName))
@@ -239,22 +233,17 @@ int level;
     return 1;
 }
 
-build(tag, srcp, level, attrsIdxBegin, attrsCount) char* tag;
-char** srcp;
-int level;
-int attrsIdxBegin;
-int attrsCount;
+static int build(const char* tag, char** srcp, int level, int attrsIdxBegin, int attrsCount)
 {
     char tagName[100];
-    char line[100000];
+    char line[MAX_LINE_SIZE];
     char* end;
-    int i, j, endP = 0;
+    int i, j;
+    bool endP = false;
     int subAttrsIdxBegin = attrsIdxBegin + attrsCount;
     int subAttrsCount = 0;
-    char *name, *ref;
-    char c, c0, *s, *anchor, *subTagp, *datap;
+    char c, *s, *datap;
     int tagID;
-    int width, height;
     char* cp;
     int ai, si, len;
     int attrTypeID;
@@ -272,10 +261,6 @@ int attrsCount;
         emitInt(tagID);
     }
 
-    name = NULL;
-    ref = NULL;
-    width = height = 0;
-
     for (i = attrsIdxBegin, j = i + attrsCount; i < j; i++) {
         /*
                         fprintf(stderr,
@@ -287,7 +272,7 @@ int attrsCount;
 
         ai = 0;
         si = 1;
-        while (c = cp[si]) {
+        while ((c = cp[si])) {
             if (c == ' ') {
                 c = cp[si++];
                 break;
@@ -302,7 +287,7 @@ int attrsCount;
         attrType[0] = '\0';
         if (c != '\0') {
             ai = 0;
-            while (c = cp[si]) {
+            while ((c = cp[si])) {
                 if (c == ' ') {
                     c = cp[si++];
                     break;
@@ -318,7 +303,7 @@ int attrsCount;
         attrValue[0] = '\0';
         if (c != '\0') {
             ai = 0;
-            while (c = cp[si]) {
+            while ((c = cp[si])) {
                 if (c == '\0')
                     break;
                 attrValue[ai++] = cp[si];
@@ -350,24 +335,24 @@ int attrsCount;
         */
         emitToken(TOKEN_ATTR);
         emitToken(attrTypeID);
-        len = strlen(attrName);
-        emitInt(strlen(attrName));
+        len = (int)strlen(attrName);
+        emitInt(len);
         emitStr(attrName, len);
         if (attrTypeID > 0) {
-            len = strlen(attrValue);
-            emitInt(strlen(attrValue));
+            len = (int)strlen(attrValue);
+            emitInt(len);
             emitStr(attrValue, len);
         }
     }
 
     do {
-        end = index(*srcp, '\n');
+        end = strchr(*srcp, '\n');
         if (!end) {
-            end = index(*srcp, '\0');
+            end = strchr(*srcp, '\0');
             strncpy(line, *srcp, end - *srcp);
             line[end - *srcp] = '\0';
             *srcp = end;
-            endP = 1;
+            endP = true;
 
         } else {
             strncpy(line, *srcp, end - *srcp);
@@ -376,7 +361,7 @@ int attrsCount;
         }
 
         if (line[0] == '(') {
-            strcpy(tagName, line + 1);
+            snprintf(tagName, sizeof(tagName), "%s", line + 1);
             if (verbose)
                 fprintf(stderr, "%s", lspaces + strlen(lspaces) - (level * 4));
 
@@ -410,6 +395,7 @@ int attrsCount;
             emitToken(TOKEN_DATA);
             emitInt(size);
             emitStr(s, size);
+            free(s);
 
         } else if (line[0] == 'A' || line[0] == 'I') {
             datap = s = line;
@@ -448,23 +434,30 @@ int main(int argc, char** argv)
     char* sdecl = "";
     char* doc = "";
 
-    strcpy(dtd, argv[1]);
+    if (argc < 2 || argc > 4) {
+        fprintf(stderr, "usage: %s DTDname [sdecl] file\n", argv[0]);
+        exit(1);
+    }
+    snprintf(dtd, sizeof(dtd), "%s", argv[1]);
     if (argc == 3) {
         doc = argv[2];
-    } else {
+    } else if (argc == 4) {
         sdecl = argv[2];
         doc = argv[3];
+    } else {
+        fprintf(stderr, "usage: %s DTDname [sdecl] file\n", argv[0]);
+        exit(1);
     }
-    sprintf(cmd, "%s %s %s 2>/dev/null", SGMLS_PATH, sdecl, doc);
+    snprintf(cmd, sizeof(cmd), "%s %s %s 2>/dev/null", SGMLS_PATH, sdecl, doc);
     fp = popen(cmd, "r");
     if (!fp) {
         fprintf(stderr, "popen() failed\n");
-        exit(0);
+        exit(1);
     }
 
     buffp = buff;
     while ((c = fgetc(fp)) != EOF) {
-        *buffp = c;
+        *buffp = (char)c;
         buffp++;
     }
     *buffp = '\0';
@@ -479,7 +472,7 @@ int main(int argc, char** argv)
     emitInt(version);
 
     if (version >= 2) {
-        emitInt(strlen(dtd));
+        emitInt((int)strlen(dtd));
         printf("%s", dtd);
     }
 
@@ -495,11 +488,14 @@ int main(int argc, char** argv)
         /*		fprintf(stderr, "  %4d  size=%4d  %s\n",
                                 i, strlen(tagDict[i]), tagDict[i]);
         */
+        int tagLen = (int)strlen(tagDict[i]);
         emitInt(i);
-        emitInt(strlen(tagDict[i]));
-        emitStr(tagDict[i], strlen(tagDict[i]));
+        emitInt(tagLen);
+        emitStr(tagDict[i], tagLen);
     }
 
     buffp = buff;
     build("top", &buffp, 0, 0, 0);
+
+    return 0;
 }
