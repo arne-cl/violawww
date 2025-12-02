@@ -24,7 +24,7 @@ VIOLA_DIR := $(PROJECT_ROOT)/src/viola
 LIBWWW_DIR := $(PROJECT_ROOT)/src/libWWW
 
 # All tests (add new tests here!)
-TESTS := test-stg-minors test-stg-context test-xpm-injection test-htcharset test-wayback-detection test-biop test-hash-memory test-mystrings test-pkinfo-concat
+TESTS := test-stg-minors test-stg-context test-xpm-injection test-htcharset test-wayback-detection test-biop test-hash-memory test-mystrings test-pkinfo-concat test-sgmls-a2b
 
 .PHONY: all test clean $(TESTS)
 
@@ -49,6 +49,7 @@ test:
 	-@$(MAKE) test-hash-memory >$(BUILD_DIR)/test-hash-memory.log 2>&1 && echo "PASS" >> $(BUILD_DIR)/results.txt && echo "  ✓ test-hash-memory: PASS" || (echo "FAIL" >> $(BUILD_DIR)/results.txt && echo "  ✗ test-hash-memory: FAIL")
 	-@$(MAKE) test-mystrings >$(BUILD_DIR)/test-mystrings.log 2>&1 && echo "PASS" >> $(BUILD_DIR)/results.txt && echo "  ✓ test-mystrings: PASS" || (echo "FAIL" >> $(BUILD_DIR)/results.txt && echo "  ✗ test-mystrings: FAIL")
 	-@$(MAKE) test-pkinfo-concat >$(BUILD_DIR)/test-pkinfo-concat.log 2>&1 && echo "PASS" >> $(BUILD_DIR)/results.txt && echo "  ✓ test-pkinfo-concat: PASS" || (echo "FAIL" >> $(BUILD_DIR)/results.txt && echo "  ✗ test-pkinfo-concat: FAIL")
+	-@$(MAKE) test-sgmls-a2b >$(BUILD_DIR)/test-sgmls-a2b.log 2>&1 && echo "PASS" >> $(BUILD_DIR)/results.txt && echo "  ✓ test-sgmls-a2b: PASS" || (echo "FAIL" >> $(BUILD_DIR)/results.txt && echo "  ✗ test-sgmls-a2b: FAIL")
 	@echo ""
 	@echo "======================================="
 	@echo "Test Suite Summary"
@@ -151,6 +152,14 @@ test-pkinfo-concat: test_pkinfo_concat.c $(PROJECT_ROOT)/src/viola/misc.o $(PROJ
 		$(PROJECT_ROOT)/src/viola/misc.o $(PROJECT_ROOT)/src/viola/mystrings.o
 	@./$(BUILD_DIR)/test_pkinfo_concat
 
+test-sgmls-a2b: test_sgmls_a2b.c $(PROJECT_ROOT)/src/viola/mystrings.o
+	@echo ""
+	@echo "Building SGMLS A2B converter tests..."
+	@mkdir -p $(BUILD_DIR)
+	@$(CC) $(CFLAGS) -I$(PROJECT_ROOT)/src/viola -o $(BUILD_DIR)/test_sgmls_a2b test_sgmls_a2b.c \
+		$(PROJECT_ROOT)/src/viola/mystrings.o
+	@./$(BUILD_DIR)/test_sgmls_a2b
+
 # Clean test artifacts
 clean:
 	@echo "Cleaning test artifacts..."
@@ -179,4 +188,5 @@ help:
 	@echo "  test-wayback-detection - Web Archive URL detection tests"
 	@echo "  test-hash-memory     - Hash table memory leak tests"
 	@echo "  test-mystrings       - String functions tests"
+	@echo "  test-sgmls-a2b       - SGMLS ASCII to Binary converter tests"
 
