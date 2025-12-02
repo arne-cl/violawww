@@ -193,8 +193,8 @@ static void renameCB(Widget widget, XtPointer clientData, XtPointer callData);
 static MenuItem catalogEditMenuItems[] = {
     {"Select All", &xmPushButtonWidgetClass, 'A', "Ctrl<Key>A", "Ctrl-A",
      selectAllCB, NULL, "Select all items in folder.", TRUE, (MenuItem*)NULL},
-    {"Rename...", &xmPushButtonWidgetClass, 'R', "Ctrl<Key>R", "Ctrl-R",
-     renameCB, NULL, "Rename the selected item.", TRUE, (MenuItem*)NULL},
+    {"Edit Label...", &xmPushButtonWidgetClass, 'E', "Ctrl<Key>E", "Ctrl-E",
+     renameCB, NULL, "Edit the label of the selected item.", TRUE, (MenuItem*)NULL},
     NULL,
 };
 
@@ -497,7 +497,11 @@ int readCatalog(Catalog* catalog, const char* filename) {
 
     fp = fopen(path, "r");
     if (!fp) {
-        /* File doesn't exist yet, create default structure */
+        /* .viola-catalog doesn't exist, try importing from Mosaic Hot List */
+        char* hotlistPath = expandPath("~/.mosaic-hotlist-default");
+        FILE* hotlistFp = fopen(hotlistPath, "r");
+        
+        /* Create default structure first */
         catalog->topFolder = (Folder*)calloc(1, sizeof(Folder));
         catalog->topFolder->type = FOLDER;
         catalog->topFolder->name = duplicateString("Root");
@@ -506,6 +510,82 @@ int readCatalog(Catalog* catalog, const char* filename) {
         catalog->topFolder->nItems = 0;
         catalog->currentFolder = catalog->topFolder;
         catalog->catalogFileName = duplicateString(filename);
+        
+        if (hotlistFp) {
+            /* Try to import from Mosaic Hot List */
+            char urlLine[1024], descLine[1024];
+            
+            /* Read and verify header */
+            if (fgets(line, sizeof(line), hotlistFp) && 
+                strncmp(line, "ncsa-xmosaic-hotlist-format-1", 29) == 0) {
+                
+                /* Skip title line (e.g., "Default") */
+                fgets(line, sizeof(line), hotlistFp);
+                
+                /* Read URL/description pairs */
+                int x = 20, y = 20;
+                int itemCount = 0;
+                
+                while (fgets(urlLine, sizeof(urlLine), hotlistFp)) {
+                    /* Remove newline */
+                    size_t len = strlen(urlLine);
+                    if (len > 0 && urlLine[len-1] == '\n') urlLine[len-1] = '\0';
+                    if (urlLine[0] == '\0') continue;
+                    
+                    /* Extract URL (before first space) and date (after) */
+                    char* url = urlLine;
+                    char* space = strchr(urlLine, ' ');
+                    if (space) *space = '\0';  /* Truncate at space to get URL only */
+                    
+                    /* Read description line */
+                    if (!fgets(descLine, sizeof(descLine), hotlistFp)) break;
+                    len = strlen(descLine);
+                    if (len > 0 && descLine[len-1] == '\n') descLine[len-1] = '\0';
+                    
+                    /* Create link */
+                    Link* link = (Link*)calloc(1, sizeof(Link));
+                    link->type = LINK;
+                    link->state = NONE;
+                    link->url = duplicateString(url);
+                    link->name = duplicateString(descLine[0] ? descLine : url);
+                    link->w = defaultLinkWidth;
+                    link->h = defaultLinkHeight;
+                    link->icon = defaultLinkIcon;
+                    link->gc = catalog->gc;
+                    link->x = (short)x;
+                    link->y = (short)y;
+                    link->nx = link->x;
+                    link->ny = (short)(link->y + link->h + 4);
+                    
+                    if (link->name) {
+                        link->nameXMS = XmStringCreateLocalized(link->name);
+                    }
+                    
+                    /* Add to folder */
+                    if (catalog->topFolder->nItems >= catalog->topFolder->allocedItems) {
+                        catalog->topFolder->allocedItems += ITEM_ALLOC_CHUNK;
+                        catalog->topFolder->items = (Item**)realloc(
+                            catalog->topFolder->items,
+                            catalog->topFolder->allocedItems * sizeof(Item*));
+                    }
+                    catalog->topFolder->items[catalog->topFolder->nItems++] = (Item*)link;
+                    
+                    /* Grid layout */
+                    x += CATALOG_GRID_X;
+                    if (x > 350) {
+                        x = 20;
+                        y += CATALOG_GRID_Y;
+                    }
+                    itemCount++;
+                }
+                
+                if (itemCount > 0) {
+                    catalog->modified = 1;  /* Mark for save to .viola-catalog */
+                }
+            }
+            fclose(hotlistFp);
+        }
+        
         return 1;
     }
 
@@ -1351,7 +1431,7 @@ static void selectAllCB(Widget widget, XtPointer clientData, XtPointer callData)
     if (!catalog || !catalog->currentFolder) return;
 
     Folder* folder = catalog->currentFolder;
-    int i;
+        int i;
     for (i = 0; i < folder->nItems; i++) {
         if (folder->items[i]) {
             folder->items[i]->state = SELECTED;
@@ -1417,7 +1497,7 @@ static void renameCB(Widget widget, XtPointer clientData, XtPointer callData) {
     /* Check selection */
     if (catalog->nSelected == 0) {
         /* No selection - do nothing */
-        return;
+            return;
     }
 
     if (catalog->nSelected > 1) {
@@ -1454,7 +1534,7 @@ static void renameCB(Widget widget, XtPointer clientData, XtPointer callData) {
 
     XtSetArg(args[n], XmNautoUnmanage, FALSE); n++;
     XtSetArg(args[n], XmNnoResize, TRUE); n++;
-    XtSetArg(args[n], XmNdialogTitle, XmStringCreateLocalized("Rename")); n++;
+    XtSetArg(args[n], XmNdialogTitle, XmStringCreateLocalized("Edit Label")); n++;
     dialog = XmCreateFormDialog(catalog->shell, "renameDialog", args, n);
 
     form = dialog;
@@ -1856,6 +1936,33 @@ void showCatalog(char* catalogFile, DocViewInfo* parentDVI) {
         hints.min_width = hints.max_width = width;
         hints.min_height = hints.max_height = height;
         XSetWMNormalHints(XtDisplay(shell), XtWindow(shell), &hints);
+    }
+
+    /* If catalog was imported (modified flag set), clean up layout */
+    if (catalog->modified) {
+        Folder* folder = catalog->currentFolder;
+        if (folder) {
+            calculateCellWidth(catalog);
+            int cellWidth = catalog->cellWidth;
+            int maxCols = (400 - 20) / cellWidth;
+            if (maxCols < 1) maxCols = 1;
+            
+            int col = 0, row = 0;
+            for (int i = 0; i < folder->nItems; i++) {
+                Item* item = folder->items[i];
+                int cellX = 20 + col * cellWidth;
+                item->x = (short)(cellX + (cellWidth - item->w) / 2);
+                item->y = (short)(20 + row * CATALOG_GRID_Y);
+                item->nx = (short)cellX;
+                item->ny = (short)(item->y + item->h + 4);
+                
+                col++;
+                if (col >= maxCols) {
+                    col = 0;
+                    row++;
+                }
+            }
+        }
     }
 
     XtPopup(shell, XtGrabNone);

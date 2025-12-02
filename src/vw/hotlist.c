@@ -210,6 +210,8 @@ Widget createHotlistDialog(DocViewInfo* dvi) {
     n++;
     XtSetArg(args[n], XmNautoUnmanage, FALSE);
     n++;
+    XtSetArg(args[n], XmNnoResize, TRUE);
+    n++;
 
     form = XmCreateFormDialog(dvi->shell, "Hotlist Manager", args, (Cardinal)n);
     XtVaSetValues(form, XmNhorizontalSpacing, 6, XmNverticalSpacing, 6, NULL);

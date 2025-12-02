@@ -165,8 +165,6 @@ static MenuItem fileMenuItems[] = {
      "Show the document source.", TRUE, (MenuItem*)NULL},
     {"Save As", &xmPushButtonWidgetClass, 'A', NULL, NULL,
      vwSaveAsCB, NULL, "Save the current document to a new local file.", TRUE, (MenuItem*)NULL},
-    {"Add to Catalog", &xmPushButtonWidgetClass, 'd', NULL, NULL,
-     addToCatalogCB, NULL, "Add current page to URL Catalog.", TRUE, (MenuItem*)NULL},
     {"", &xmSeparatorGadgetClass, (char)0, NULL, NULL, NULL, NULL, NULL, TRUE, (MenuItem*)NULL},
     {"Quit", &xmPushButtonWidgetClass, 'Q', "Ctrl<Key>Q", "Ctrl-Q", quitCallback, NULL,
      "Quit the entire application.", TRUE, (MenuItem*)NULL},
@@ -202,6 +200,11 @@ static MenuItem navigationMenuItems[] = {
      "Show list of saved URL links.", TRUE, (MenuItem*)NULL},
     {"Add to Hot List", &xmPushButtonWidgetClass, 't', NULL, NULL, addToHotlistCB, "Add To Hot List",
      "Add current document to Hot List.", TRUE, (MenuItem*)NULL},
+    {"", &xmSeparatorGadgetClass, (char)0, NULL, NULL, NULL, NULL, NULL, TRUE, (MenuItem*)NULL},
+    {"Catalog", &xmPushButtonWidgetClass, 'C', NULL, NULL, showCatalogCB, "",
+     "Personal URL organizer.", TRUE, (MenuItem*)NULL},
+    {"Add to Catalog", &xmPushButtonWidgetClass, 'd', NULL, NULL, addToCatalogCB, "",
+     "Add current page to URL Catalog.", TRUE, (MenuItem*)NULL},
     NULL,
 };
 
@@ -227,11 +230,7 @@ static MenuItem fontsMenuItems[] = {
     NULL,
 };
 
-static MenuItem testMenuItems[] = {
-    {"Catalog", &xmPushButtonWidgetClass, 'C', NULL, NULL,
-     showCatalogCB, "", "Personal URL organizer tool.", TRUE, (MenuItem*)NULL},
-    NULL,
-};
+/* testMenuItems removed - Catalog moved to Navigation menu */
 
 MenuItem helpMenuItems[] = {
     {"About ViolaWWW", &xmPushButtonWidgetClass, 'A', NULL, NULL, oneWordMessageCB,
@@ -270,7 +269,6 @@ static Menu mainMenus[] = {
     {"Navigation", 'N', navigationMenuItems},
     {"Fonts", 'o', fontsMenuItems},
     {"Guides", 'S', serversMenuItems},
-    {"Tools", 'T', testMenuItems},
     NULL,
 };
 
