@@ -4,6 +4,7 @@ This document describes functions available in the Viola language. All functions
 
 ## Contents
 
+- [Core Functions](#core-functions)
 - [HTTP Functions](#http-functions)
 - [SGML/HTML Functions](#sgmlhtml-functions)
 - [STG Functions](#stg-functions)
@@ -14,7 +15,114 @@ This document describes functions available in the Viola language. All functions
 - [Input/Output Functions](#inputoutput-functions)
 - [Time Functions](#time-functions)
 - [Graphics Functions](#graphics-functions)
+- [Drawing Functions](#drawing-functions)
 - [Miscellaneous Functions](#miscellaneous-functions)
+
+---
+
+## Core Functions
+
+These functions are fundamental to Viola's message-passing object model.
+
+### send(target, message, args...)
+Sends a message to another object.
+
+**Parameters:**
+- `target` (object/string) - target object or object name
+- `message` (string) - message to send
+- `args...` (any, optional) - additional arguments
+
+**Returns:** (any) result from the target object's message handler
+
+**Example:**
+```c
+send(parent(), "redraw");
+send("res.font", "useHelveticaMediumFonts");
+result = send(self(), "calculate", x, y);
+```
+
+---
+
+### usual()
+Calls the class script (inherited behavior) for the current message. This is similar to calling the superclass method in traditional OOP.
+
+**Returns:** (any) result from the class script
+
+**Example:**
+```c
+switch (arg[0]) {
+case "init":
+    /* custom initialization */
+    count = 0;
+    usual();  /* call inherited init behavior */
+break;
+}
+```
+
+---
+
+### interpret(code)
+Dynamically executes Viola script code.
+
+**Parameters:**
+- `code` (string) - Viola script code to execute
+
+**Returns:** (any) result of the executed code
+
+**Example:**
+```c
+interpret("x = 10; y = 20;");
+result = interpret("return " + varName + ";");
+```
+
+**Note:** Requires security clearance.
+
+---
+
+### exit(code)
+Terminates the application with an exit code.
+
+**Parameters:**
+- `code` (int) - exit status code
+
+**Note:** Requires security clearance.
+
+---
+
+### quit()
+Gracefully quits the application, decrementing the application count.
+
+**Note:** Typically called via `send("res", "quit")`.
+
+---
+
+### exist(obj)
+Checks whether an object exists (is currently loaded).
+
+**Parameters:**
+- `obj` (object/string) - object or object name to check
+
+**Returns:** (int) 1 if exists, 0 if not
+
+---
+
+### object(name)
+Returns an object reference by name.
+
+**Parameters:**
+- `name` (string) - object name
+
+**Returns:** (object) object reference, or NULL if not found
+
+---
+
+### loadObjFile(filename)
+Loads objects from a `.v` file.
+
+**Parameters:**
+- `filename` (string) - path to the object file
+
+**Returns:** (int) number of objects loaded, -1 on error
 
 ---
 
@@ -1287,6 +1395,172 @@ Clears the window.
 
 ### clearWindow()
 Clears the object window.
+
+**Returns:** (int) 1
+
+**Note:** Available in `field` class and subclasses.
+
+---
+
+## Drawing Functions
+
+These functions are available in the `field` class and its subclasses for custom drawing.
+
+### drawLine(x0, y0, x1, y1)
+Draws a line from (x0, y0) to (x1, y1).
+
+**Parameters:**
+- `x0` (int) - starting x-coordinate
+- `y0` (int) - starting y-coordinate
+- `x1` (int) - ending x-coordinate
+- `y1` (int) - ending y-coordinate
+
+**Returns:** (int) 1 on success, 0 on failure
+
+---
+
+### drawRect(x0, y0, x1, y1)
+Draws a rectangle outline.
+
+**Parameters:**
+- `x0` (int) - left x-coordinate
+- `y0` (int) - top y-coordinate
+- `x1` (int) - right x-coordinate
+- `y1` (int) - bottom y-coordinate
+
+**Returns:** (int) 1 on success
+
+---
+
+### drawFillRect(x0, y0, x1, y1)
+Draws a filled rectangle.
+
+**Parameters:**
+- `x0` (int) - left x-coordinate
+- `y0` (int) - top y-coordinate
+- `x1` (int) - right x-coordinate
+- `y1` (int) - bottom y-coordinate
+
+**Returns:** (int) 1 on success
+
+---
+
+### drawOval(x0, y0, x1, y1)
+Draws an oval outline within the bounding box.
+
+**Parameters:**
+- `x0` (int) - left x-coordinate
+- `y0` (int) - top y-coordinate
+- `x1` (int) - right x-coordinate
+- `y1` (int) - bottom y-coordinate
+
+**Returns:** (int) 1 on success
+
+---
+
+### drawFillOval(x0, y0, x1, y1)
+Draws a filled oval within the bounding box.
+
+**Parameters:**
+- `x0` (int) - left x-coordinate
+- `y0` (int) - top y-coordinate
+- `x1` (int) - right x-coordinate
+- `y1` (int) - bottom y-coordinate
+
+**Returns:** (int) 1 on success
+
+---
+
+### drawText(x, y, fontID, text)
+Draws text at the specified position.
+
+**Parameters:**
+- `x` (int) - x-coordinate
+- `y` (int) - y-coordinate
+- `fontID` (int) - font identifier
+- `text` (string) - text to draw
+
+**Returns:** (int) 1 on success
+
+---
+
+### clearArea(x0, y0, x1, y1)
+Clears a rectangular area (fills with background color).
+
+**Parameters:**
+- `x0` (int) - left x-coordinate
+- `y0` (int) - top y-coordinate
+- `x1` (int) - right x-coordinate
+- `y1` (int) - bottom y-coordinate
+
+**Returns:** (int) 1 on success
+
+---
+
+### copyArea(srcX, srcY, width, height, destX, destY)
+Copies a rectangular area to another location.
+
+**Parameters:**
+- `srcX` (int) - source x-coordinate
+- `srcY` (int) - source y-coordinate
+- `width` (int) - width to copy
+- `height` (int) - height to copy
+- `destX` (int) - destination x-coordinate
+- `destY` (int) - destination y-coordinate
+
+**Returns:** (int) 1 on success
+
+---
+
+### mouseX()
+Returns the current mouse x-coordinate within the widget.
+
+**Returns:** (int) x-coordinate
+
+---
+
+### mouseY()
+Returns the current mouse y-coordinate within the widget.
+
+**Returns:** (int) y-coordinate
+
+---
+
+### eraseFillRect(x0, y0, x1, y1)
+Erases a filled rectangle (fills with background color).
+
+**Parameters:**
+- `x0` (int) - left x-coordinate
+- `y0` (int) - top y-coordinate
+- `x1` (int) - right x-coordinate
+- `y1` (int) - bottom y-coordinate
+
+**Returns:** (int) 1 on success
+
+---
+
+### eraseFillOval(x0, y0, x1, y1)
+Erases a filled oval (fills with background color).
+
+**Parameters:**
+- `x0` (int) - left x-coordinate
+- `y0` (int) - top y-coordinate
+- `x1` (int) - right x-coordinate
+- `y1` (int) - bottom y-coordinate
+
+**Returns:** (int) 1 on success
+
+---
+
+### render()
+Forces the widget to re-render itself.
+
+**Returns:** (int) 1
+
+---
+
+### smudge()
+Marks the widget as needing redraw.
 
 **Returns:** (int) 1
 

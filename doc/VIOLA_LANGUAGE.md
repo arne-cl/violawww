@@ -309,112 +309,19 @@ for (i = 0; i < data[]; i++) {
 
 ### Built-in Functions
 
-#### Object Communication
+Viola provides a rich set of built-in functions. Key categories include:
 
-| Function | Description |
-|----------|-------------|
-| `send(target, message, args...)` | Send message to object |
-| `self()` | Return current object reference |
-| `parent()` | Return parent object reference |
-| `usual()` | Call inherited/default handler |
+- **Core Functions**: `send()`, `usual()`, `interpret()`, `exit()`, `quit()`
+- **Object Functions**: `self()`, `parent()`, `get()`, `set()`, `clone()`
+- **String Functions**: `concat()`, `nthChar()`, `nthWord()`, `strlen()`
+- **Math Functions**: `sin()`, `cos()`, `random()`, `int()`, `float()`
+- **Graphics Functions**: `drawLine()`, `drawRect()`, `clearWindow()`, `mouseX()`, `mouseY()`
+- **File Functions**: `loadFile()`, `saveFile()`
+- **I/O Functions**: `print()`, `sprintf()`
+- **Time Functions**: `after()`, `time()`, `date()`
+- **HTTP Functions**: `HTTPGet()`, `HTTPPost()`
 
-```c
-send("objectName", "message", arg1, arg2);
-send(parent(), "redraw");
-send(self(), "update", newValue);
-```
-
-#### Attribute Access
-
-| Function | Description |
-|----------|-------------|
-| `get("attr")` | Get attribute value |
-| `set("attr", value)` | Set attribute value |
-
-```c
-w = get("width");
-set("BGColor", "red");
-set("label", concat("Count: ", count));
-```
-
-#### String Operations
-
-| Function | Description |
-|----------|-------------|
-| `concat(s1, s2, ...)` | Concatenate strings |
-| `nthChar(str, n)` | Get nth character |
-| `nthWord(str, n)` | Get nth word |
-| `subString(str, start, len)` | Extract substring |
-| `strLength(str)` | String length |
-
-```c
-full = concat("Hello, ", name, "!");
-c = nthChar(str, 0);
-word = nthWord(line, 2);
-```
-
-#### Math Functions
-
-| Function | Description |
-|----------|-------------|
-| `sin(x)` | Sine |
-| `cos(x)` | Cosine |
-| `sqrt(x)` | Square root |
-| `random(seed)` | Random number |
-| `int(x)` | Convert to integer |
-| `float(x)` | Convert to float |
-
-#### Graphics Functions
-
-| Function | Description |
-|----------|-------------|
-| `drawLine(x0, y0, x1, y1)` | Draw line |
-| `drawRect(x0, y0, x1, y1)` | Draw rectangle outline |
-| `drawFillRect(x0, y0, x1, y1)` | Draw filled rectangle |
-| `drawText(x, y, font, text)` | Draw text |
-| `clearWindow()` | Clear the drawing area |
-| `copyArea(sx, sy, w, h, dx, dy)` | Copy screen area |
-| `width()` | Get widget width |
-| `height()` | Get widget height |
-| `mouseX()` | Get mouse X position |
-| `mouseY()` | Get mouse Y position |
-| `render()` | Force re-render |
-
-#### File Operations
-
-| Function | Description |
-|----------|-------------|
-| `loadFile(path)` | Load file contents |
-| `saveFile(path, content)` | Save to file |
-
-#### I/O Functions
-
-| Function | Description |
-|----------|-------------|
-| `print(args...)` | Print to console |
-| `input()` | Read input (for socket class) |
-
-#### Time Functions
-
-| Function | Description |
-|----------|-------------|
-| `after(ms, target, message)` | Schedule delayed message |
-| `time()` | Current time |
-
-```c
-/* Call "update" on self after 1000ms */
-after(1000, self(), "update");
-```
-
-#### System Functions
-
-| Function | Description |
-|----------|-------------|
-| `interpret(code)` | Execute code string |
-| `getVariable(name)` | Get variable by name |
-| `shell(command)` | Execute shell command |
-| `exit(code)` | Exit application |
-| `quit()` | Quit gracefully |
+For the complete function reference with parameters and examples, see **[VIOLA_FUNCTIONS.md](VIOLA_FUNCTIONS.md)**.
 
 ### Event Model
 
