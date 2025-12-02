@@ -148,6 +148,28 @@ long meth_menu_config(VObj* self, Packet* result, int argc, Packet argv[]) {
 }
 
 /*
+ * Recursively free menu entry tree.
+ * Each entry has item_name, item_message (strings allocated via SaveString),
+ * and sub_entrys (recursively allocated array).
+ */
+static void free_menu_entries(xpa_entrys entrys) {
+    if (!entrys)
+        return;
+
+    for (xpa_entry* e = entrys; e->item_type != XPA_ITEM_TYPE_NONE; e++) {
+        if (e->item_name)
+            free(e->item_name);
+        if (e->item_message)
+            free(e->item_message);
+        if (e->sub_title)
+            free(e->sub_title);
+        if (e->sub_entrys)
+            free_menu_entries(e->sub_entrys);
+    }
+    free(entrys);
+}
+
+/*
  * freeSelf()
  *
  * Free object attributes and.
@@ -156,13 +178,22 @@ long meth_menu_config(VObj* self, Packet* result, int argc, Packet argv[]) {
  * Return: 1 if successful, 0 if error occured
  */
 long meth_menu_freeSelf(VObj* self, Packet* result, int argc, Packet argv[]) {
-    free(GET_menuConfig(self));
+    if (GET_menuConfig(self)) {
+        free(GET_menuConfig(self));
+        SET_menuConfig(self, NULL);
+    }
 
-    /*XXX NEED TO deep destroy menu structure */
-    if (GET__menu(self))
-        free((void*)GET__menu(self));
-    if (GET__menuEntries(self))
-        free((void*)GET__menuEntries(self));
+    /* Destroy xpa menu (frees X resources and internal structures) */
+    if (GET__menu(self)) {
+        xpa_destroy((xpa_menu)GET__menu(self));
+        SET__menu(self, NULL);
+    }
+
+    /* Free menu entry tree (strings and sub-menus) */
+    if (GET__menuEntries(self)) {
+        free_menu_entries((xpa_entrys)GET__menuEntries(self));
+        SET__menuEntries(self, NULL);
+    }
 
     meth_txt_freeSelf(self, result, argc, argv);
     return 1;
@@ -185,6 +216,15 @@ long meth_menu_get(VObj* self, Packet* result, int argc, Packet argv[]) {
 long meth_menu_initialize(VObj* self, Packet* result, int argc, Packet argv[]) {
     if (!meth_txt_initialize(self, result, argc, argv))
         return 0;
+
+    /* Replace default string literal with heap-allocated copy.
+     * The default menuConfig slot value is a string literal (static memory).
+     * We must allocate a heap copy so freeSelf can safely free it.
+     */
+    char* menuConfig = GET_menuConfig(self);
+    if (menuConfig)
+        SET_menuConfig(self, saveString(menuConfig));
+
     return set_menuConfig(self);
 }
 
