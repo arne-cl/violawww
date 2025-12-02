@@ -3,7 +3,9 @@
 *.d
 *.a
 src/viola/viola
+src/viola/sgmlsA2B
 src/vw/vw
+src/vw/sgmlsA2B
 test/build/
 
 # Generated files

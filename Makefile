@@ -75,6 +75,12 @@ LDFLAGS = $(ARCH_FLAGS) -Wl,-dead_strip \
           -L/opt/X11/lib
 LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lm $(ICU_LIBS) $(SSL_LIBS)
 
+# macOS-specific: AppKit and AVFoundation for sound
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+LIBS += -framework AppKit -framework AVFoundation -framework Foundation
+endif
+
 # Source directories
 SRC_DIR = src
 LIBWWW_DIR = $(SRC_DIR)/libWWW
@@ -272,6 +278,11 @@ VIOLA_SRCS = $(VIOLA_DIR)/DefaultStyles.c $(VIOLA_DIR)/ast.c $(VIOLA_DIR)/attr.c
              $(VIOLA_DIR)/HTML_style.c $(VIOLA_DIR)/memory_debug.c
 VIOLA_OBJS = $(VIOLA_SRCS:.c=.o)
 
+# macOS-specific: Objective-C sound library
+ifeq ($(UNAME_S),Darwin)
+VIOLA_OBJS += $(VIOLA_DIR)/slib_darwin.o
+endif
+
 .PHONY: viola
 viola: $(VIOLA)
 
@@ -285,6 +296,10 @@ $(VIOLA): $(VIOLA_OBJS) $(LIBWWW) $(LIBXPM) $(LIBXPA) $(LIBIMG) $(LIBSTYLE)
 # Compile Viola sources with automatic dependency generation
 $(VIOLA_DIR)/%.o: $(VIOLA_DIR)/%.c
 	$(CC) $(CFLAGS) $(DEPFLAGS) $(INCLUDES) -I$(VIOLA_DIR) -I$(LIBWWW_DIR) -c $< -o $@
+
+# Compile Objective-C sources (macOS only)
+$(VIOLA_DIR)/%.o: $(VIOLA_DIR)/%.m
+	$(CC) $(CFLAGS) -fobjc-arc $(DEPFLAGS) $(INCLUDES) -I$(VIOLA_DIR) -I$(LIBWWW_DIR) -c $< -o $@
 
 # Generate .h files from .v scripts (hex encoding for C string literals)
 $(VIOLA_DIR)/embeds/%.v.h: $(VIOLA_DIR)/embeds/%.v
