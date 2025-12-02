@@ -210,11 +210,10 @@ Widget createHotlistDialog(DocViewInfo* dvi) {
     n++;
     XtSetArg(args[n], XmNautoUnmanage, FALSE);
     n++;
-    XtSetArg(args[n], XmNnoResize, TRUE);
-    n++;
 
     form = XmCreateFormDialog(dvi->shell, "Hotlist Manager", args, (Cardinal)n);
     XtVaSetValues(form, XmNhorizontalSpacing, 6, XmNverticalSpacing, 6, NULL);
+    XtVaSetValues(XtParent(form), XmNtitle, "Hot List", XmNnoResize, TRUE, NULL);
 
     actionForm = XtVaCreateManagedWidget(
         "actionForm", xmFormWidgetClass, form, XmNtopAttachment, XmATTACH_FORM, XmNleftAttachment,
@@ -432,6 +431,6 @@ void editHotlistItem(Widget button, XtPointer clientData, XtPointer callData)
             /* huh? no such item? internal error */
             return;
         }
-        openSimpleLineEntryDialog(dvi, "Edit Hot Link Label", hip->comment, editHotlistItemCB);
+        openSimpleLineEntryDialog(dvi, "Edit Label", hip->comment, editHotlistItemCB);
     }
 }

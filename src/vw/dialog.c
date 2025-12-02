@@ -30,6 +30,7 @@
 #include <Xm/SelectioB.h>
 #include <Xm/TextF.h>
 #include <Xm/Xm.h>
+#include <Xm/MwmUtil.h>
 
 #include "../viola/attr.h"
 #include "../viola/cexec.h"
@@ -1251,6 +1252,10 @@ char* openSimpleLineEntryDialog(DocViewInfo* dvi, char *dialogLabel, char *defau
     n++;
     form = XmCreateFormDialog(dvi->shell, "LineEntry", args, (Cardinal)n);
     lds->dlog = XtParent(form);
+    XtVaSetValues(lds->dlog, XmNtitle, dialogLabel, XmNnoResize, TRUE,
+                  XmNmwmFunctions, MWM_FUNC_MOVE | MWM_FUNC_CLOSE,
+                  XmNmwmDecorations, MWM_DECOR_BORDER | MWM_DECOR_TITLE | MWM_DECOR_MENU,
+                  NULL);
 
     labelStringXMS = XmStringCreateLtoR(dialogLabel, "largeFont");
     label = XtVaCreateManagedWidget("mainLabel", xmLabelWidgetClass, form, XmNalignment,
