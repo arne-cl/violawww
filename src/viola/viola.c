@@ -131,6 +131,105 @@ viola -o hmml -0Sshow -1I234 -2CHello
 #define DEFAULT_VIOLA_PATH "/usr/lib/apps"
 #endif
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
+/* Try to find viola path relative to executable */
+static char* findViolaPathFromExecutable(void) {
+    static char exePath[1024];
+    static char violaDir[1024];
+    char* lastSlash;
+    
+#ifdef __APPLE__
+    uint32_t size = sizeof(exePath);
+    if (_NSGetExecutablePath(exePath, &size) != 0) {
+        return NULL;
+    }
+    /* Resolve symlinks */
+    char* resolved = realpath(exePath, NULL);
+    if (resolved) {
+        strncpy(exePath, resolved, sizeof(exePath) - 1);
+        free(resolved);
+    }
+#elif defined(__linux__)
+    ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+    if (len == -1) {
+        return NULL;
+    }
+    exePath[len] = '\0';
+#else
+    return NULL;
+#endif
+
+    /* exePath is like /path/to/violawww2/src/vw/vw */
+    /* We want /path/to/violawww2/src/viola */
+    lastSlash = strrchr(exePath, '/');
+    if (!lastSlash) return NULL;
+    *lastSlash = '\0';  /* /path/to/violawww2/src/vw */
+    
+    lastSlash = strrchr(exePath, '/');
+    if (!lastSlash) return NULL;
+    *lastSlash = '\0';  /* /path/to/violawww2/src */
+    
+    snprintf(violaDir, sizeof(violaDir), "%s/viola", exePath);
+    
+    /* Check if this path exists */
+    if (access(violaDir, F_OK) == 0) {
+        return violaDir;
+    }
+    return NULL;
+}
+
+/* Try to find sgml path relative to executable */
+static char* findSgmlPathFromExecutable(void) {
+    static char exePath[1024];
+    static char sgmlDir[1024];
+    char* lastSlash;
+    
+#ifdef __APPLE__
+    uint32_t size = sizeof(exePath);
+    if (_NSGetExecutablePath(exePath, &size) != 0) {
+        return NULL;
+    }
+    char* resolved = realpath(exePath, NULL);
+    if (resolved) {
+        strncpy(exePath, resolved, sizeof(exePath) - 1);
+        free(resolved);
+    }
+#elif defined(__linux__)
+    ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+    if (len == -1) {
+        return NULL;
+    }
+    exePath[len] = '\0';
+#else
+    return NULL;
+#endif
+
+    /* exePath is like /path/to/violawww2/src/vw/vw */
+    /* We want /path/to/violawww2/res */
+    lastSlash = strrchr(exePath, '/');
+    if (!lastSlash) return NULL;
+    *lastSlash = '\0';  /* /path/to/violawww2/src/vw */
+    
+    lastSlash = strrchr(exePath, '/');
+    if (!lastSlash) return NULL;
+    *lastSlash = '\0';  /* /path/to/violawww2/src */
+    
+    lastSlash = strrchr(exePath, '/');
+    if (!lastSlash) return NULL;
+    *lastSlash = '\0';  /* /path/to/violawww2 */
+    
+    snprintf(sgmlDir, sizeof(sgmlDir), "%s/res", exePath);
+    
+    /* Check if this path exists */
+    if (access(sgmlDir, F_OK) == 0) {
+        return sgmlDir;
+    }
+    return NULL;
+}
+
 /* intefers with normal events, used only for http progress reports */
 int perishableActiveHelp = 0;
 
@@ -186,19 +285,22 @@ char* initViola(int argc, char* argv[], char* vObjFile, Display* display, Screen
     parseCommandLine(argc, argv, startObj, &startObjCount, &violaPath,
                      &startWithCommandLineInterpreter, &scriptSnipet);
 
-    /* Set default sgmlPath relative to violaPath if not specified */
-    if (!sgmlPath && violaPath) {
-        /* violaPath typically ends with "apps", go up one level to find "res" */
-        char* lastSlash;
-        char defaultSgmlPath[512];
-        strncpy(defaultSgmlPath, violaPath, sizeof(defaultSgmlPath) - 1);
-        defaultSgmlPath[sizeof(defaultSgmlPath) - 1] = '\0';
-        lastSlash = strrchr(defaultSgmlPath, '/');
-        if (lastSlash) {
-            strcpy(lastSlash, "/res");
-            sgmlPath = saveString(defaultSgmlPath);
+    /* Try to find paths relative to executable if not specified */
+    if (!violaPath) {
+        char* autoPath = findViolaPathFromExecutable();
+        if (autoPath) {
+            violaPath = saveString(autoPath);
             if (verbose)
-                fprintf(stderr, "Using default VIOLA_SGML=``%s''\n", sgmlPath);
+                fprintf(stderr, "Auto-detected VIOLA_PATH=``%s''\n", violaPath);
+        }
+    }
+    
+    if (!sgmlPath) {
+        char* autoPath = findSgmlPathFromExecutable();
+        if (autoPath) {
+            sgmlPath = saveString(autoPath);
+            if (verbose)
+                fprintf(stderr, "Auto-detected VIOLA_SGML=``%s''\n", sgmlPath);
         }
     }
 
