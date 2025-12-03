@@ -74,6 +74,16 @@ Topics covered:
 - Supported audio formats (AU, AIFF, MP3, AAC, FLAC, etc.)
 - macOS implementation using `afplay`
 
+### [VPLOT_REFERENCE.md](VPLOT_REFERENCE.md)
+3D surface plotter and wireframe model viewer.
+
+Topics covered:
+- Complete command reference (window, domain, equation, file, camera)
+- Mathematical expression parser (sin, cos, exp, sqrt, abs)
+- OFF file format specification for 3D models
+- Viola TTY integration and slider controls
+- HiDPI/Retina display support
+
 ---
 
 ## Programming Language
