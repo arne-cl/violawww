@@ -6,9 +6,8 @@ src/viola/viola
 src/viola/sgmlsA2B
 src/vw/vw
 src/vw/sgmlsA2B
+src/tools/iob2off
 vplot_dir/vplot
-/vplot
-/iob2off
 test/build/
 
 # Generated files
