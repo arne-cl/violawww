@@ -18,6 +18,27 @@
 	case "getFG":
 		return fgColor;
 	break;
+	case "getBD":
+		return bdColor;
+	break;
+	case "getRot":
+		rv = get("gfxRotZ");
+		rv2 = get("name");
+		print("[RECT] getRot: gfxRotZ='", rv, "' name='", rv2, "'\n");
+		return rv;
+	break;
+	case "getScaleX":
+		return get("gfxScaleX");
+	break;
+	case "getScaleY":
+		return get("gfxScaleY");
+	break;
+	case "getAxisX":
+		return get("gfxAxisX");
+	break;
+	case "getAxisY":
+		return get("gfxAxisY");
+	break;
 	case "expose":
 		return;
 	break;
@@ -65,11 +86,29 @@
 		return;
 	break;
 	case "setBDColor":
-		set("BDColor", arg[1]);
+		print("[RECT] setBDColor: ", arg[1], "\n");
+		bdColor = arg[1];
 		return;
 	break;
 	case "setFilled":
 		filled = int(arg[1]);
+		return;
+	break;
+	case "setRot":
+		print("[RECT] setRot: ", arg[1], " degrees\n");
+		set("gfxRotZ", arg[1]);
+		return;
+	break;
+	case "setScale":
+		print("[RECT] setScale: ", arg[1], ",", arg[2], "\n");
+		set("gfxScaleX", arg[1]);
+		set("gfxScaleY", arg[2]);
+		return;
+	break;
+	case "setAxis":
+		print("[RECT] setAxis: ", arg[1], ",", arg[2], "\n");
+		set("gfxAxisX", arg[1]);
+		set("gfxAxisY", arg[2]);
 		return;
 	break;
 	case "config":
@@ -88,6 +127,7 @@
 		sizeX = 0;
 		sizeY = 0;
 		fgColor = "black";
+		bdColor = "";
 		print("[RECT] init: done\n");
 		return;
 	break;

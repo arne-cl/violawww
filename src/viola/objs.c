@@ -5201,12 +5201,19 @@ static char _slotValue_HTML_rect1[] = "HTML_rect";
 static char _slotValue_HTML_rect2[] = {
 #include "embeds/HTML_rect_script.v.h"
 };
+static char _slotValue_gfxRot0[] = "0";
+static char _slotValue_gfxScale1[] = "1";
 /* END OF FILE */
 
 static SlotStruct objDesc_HTML_rect[] = {
     {"class", _slotValue_HTML_rect0},
     {"name", _slotValue_HTML_rect1},
     {"script", _slotValue_HTML_rect2},
+    {"gfxRotZ", _slotValue_gfxRot0},
+    {"gfxScaleX", _slotValue_gfxScale1},
+    {"gfxScaleY", _slotValue_gfxScale1},
+    {"gfxAxisX", _slotValue_gfxRot0},
+    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5221,6 +5228,11 @@ static SlotStruct objDesc_HTML_circle[] = {
     {"class", _slotValue_HTML_circle0},
     {"name", _slotValue_HTML_circle1},
     {"script", _slotValue_HTML_circle2},
+    {"gfxRotZ", _slotValue_gfxRot0},
+    {"gfxScaleX", _slotValue_gfxScale1},
+    {"gfxScaleY", _slotValue_gfxScale1},
+    {"gfxAxisX", _slotValue_gfxRot0},
+    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5235,6 +5247,11 @@ static SlotStruct objDesc_HTML_oval[] = {
     {"class", _slotValue_HTML_oval0},
     {"name", _slotValue_HTML_oval1},
     {"script", _slotValue_HTML_oval2},
+    {"gfxRotZ", _slotValue_gfxRot0},
+    {"gfxScaleX", _slotValue_gfxScale1},
+    {"gfxScaleY", _slotValue_gfxScale1},
+    {"gfxAxisX", _slotValue_gfxRot0},
+    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5263,6 +5280,11 @@ static SlotStruct objDesc_HTML_line[] = {
     {"class", _slotValue_HTML_line0},
     {"name", _slotValue_HTML_line1},
     {"script", _slotValue_HTML_line2},
+    {"gfxRotZ", _slotValue_gfxRot0},
+    {"gfxScaleX", _slotValue_gfxScale1},
+    {"gfxScaleY", _slotValue_gfxScale1},
+    {"gfxAxisX", _slotValue_gfxRot0},
+    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5277,6 +5299,11 @@ static SlotStruct objDesc_HTML_polygon[] = {
     {"class", _slotValue_HTML_polygon0},
     {"name", _slotValue_HTML_polygon1},
     {"script", _slotValue_HTML_polygon2},
+    {"gfxRotZ", _slotValue_gfxRot0},
+    {"gfxScaleX", _slotValue_gfxScale1},
+    {"gfxScaleY", _slotValue_gfxScale1},
+    {"gfxAxisX", _slotValue_gfxRot0},
+    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5361,6 +5388,48 @@ static SlotStruct objDesc_HTML_bgcolor[] = {
     {"class", _slotValue_HTML_bgcolor0},
     {"name", _slotValue_HTML_bgcolor1},
     {"script", _slotValue_HTML_bgcolor2},
+    {(char*)0, (char*)0},
+};
+
+static char _slotValue_HTML_rot0[] = "field";
+static char _slotValue_HTML_rot1[] = "HTML_rot";
+static char _slotValue_HTML_rot2[] = {
+#include "embeds/HTML_rot_script.v.h"
+};
+/* END OF FILE */
+
+static SlotStruct objDesc_HTML_rot[] = {
+    {"class", _slotValue_HTML_rot0},
+    {"name", _slotValue_HTML_rot1},
+    {"script", _slotValue_HTML_rot2},
+    {(char*)0, (char*)0},
+};
+
+static char _slotValue_HTML_scale0[] = "field";
+static char _slotValue_HTML_scale1[] = "HTML_scale";
+static char _slotValue_HTML_scale2[] = {
+#include "embeds/HTML_scale_script.v.h"
+};
+/* END OF FILE */
+
+static SlotStruct objDesc_HTML_scale[] = {
+    {"class", _slotValue_HTML_scale0},
+    {"name", _slotValue_HTML_scale1},
+    {"script", _slotValue_HTML_scale2},
+    {(char*)0, (char*)0},
+};
+
+static char _slotValue_HTML_axis0[] = "field";
+static char _slotValue_HTML_axis1[] = "HTML_axis";
+static char _slotValue_HTML_axis2[] = {
+#include "embeds/HTML_axis_script.v.h"
+};
+/* END OF FILE */
+
+static SlotStruct objDesc_HTML_axis[] = {
+    {"class", _slotValue_HTML_axis0},
+    {"name", _slotValue_HTML_axis1},
+    {"script", _slotValue_HTML_axis2},
     {(char*)0, (char*)0},
 };
 
@@ -7418,6 +7487,12 @@ ObjsNamesStruct objsNames[] = {"HTML__box.v",
                                objDesc_HTML_bdcolor,
                                "HTML_bgcolor.v",
                                objDesc_HTML_bgcolor,
+                               "HTML_rot.v",
+                               objDesc_HTML_rot,
+                               "HTML_scale.v",
+                               objDesc_HTML_scale,
+                               "HTML_axis.v",
+                               objDesc_HTML_axis,
                                "HTML_head.v",
                                objDesc_HTML_head,
                                "HTML_header_big.v",

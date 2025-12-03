@@ -161,11 +161,11 @@ FGCOLOR		HTML_fgcolor		1 0 0 1 0		0 0 0 0\n\
 BDCOLOR		HTML_bdcolor		1 0 0 1 0		0 0 0 0\n\
 BGCOLOR		HTML_bgcolor		1 0 0 1 0		0 0 0 0\n\
 #proto-vrml (not yet implemented)\n\
-AXIS 		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
+AXIS 		HTML_axis		1 0 0 0 0		0 0 0 0\n\
 BUTTON 		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
 HINT		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
-ROT		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
-SCALE		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
+ROT		HTML_rot		1 0 0 0 0		0 0 0 0\n\
+SCALE		HTML_scale		1 0 0 0 0		0 0 0 0\n\
 TEXT		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
 ACTION		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
 SCRIPT		HTML_ignore		1 0 0 0 0		0 0 0 0\n\

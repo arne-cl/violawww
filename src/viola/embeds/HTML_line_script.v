@@ -18,6 +18,21 @@
 	case "getFG":
 		return fgColor;
 	break;
+	case "getRot":
+		return get("gfxRotZ");
+	break;
+	case "getScaleX":
+		return get("gfxScaleX");
+	break;
+	case "getScaleY":
+		return get("gfxScaleY");
+	break;
+	case "getAxisX":
+		return get("gfxAxisX");
+	break;
+	case "getAxisY":
+		return get("gfxAxisY");
+	break;
 	case "expose":
 		return;
 	break;
@@ -65,6 +80,23 @@
 	case "setFGColor":
 		print("[LINE] setFGColor: ", arg[1], "\n");
 		fgColor = arg[1];
+		return;
+	break;
+	case "setRot":
+		print("[LINE] setRot: ", arg[1], " degrees\n");
+		set("gfxRotZ", arg[1]);
+		return;
+	break;
+	case "setScale":
+		print("[LINE] setScale: ", arg[1], ",", arg[2], "\n");
+		set("gfxScaleX", arg[1]);
+		set("gfxScaleY", arg[2]);
+		return;
+	break;
+	case "setAxis":
+		print("[LINE] setAxis: ", arg[1], ",", arg[2], "\n");
+		set("gfxAxisX", arg[1]);
+		set("gfxAxisY", arg[2]);
 		return;
 	break;
 	case "config":
