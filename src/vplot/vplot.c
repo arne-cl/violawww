@@ -45,7 +45,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include <math.h>
 #include <ctype.h>
 #include <unistd.h>
@@ -53,23 +52,6 @@
 #include <mach-o/dyld.h>
 #include <libgen.h>
 #endif
-
-// Logging
-static FILE *logfp = NULL;
-
-static void logmsg(const char *fmt, ...) {
-    if (!logfp) {
-        logfp = fopen("/tmp/vplot.log", "a");
-        if (logfp) setbuf(logfp, NULL);
-    }
-    if (logfp) {
-        va_list ap;
-        va_start(ap, fmt);
-        vfprintf(logfp, fmt, ap);
-        va_end(ap);
-        fflush(logfp);
-    }
-}
 
 static Display *dpy = NULL;
 static int screen = 0;
@@ -269,24 +251,19 @@ static double detect_display_scale(void) {
     
     double scale = 1.0;
     
-    logmsg("vplot: detect_display_scale() called\n");
-    
 #ifdef __APPLE__
     /* macOS with Retina: XQuartz hides real DPI, default to 2x 
      * This matches the visual size from 90s era 640x480/800x600 displays */
     scale = 2.0;
-    logmsg("vplot: macOS detected, defaulting to scale=2.0\n");
 #endif
     
     /* Method 1: Check Xft.dpi resource (set by XQuartz for Retina) */
     char *dpi_str = XGetDefault(dpy, "Xft", "dpi");
-    logmsg("vplot: Xft.dpi = %s\n", dpi_str ? dpi_str : "(null)");
     if (dpi_str) {
         double dpi = atof(dpi_str);
         if (dpi > 0 && dpi != 96.0) {
             /* Standard DPI is 96, Retina typically reports 192 */
             scale = dpi / 96.0;
-            logmsg("vplot: detected Xft.dpi=%s, scale=%.2f\n", dpi_str, scale);
         }
     }
     
@@ -296,14 +273,11 @@ static double detect_display_scale(void) {
         int screen_w = DisplayWidth(dpy, screen);
         int screen_mm = DisplayWidthMM(dpy, screen);
         double physical_dpi = (screen_mm > 0) ? (double)screen_w / ((double)screen_mm / 25.4) : 0;
-        logmsg("vplot: screen %dx? pixels, %dmm wide, physical DPI=%.1f\n", 
-               screen_w, screen_mm, physical_dpi);
         if (screen_mm > 0 && physical_dpi > 140) {  /* Likely HiDPI */
             scale = physical_dpi / 96.0;
             /* Round to common scale factors */
             if (scale > 1.8 && scale < 2.2) scale = 2.0;
             else if (scale > 1.4 && scale < 1.6) scale = 1.5;
-            logmsg("vplot: using physical DPI scale=%.2f\n", scale);
         }
     }
 #endif
@@ -314,11 +288,9 @@ static double detect_display_scale(void) {
         double env_scale = atof(scale_env);
         if (env_scale > 0) {
             scale = env_scale;
-            logmsg("vplot: using VPLOT_SCALE=%.2f\n", scale);
         }
     }
     
-    logmsg("vplot: final display_scale=%.2f\n", scale);
     return scale;
 }
 
@@ -350,7 +322,6 @@ static void clear_model(void) {
 static int load_off_model(const char *filename) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
-        logmsg("load_off: cannot open '%s'\n", filename);
         return 0;
     }
     
@@ -372,7 +343,6 @@ static int load_off_model(const char *filename) {
         // Try to parse vertex/face counts
         int ne = 0;
         if (sscanf(p, "%d %d %d", &expected_verts, &expected_faces, &ne) >= 2) {
-            logmsg("load_off: header: nv=%d, nf=%d, ne=%d\n", expected_verts, expected_faces, ne);
             break;
         }
     }
@@ -416,8 +386,6 @@ static int load_off_model(const char *filename) {
         model_verts[i].z = (model_verts[i].z - cz) * scale;
     }
     
-    logmsg("load_off: loaded %d vertices\n", model_nverts);
-    
     // Read faces
     while (model_nfaces < expected_faces && model_nfaces < MAX_FACES && fgets(line, sizeof(line), fp)) {
         char *p = line;
@@ -441,7 +409,6 @@ static int load_off_model(const char *filename) {
     
     fclose(fp);
     model_loaded = 1;
-    logmsg("load_off: loaded %d faces\n", model_nfaces);
     return 1;
 }
 
@@ -778,7 +745,6 @@ static void handle_cmd(char *line) {
 #endif
             }
             
-            logmsg("vplot: loading model '%s'\n", path);
             if (load_off_model(path)) {
                 redraw();
             }
@@ -790,23 +756,16 @@ static void handle_cmd(char *line) {
 
 int main(void) {
     char buf[1024];
-    char *display_env;
     
     setbuf(stdout, NULL);
     setbuf(stdin, NULL);
     
-    display_env = getenv("DISPLAY");
-    logmsg("vplot started, DISPLAY='%s'\n", display_env ? display_env : "(null)");
-    
     while (fgets(buf, sizeof(buf), stdin)) {
-        logmsg("vplot: received: '%s'\n", buf);
         handle_cmd(buf);
     }
     
-    logmsg("vplot: EOF, exiting\n");
     if (backbuf) XFreePixmap(dpy, backbuf);
     if (gc) XFreeGC(dpy, gc);
     if (dpy) XCloseDisplay(dpy);
-    if (logfp) fclose(logfp);
     return 0;
 }

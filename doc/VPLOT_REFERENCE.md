@@ -330,31 +330,8 @@ cc -o vplot vplot.c -I/opt/X11/include -L/opt/X11/lib -lX11 -lm
 
 ---
 
-## Debugging
-
-VPlot logs all commands to `/tmp/vplot.log`:
-
-```bash
-tail -f /tmp/vplot.log
-```
-
-Example log output:
-```
-vplot started, DISPLAY=':0'
-vplot: received: 'window 0x1234567 400 300'
-vplot: macOS detected, defaulting to scale=2.0
-vplot: final display_scale=2.00
-vplot: received: 'domain -2 2 -2 2'
-vplot: received: 'equation sin(x * y)'
-vplot: received: 'expose'
-```
-
----
-
 ## See Also
 
 - [TTY_REFERENCE.md](TTY_REFERENCE.md) — TTY class for external process communication
 - [VIOLA_LANGUAGE.md](VIOLA_LANGUAGE.md) — Viola scripting language reference
-- `examples/plot.v` — Complete working example
-- `examples/plotDemo.html` — HTML page embedding the plot widget
 
