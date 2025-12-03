@@ -23,43 +23,244 @@
 #include "cl_TTY.h"
 #if defined(__APPLE__)
 /*
- * macOS: disable legacy BSD TTY implementation. Provide minimal stubs
- * to satisfy references; TTY widget will be non-functional on this platform.
+ * macOS: Use openpty()/forkpty() for pseudo-terminal support.
  */
 #include "slotaccess.h"
 #include "class.h"
 #include "classlist.h"
+#include "error.h"
+#include "ident.h"
+#include "mystrings.h"
 #include "obj.h"
 #include "packet.h"
+#include "scanutils.h"
 
-/* Provide minimal empty slot tables to satisfy ClassInfo */
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <util.h>   /* macOS: openpty, forkpty */
+#include <termios.h>
+
 SlotInfo cl_TTY_NCSlots[] = {0};
-SlotInfo cl_TTY_NPSlots[] = {0};
-SlotInfo cl_TTY_CSlots[] = {0};
-SlotInfo cl_TTY_PSlots[] = {0};
-SlotInfo* slots_TTY[] = {(SlotInfo*)cl_TTY_NCSlots, (SlotInfo*)cl_TTY_NPSlots, (SlotInfo*)cl_TTY_CSlots, (SlotInfo*)cl_TTY_PSlots};
+SlotInfo cl_TTY_NPSlots[] = {{
+                                 STR_path,
+                                 PTRS | SLOT_RW,
+                                 (long)"",
+                             },
+                             {
+                                 STR_args,
+                                 PTRS | SLOT_RW,
+                                 (long)"",
+                             },
+                             {STR_pid, LONG, 0},
+                             {0}};
+SlotInfo cl_TTY_CSlots[] = {{STR_class, PTRS | SLOT_RW, (long)"TTY"},
+                            {
+                                STR_classScript,
+                                PTRS,
+                                (long)"\n\
+		switch (arg[0]) {\n\
+		case \"config\":\n\
+			config(arg[1], arg[2], arg[3], arg[4]);\n\
+		break;\n\
+		case \"configSelf\":\n\
+			/* icky! but necessary to give script a chance to \n\
+			 * intercept and do something...*/\n\
+	        	send(self(), \"config\", \n\
+				x(), y(), width(), height());\n\
+		break;\n\
+		case \"expose\":\n\
+			expose(arg[1], arg[2], arg[3], arg[4]);\n\
+		break;\n\
+		case \"render\":\n\
+			render();\n\
+		break;\n\
+		case \"visible\":\n\
+			set(\"visible\", arg[1]);\n\
+		break;\n\
+		case \"mouseMove\":\n\
+		case \"enter\":\n\
+		case \"leave\":\n\
+		case \"buttonPress\":\n\
+		case \"buttonRelease\":\n\
+		case \"keyPress\":\n\
+		case \"keyRelease\":\n\
+		case \"shownPositionH\":\n\
+		case \"shownPositionV\":\n\
+		case \"shownInfoV\":\n\
+		case \"shownInfoH\":\n\
+		break;\n\
+		case \"focus\":\n\
+			mousePos = mouse();\n\
+			winPos = windowPosition();\n\
+			mx = mousePos[0];\n\
+			my = mousePos[1];\n\
+			dx = ((winPos[0] + width() / 2) - mx) / 10.0;\n\
+			dy = ((winPos[1] + height() / 2) - my) / 10.0;\n\
+			for (i = 0; i < 10; i = i + 1) {\n\
+				mx = mx + dx;\n\
+				my = my + dy;\n\
+				setMouse(mx, my);\n\
+			}\n\
+		break;\n\
+		case \"key_up\":\n\
+			send(parent(), \"key_up\");\n\
+			return;\n\
+		break;\n\
+		case \"key_down\":\n\
+			send(parent(), \"key_down\");\n\
+			return;\n\
+		break;\n\
+		case \"init\":\n\
+			initialize();\n\
+		break;\n\
+		case \"raise\":\n\
+			raise();\n\
+		break;\n\
+		case \"info\":\n\
+			info();\n\
+		break;\n\
+		case \"freeSelf\":\n\
+			return freeSelf();\n\
+		break;\n\
+		default:\n\
+			print(\"unknown message, clsss = \", get(\"class\"),\n\
+				\": self = \", get(\"name\"), \" args: \");\n\
+			for (i = 0; i < arg[]; i++) print(arg[i], \", \");\n\
+	print(\"\n\");\n\
+	break;\n\
+	}\n\
+",
+                            },
+                            {0}};
+SlotInfo cl_TTY_PSlots[] = {{STR__classInfo, CLSI, (long)&class_TTY}, {0}};
+
+SlotInfo* slots_TTY[] = {(SlotInfo*)cl_TTY_NCSlots, (SlotInfo*)cl_TTY_NPSlots,
+                         (SlotInfo*)cl_TTY_CSlots, (SlotInfo*)cl_TTY_PSlots};
+
+MethodInfo meths_TTY[] = {
+    /* local methods */
+    {STR__startClient, meth_TTY__startClient},
+    {
+        STR_geta,
+        meth_TTY_get,
+    },
+    {STR_seta, meth_TTY_set},
+    {0}};
+
+ClassInfo class_TTY = {
+    helper_TTY_get, helper_TTY_set, slots_TTY, /* class slot information	*/
+    meths_TTY,                                 /* class methods		*/
+    STR_TTY,                                   /* class identifier number	*/
+    &class_client,                             /* super class info		*/
+};
 
 long meth_TTY__startClient(VObj* self, Packet* result, int argc, Packet argv[]) {
+    int master_fd;
+    pid_t pid;
+    char* args[16];
+    int n;
+    char *path;
+    char *plot_path_env;
+
     result->type = PKT_INT;
     result->canFree = 0;
-    result->info.i = 0;
-    return 0;
-}
-long helper_TTY_get(VObj* self, Packet* result, int argc, Packet argv[], long labelID) {
-    return 0;
-}
-long meth_TTY_get(VObj* self, Packet* result, int argc, Packet argv[]) {
-    return 0;
-}
-long helper_TTY_set(VObj* self, Packet* result, int argc, Packet argv[], long labelID) {
-    return 0;
-}
-long meth_TTY_set(VObj* self, Packet* result, int argc, Packet argv[]) {
-    return 0;
+
+    /* Set up argument list */
+    path = GET_path(self);
+    
+    /* Workaround for 64-bit pointer truncation issue: 
+     * if path is empty/invalid, try to construct from PLOT_PATH env var */
+    if (!path || !*path || strlen(path) < 5) {
+        plot_path_env = getenv("PLOT_PATH");
+        if (plot_path_env && *plot_path_env) {
+            static char path_buf[512];
+            snprintf(path_buf, sizeof(path_buf), "%s/vplot", plot_path_env);
+            path = path_buf;
+        }
+    }
+    
+    if (!path || !*path) {
+        MERROR(self, "startClient: path not set");
+        result->info.i = -1;
+        return 0;
+    }
+    
+    args[0] = path;
+    n = makeArgv(&args[1], GET_args(self));
+    args[n + 1] = NULL;
+
+    /* Use forkpty which handles all the pty/tty setup */
+    pid = forkpty(&master_fd, NULL, NULL, NULL);
+
+    if (pid < 0) {
+        MERROR(self, "startClient: forkpty failed");
+        result->info.i = -1;
+        return 0;
+    }
+
+    if (pid == 0) {
+        /* Child process */
+        execv(path, args);
+        perror(path);
+        _exit(-1);
+    }
+
+    /* Parent process */
+    SET_pid(self, pid);
+    SET_clientFD(self, master_fd);
+    result->info.i = master_fd;
+    return 1;
 }
 
-MethodInfo meths_TTY[] = {0};
-ClassInfo class_TTY = {helper_TTY_get, helper_TTY_set, slots_TTY, meths_TTY, (long)0, &class_client};
+long helper_TTY_get(VObj* self, Packet* result, int argc, Packet argv[], long labelID) {
+    switch (labelID) {
+    case STR_pid:
+        result->type = PKT_INT;
+        result->canFree = 0;
+        result->info.i = GET_pid(self);
+        return 1;
+
+    case STR_args:
+        result->type = PKT_STR;
+        result->canFree = PK_CANFREE_STR;
+        result->info.s = SaveString(GET_args(self));
+        return 1;
+
+    case STR_path:
+        result->type = PKT_STR;
+        result->canFree = PK_CANFREE_STR;
+        result->info.s = SaveString(GET_path(self));
+        return 1;
+    }
+    return helper_client_get(self, result, argc, argv, labelID);
+}
+long meth_TTY_get(VObj* self, Packet* result, int argc, Packet argv[]) {
+    return helper_TTY_get(self, result, argc, argv, getIdent(PkInfo2Str(argv)));
+}
+
+long helper_TTY_set(VObj* self, Packet* result, int argc, Packet argv[], long labelID) {
+    switch (labelID) {
+    case STR_args:
+        result->info.s = SaveString(PkInfo2Str(&argv[1]));
+        SET_args(self, result->info.s);
+        result->type = PKT_STR;
+        result->canFree = 0;
+        return 1;
+
+    case STR_path:
+        result->info.s = SaveString(PkInfo2Str(&argv[1]));
+        SET_path(self, result->info.s);
+        result->type = PKT_STR;
+        result->canFree = 0;
+        return 1;
+    }
+    return helper_client_set(self, result, argc, argv, labelID);
+}
+long meth_TTY_set(VObj* self, Packet* result, int argc, Packet argv[]) {
+    return helper_TTY_set(self, result, argc, argv, getIdent(PkInfo2Str(argv)));
+}
 
 #else
 #include "class.h"

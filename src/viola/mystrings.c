@@ -539,13 +539,20 @@ char* saveString(const char* str) {
     if (!str)
         return NULL;
 
-    /* Проверка что указатель валидный (не слишком маленький адрес) */
-    /* Check for invalid pointers: NULL, low addresses, truncated 32-bit pointers */
-    if ((unsigned long)str < 0x1000 ||
-        ((unsigned long)str & 0xFFFFFFFF00000000UL) == 0 || /* Truncated 32-bit */
-        ((unsigned long)str & 0xFFFFFFFF00000000UL) == 0xFFFFFFFF00000000UL) { /* Sign-extended */
-        fprintf(stderr, "saveString: invalid pointer %p, returning empty string\n", str);
-        /* Allocate empty string to avoid recursion */
+    /* Check for invalid pointers: NULL, very low addresses */
+    if ((unsigned long)str < 0x1000) {
+        /* Allocate empty string to avoid crashes */
+        char* sp = (char*)malloc(1);
+        if (sp)
+            sp[0] = '\0';
+        return sp;
+    }
+    
+    /* Handle sign-extended 32-bit pointers from legacy code paths.
+     * If upper 32 bits are 0xFFFFFFFF, the pointer was corrupted.
+     * Return empty string to avoid crash.
+     */
+    if (((unsigned long)str & 0xFFFFFFFF00000000UL) == 0xFFFFFFFF00000000UL) {
         char* sp = (char*)malloc(1);
         if (sp)
             sp[0] = '\0';

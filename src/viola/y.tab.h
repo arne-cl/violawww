@@ -39,7 +39,7 @@
 
 typedef union {
     struct AST* p; /* an AST node	*/
-    int i;
+    long i;
     float f;
     char c;
     char* s;

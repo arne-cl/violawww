@@ -1253,7 +1253,6 @@ void GLRootPosition(Window w, int *root_xp, int *root_yp)
             *root_yp += y;
         }
     } else {
-        fprintf(stderr, "rootPosition: window == NULL\n");
         *root_xp = 0;
         *root_yp = 0;
     }
