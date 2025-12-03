@@ -62,7 +62,7 @@ Topics covered:
 
 ---
 
-## Sound
+## Multimedia
 
 ### [SOUND_REFERENCE.md](SOUND_REFERENCE.md)
 Audio playback capabilities in ViolaWWW.
@@ -109,6 +109,16 @@ Topics covered:
 - Graphics Functions
 
 All functions include parameter descriptions and return values.
+
+### [TTY_REFERENCE.md](TTY_REFERENCE.md)
+How to run external programs from Viola — a practical guide.
+
+Topics covered:
+- TTY class for inter-process communication
+- Step-by-step tutorial with examples
+- Complete working example (bc calculator)
+- Delimiter configuration
+- Environment variables and command-line arguments
 
 ---
 

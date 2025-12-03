@@ -17,6 +17,7 @@ This document describes functions available in the Viola language. All functions
 - [Graphics Functions](#graphics-functions)
 - [Drawing Functions](#drawing-functions)
 - [Miscellaneous Functions](#miscellaneous-functions)
+- [Client/TTY Class Methods](#clienttty-class-methods)
 
 ---
 
@@ -1908,6 +1909,120 @@ Internal function for medium HTML header processing.
 
 ### code_HTML_header_small(...)
 Internal function for small HTML header processing.
+
+---
+
+## Client/TTY Class Methods
+
+The `client` class (and its subclass `TTY`) provides methods for inter-process communication via pseudo-terminals.
+
+### Class Hierarchy
+
+```
+field → client → TTY
+```
+
+### Client Class Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `inDelimStr1` | string | First input delimiter string |
+| `inDelimStr2` | string | Second input delimiter string |
+| `outDelimStr` | string | Output delimiter string |
+| `clientFD` | int | Client file descriptor |
+
+### TTY Class Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `path` | string | Path to executable file |
+| `args` | string | Command line arguments |
+| `pid` | int | Process ID of the running client |
+
+---
+
+### startClient()
+Starts the client process. For TTY class, this forks a new process and connects it via pseudo-terminal.
+
+**Returns:** (int) file descriptor on success, -1 on error
+
+**Note:** The `path` attribute must be set before calling this method.
+
+---
+
+### endClient()
+Terminates the client process.
+
+**Returns:** (int) 1 on success
+
+---
+
+### initialize()
+Initializes the client object.
+
+**Returns:** (int) 1
+
+---
+
+### input([timeout])
+Reads input from the client process. Blocks until data is available or delimiter is matched.
+
+**Parameters:**
+- `timeout` (int, optional) - timeout in some units (0 = no timeout)
+
+**Returns:** (string) data received from client
+
+---
+
+### inputn(n)
+Reads exactly n bytes from the client process.
+
+**Parameters:**
+- `n` (int) - number of bytes to read
+
+**Returns:** (string) data received
+
+---
+
+### output(data)
+Sends data to the client process. The `outDelimStr` is automatically appended.
+
+**Parameters:**
+- `data` (string) - data to send
+
+**Returns:** (int) 1 on success
+
+---
+
+### Example Usage
+
+```c
+\class {TTY}
+\name {myProcess}
+\script {
+    switch (arg[0]) {
+    case "init":
+        usual();
+        set("path", "/usr/bin/myprogram");
+        set("args", "-v -o output.txt");
+        set("inDelimStr1", "\n");
+        set("outDelimStr", "\n");
+        startClient();
+        return;
+    break;
+    case "sendCommand":
+        output(arg[1]);
+        return;
+    break;
+    case "input":
+        data = input(0);
+        print("Received: ", data, "\n");
+        return;
+    break;
+    }
+    usual();
+}
+```
 
 ---
 
