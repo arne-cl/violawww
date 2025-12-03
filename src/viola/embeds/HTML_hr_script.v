@@ -32,7 +32,8 @@
 	case "init":
 		usual();
 		color = getResource("Viola.foreground_doc");
-		if (color) set("BGColor", color);
+		if (isBlank(color) == 1) color = "black";
+		set("BGColor", color);
 		return;
 	break;
 	}

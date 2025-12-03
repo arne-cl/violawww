@@ -37,7 +37,9 @@
 	break;
 	case "init":
 		usual();
-		SGMLBuildDoc_setColors();
+		color = getResource("Viola.foreground_doc");
+		if (isBlank(color) == 1) color = "black";
+		set("BGColor", color);
 		return;
 	break;
 	}
