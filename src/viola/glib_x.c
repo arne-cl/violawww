@@ -957,8 +957,16 @@ Window GLOpenWindow(VObj* self, int x, int y, int width, int height, int isGlass
     if (parentWindow == 0)
         parentWindow = rootWindow;
 
-    if (parentWindow == rootWindow && runInSubWindow)
-        parentWindow = topWindow;
+    /* Check if this is a popup dialog that should appear as a separate top-level window.
+     * Dialog objects start with "res.dialog" and should not be confined to topWindow.
+     */
+    {
+        const char* name = GET_name(self);
+        int isPopupDialog = (name && strncmp(name, "res.dialog", 10) == 0);
+        
+        if (parentWindow == rootWindow && runInSubWindow && !isPopupDialog)
+            parentWindow = topWindow;
+    }
 
     if (isGlass) {
         attrs.event_mask = GET__eventMask(self);
@@ -1131,6 +1139,20 @@ Window GLOpenWindow(VObj* self, int x, int y, int width, int height, int isGlass
     }
 
     return w;
+}
+
+/*
+ * GLRaiseWindow - raise window to top of stack
+ * On macOS/XQuartz, XRaiseWindow alone may not be enough,
+ * so we also use XMapRaised and XFlush.
+ */
+void GLRaiseWindow(Window w)
+{
+    if (w) {
+        XMapRaised(display, w);
+        XRaiseWindow(display, w);
+        XFlush(display);
+    }
 }
 
 /*

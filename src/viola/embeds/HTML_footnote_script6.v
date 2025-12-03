@@ -4,7 +4,8 @@
 		set("BDColor", "red");
 	break;
 	case "buttonRelease":
-		res.dialogWithButtons("show", get("content"), "OK", "");
+		mousePos = mouse();
+		res.dialogWithButtons("showAt", mousePos[0], mousePos[1] + 20, 600, 100, get("content"), "OK", "");
 		set("BDColor", "LemonChiffon1");
 	break;
 	case "make":

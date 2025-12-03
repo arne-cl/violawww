@@ -158,7 +158,7 @@ void free_fonts(void);
 
 #define GLClearWindow(w) XClearWindow(display, w)
 #define GLLowerWindow(w) XLowerWindow(display, w)
-#define GLRaiseWindow(w) XRaiseWindow(display, w)
+void GLRaiseWindow(Window w);
 
 /* window
  */
