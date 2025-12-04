@@ -136,8 +136,9 @@ This version brings ViolaWWW into the modern web era while preserving its unique
   - `<SCALE X=... Y=... Z=...>` — scaling with perspective
   - `<AXIS>` — transformation center point
 - Colors: `<FGCOLOR>`, `<BGCOLOR>`, `<BDCOLOR>` with named colors
-- **Not implemented**: Interactive scripting (`<ACTION>`, `<BUTTON>`), multi-user sync (`SC` attribute)
-- **Files**: `embeds/HTML_graphics_script.v`, `HTML_rect_script.v`, `HTML_polygon_script.v`, etc.
+- Interactive elements: `<BUTTON>` with LABEL, HREF, HINT attributes (3D appearance, click handling, status bar hints)
+- **Not implemented**: Interactive scripting (`<ACTION>`, inline `<SCRIPT>`), multi-user sync (`SC` attribute)
+- **Files**: `embeds/HTML_graphics_script.v`, `HTML_button_script.v`, `HTML_rect_script.v`, `HTML_polygon_script.v`, etc.
 - **Documentation**: [GRAPHICS_TAGS_REFERENCE.md](doc/GRAPHICS_TAGS_REFERENCE.md)
 
 #### TTY Interface Restoration
