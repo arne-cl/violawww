@@ -352,6 +352,7 @@ a:visited { color: blue; }  /* traversedForegroundColor */
 **Historical Note**: The term "traversed" was used in early web browsers (including ViolaWWW, 1992-1994) to describe links that the user had "traversed" or navigated through. This predates the CSS `:visited` terminology.
 
 **Original Source**: This attribute was found in the original ViolaWWW stylesheet from Pei Wei's archives:
+- [Viola Styles Directory (Web Archive, 2004)](https://web.archive.org/web/20040427234619/http://www.xcf.berkeley.edu/~wei/viola/styles/)
 - [hmml.stg (Web Archive, 2004)](https://web.archive.org/web/20040329164901/http://www.xcf.berkeley.edu/~wei/viola/styles/hmml.stg)
 
 **Viola Function**: You can also programmatically check if a URL has been visited using the `isURLVisited(url)` function in Viola scripts:
