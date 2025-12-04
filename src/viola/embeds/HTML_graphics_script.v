@@ -408,9 +408,9 @@
 										set("FGColor", "black");
 									}
 									/* Center text in button: drawText(x, y, size, text) */
-									/* Y is baseline, so use middle of button */
-									textX = shapeX + 6;
-									textY = shapeY + (shapeH / 2) + 4;
+									labelW = textWidth(1, btnLabel);
+									textX = shapeX + ((shapeW - labelW) / 2);
+									textY = shapeY + (shapeH / 2) + 5;
 									drawText(textX, textY, 1, btnLabel);
 								}
 							}
