@@ -206,6 +206,10 @@ static attr size_attr[] = {{"SC"}, {"X"}, {"Y"}, {"Z"}, {0}};
 
 static attr square_attr[] = {{"ID"}, {"NAME"}, {0}};
 
+static attr text_attr[] = {{"ID"}, {"LABEL"}, {"NAME"}, {0}};
+#undef HTML_TEXT_ATTRIBUTES
+#define HTML_TEXT_ATTRIBUTES 3
+
 static attr select_attr[] = {{"CHECKED"}, {"DISABLED"}, {"ENVVAR"}, {"MAXWIDTH"}, {"MINWIDTH"},
                              {"NAME"},    {"SIZE"},     {"TYPE"},   {"VALUE"},    {0}};
 
@@ -333,9 +337,9 @@ static HTMLElement th_validSubElements[] = {
 };
 
 /* Valid children for GRAPHICS container */
-#define graphics_validSubElementsCount 15
+#define graphics_validSubElementsCount 16
 static HTMLElement graphics_validSubElements[] = {
-    HTML_RECT, HTML_SQUARE, HTML_CIRCLE, HTML_OVAL, HTML_LINE, HTML_POLYGON, HTML_POINT,
+    HTML_RECT, HTML_SQUARE, HTML_CIRCLE, HTML_OVAL, HTML_LINE, HTML_POLYGON, HTML_POINT, HTML_TEXT,
     HTML_POS, HTML_SIZE, HTML_ROT, HTML_SCALE, HTML_AXIS,
     HTML_FGCOLOR, HTML_BDCOLOR, HTML_BGCOLOR
 };
@@ -483,7 +487,7 @@ static HTTag tags[] = {
     {"TCAP", tcap_attr, HTML_TCAP_ATTRIBUTES, SGML_CDATA, 0, 0},
     {"TD", td_attr, HTML_TD_ATTRIBUTES, SGML_MIXED, loose_validSubElements,
      loose_validSubElementsCount},
-    {"TEXT", no_attr, 0, SGML_LITTERAL, 0, 0},
+    {"TEXT", text_attr, HTML_TEXT_ATTRIBUTES, SGML_MIXED, 0, 0},
     /*    { "TEXTAREA", textarea_attr, HTML_TEXTAREA_ATTRIBUTES, SGML_LITTERAL,0,0},*/
     {"TEXTAREA", textarea_attr, HTML_TEXTAREA_ATTRIBUTES, SGML_MIXED, 0, 0},
     {"TH", th_attr, HTML_TH_ATTRIBUTES, SGML_MIXED, th_validSubElements, th_validSubElementsCount},

@@ -5252,6 +5252,20 @@ static SlotStruct objDesc_HTML_square[] = {
     {(char*)0, (char*)0},
 };
 
+static char _slotValue_HTML_text0[] = "field";
+static char _slotValue_HTML_text1[] = "HTML_text";
+static char _slotValue_HTML_text2[] = {
+#include "embeds/HTML_text_script.v.h"
+};
+/* END OF FILE */
+
+static SlotStruct objDesc_HTML_text[] = {
+    {"class", _slotValue_HTML_text0},
+    {"name", _slotValue_HTML_text1},
+    {"script", _slotValue_HTML_text2},
+    {(char*)0, (char*)0},
+};
+
 static char _slotValue_HTML_line0[] = "field";
 static char _slotValue_HTML_line1[] = "HTML_line";
 static char _slotValue_HTML_line2[] = {
@@ -7472,6 +7486,8 @@ ObjsNamesStruct objsNames[] = {"HTML__box.v",
                                objDesc_HTML_oval,
                                "HTML_square.v",
                                objDesc_HTML_square,
+                               "HTML_text.v",
+                               objDesc_HTML_text,
                                "HTML_line.v",
                                objDesc_HTML_line,
                                "HTML_polygon.v",

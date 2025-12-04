@@ -1586,6 +1586,30 @@ Draws text at the specified position.
 
 ---
 
+### drawTextTransformed(x, y, fontID, text, rotZ, scaleX, scaleY)
+Draws text with rotation and scaling using XRender extension.
+
+**Parameters:**
+- `x` (int) - x-coordinate (center of transformation)
+- `y` (int) - y-coordinate (center of transformation)
+- `fontID` (int) - font identifier
+- `text` (string) - text to draw
+- `rotZ` (float) - rotation angle in degrees (around Z axis)
+- `scaleX` (float) - horizontal scale factor (1.0 = normal)
+- `scaleY` (float) - vertical scale factor (1.0 = normal)
+
+**Returns:** (int) 1 on success
+
+**Example:**
+```
+/* Draw text rotated 45 degrees, scaled 1.5x */
+drawTextTransformed(100, 100, 1, "Hello", 45.0, 1.5, 1.5);
+```
+
+**Note:** Falls back to regular drawText if no transformation is needed or XRender is unavailable.
+
+---
+
 ### clearArea(x0, y0, x1, y1)
 Clears a rectangular area (fills with background color).
 

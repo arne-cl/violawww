@@ -43,6 +43,7 @@
 #include <X11/StringDefs.h>
 /*#include <X11/Shell.h>*/
 #include <X11/extensions/shape.h>
+#include <X11/extensions/Xrender.h>
 
 #include "../libXPM/xpm.h"
 
@@ -1541,6 +1542,113 @@ int GLPaintTextLength(Window w, GC gc, int fontID, int x0, int y0, char* str, in
     item.font = FontFont(fontID);
 
     XDrawText(display, w, gc, x0, y0 + FontMaxHeight(fontID) - FontDescent(fontID), &item, 1);
+    return 1;
+}
+
+/*
+ * GLPaintTextTransformed - Draw text with rotation and scaling using XRender
+ * rotZ is in degrees, scaleX/scaleY are scale factors (1.0 = normal)
+ * Note: XRender scaling has issues with transparency, so we only use it for rotation.
+ * For scale-only, we just draw normal text (scaling would require different fonts).
+ */
+int GLPaintTextTransformed(Window w, GC gc, int fontID, int x0, int y0, 
+                           char* str, double rotZ, double scaleX, double scaleY)
+{
+    if (!str || !*str) return 0;
+    
+    int textWidth = GLTextWidth(fontID, str);
+    int textHeight = FontMaxHeight(fontID);
+    
+    /* If no transformation needed, use simple text drawing */
+    if ((rotZ < 0.001 && rotZ > -0.001) && 
+        (scaleX > 0.999 && scaleX < 1.001) && 
+        (scaleY > 0.999 && scaleY < 1.001)) {
+        return GLPaintText(w, gc, fontID, x0, y0, str);
+    }
+    
+    /* If only scale (no rotation), just draw normal text - 
+     * XRender has issues with transparency for scaling */
+    if (rotZ < 0.001 && rotZ > -0.001) {
+        return GLPaintText(w, gc, fontID, x0, y0, str);
+    }
+    
+    /* Create a pixmap to render text into */
+    int pixWidth = (int)(textWidth * scaleX + textHeight * scaleY) + 10;
+    int pixHeight = (int)(textWidth * scaleX + textHeight * scaleY) + 10;
+    if (pixWidth < 1) pixWidth = 1;
+    if (pixHeight < 1) pixHeight = 1;
+    if (pixWidth > 2000) pixWidth = 2000;  /* Sanity limit */
+    if (pixHeight > 2000) pixHeight = 2000;
+    
+    Pixmap textPix = XCreatePixmap(display, w, pixWidth, pixHeight, screenDepth);
+    if (!textPix) {
+        return GLPaintText(w, gc, fontID, x0, y0, str);  /* Fallback */
+    }
+    
+    /* Clear pixmap with background (transparent) */
+    XSetForeground(display, gc_bg, 0);  /* Black = transparent for XRender */
+    XFillRectangle(display, textPix, gc_bg, 0, 0, pixWidth, pixHeight);
+    
+    /* Draw text in center of pixmap */
+    int tx = pixWidth / 2 - textWidth / 2;
+    int ty = pixHeight / 2 - textHeight / 2;
+    
+    XTextItem item;
+    item.chars = str;
+    item.nchars = (int)strlen(str);
+    item.delta = 0;
+    item.font = FontFont(fontID);
+    XDrawText(display, textPix, gc, tx, ty + textHeight - FontDescent(fontID), &item, 1);
+    
+    /* Create XRender pictures */
+    XRenderPictFormat* format = XRenderFindVisualFormat(display, 
+        DefaultVisual(display, screenNumber));
+    if (!format) {
+        XFreePixmap(display, textPix);
+        return GLPaintText(w, gc, fontID, x0, y0, str);  /* Fallback */
+    }
+    
+    XRenderPictureAttributes pa;
+    pa.subwindow_mode = IncludeInferiors;
+    
+    Picture srcPic = XRenderCreatePicture(display, textPix, format, 
+                                          CPSubwindowMode, &pa);
+    Picture dstPic = XRenderCreatePicture(display, w, format, 
+                                          CPSubwindowMode, &pa);
+    
+    if (!srcPic || !dstPic) {
+        if (srcPic) XRenderFreePicture(display, srcPic);
+        if (dstPic) XRenderFreePicture(display, dstPic);
+        XFreePixmap(display, textPix);
+        return GLPaintText(w, gc, fontID, x0, y0, str);  /* Fallback */
+    }
+    
+    /* Build transformation matrix */
+    /* XRender uses fixed-point 16.16 format */
+    double radians = rotZ * M_PI / 180.0;
+    double cosR = cos(radians);
+    double sinR = sin(radians);
+    
+    XTransform xform = {{
+        { XDoubleToFixed(cosR / scaleX), XDoubleToFixed(sinR / scaleX), XDoubleToFixed(0) },
+        { XDoubleToFixed(-sinR / scaleY), XDoubleToFixed(cosR / scaleY), XDoubleToFixed(0) },
+        { XDoubleToFixed(0), XDoubleToFixed(0), XDoubleToFixed(1) }
+    }};
+    
+    XRenderSetPictureTransform(display, srcPic, &xform);
+    
+    /* Composite to destination */
+    int destX = x0 - pixWidth / 2;
+    int destY = y0 - pixHeight / 2;
+    
+    XRenderComposite(display, PictOpOver, srcPic, None, dstPic,
+                     0, 0, 0, 0, destX, destY, pixWidth, pixHeight);
+    
+    /* Cleanup */
+    XRenderFreePicture(display, srcPic);
+    XRenderFreePicture(display, dstPic);
+    XFreePixmap(display, textPix);
+    
     return 1;
 }
 

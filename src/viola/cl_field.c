@@ -244,6 +244,10 @@ MethodInfo meths_field[] = {
         meth_field_drawText,
     },
     {
+        STR_drawTextTransformed,
+        meth_field_drawTextTransformed,
+    },
+    {
         STR_eraseFillOval,
         meth_field_eraseFillOval,
     },
@@ -855,6 +859,32 @@ long meth_field_drawText(VObj* self, Packet* result, int argc, Packet argv[]) {
         if (GET__classInfo(self) != &class_glass) {
             GLPrepareObjColor(self);
             GLDrawText(GET_window(self), fontID, x0, y0, PkInfo2Str(&argv[3]));
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/*
+ * drawTextTransformed(x, y, fontID, text, rotZ, scaleX, scaleY)
+ */
+long meth_field_drawTextTransformed(VObj* self, Packet* result, int argc, Packet argv[]) {
+    int x0, y0, fontID;
+    double rotZ, scaleX, scaleY;
+    
+    x0 = (int)PkInfo2Int(&argv[0]);
+    y0 = (int)PkInfo2Int(&argv[1]);
+    fontID = (int)PkInfo2Int(&argv[2]);
+    rotZ = PkInfo2Flt(&argv[4]);
+    scaleX = PkInfo2Flt(&argv[5]);
+    scaleY = PkInfo2Flt(&argv[6]);
+
+    clearPacket(result);
+    if (GET_window(self) && GET_visible(self)) {
+        if (GET__classInfo(self) != &class_glass) {
+            GLPrepareObjColor(self);
+            GLDrawTextTransformed(GET_window(self), fontID, x0, y0, 
+                                  PkInfo2Str(&argv[3]), rotZ, scaleX, scaleY);
             return 1;
         }
     }

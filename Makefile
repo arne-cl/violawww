@@ -73,7 +73,7 @@ LDFLAGS = $(ARCH_FLAGS) -Wl,-dead_strip \
           -L$(BREW_PREFIX)/lib \
           -L$(OPENMOTIF_PREFIX)/lib \
           -L/opt/X11/lib
-LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lm $(ICU_LIBS) $(SSL_LIBS)
+LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lXrender -lm $(ICU_LIBS) $(SSL_LIBS)
 
 # macOS-specific: AppKit and AVFoundation for sound
 UNAME_S := $(shell uname -s)

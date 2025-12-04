@@ -262,6 +262,11 @@ int GLPaintTextLength(Window, GC, int, int, int, char*, int);
 #define GLInvertTextLength(w, fontID, x0, y0, str, length)                                         \
     GLPaintTextLength(w, gc_invert, fontID, x0, y0, str, length)
 
+/* Transformed text (with rotation and scaling via XRender) */
+int GLPaintTextTransformed(Window, GC, int, int, int, char*, double, double, double);
+#define GLDrawTextTransformed(w, fontID, x0, y0, str, rotZ, scaleX, scaleY) \
+    GLPaintTextTransformed(w, gc_fg, fontID, x0, y0, str, rotZ, scaleX, scaleY)
+
 /* bitmap
  */
 Pixmap GLMakeXBMFromASCII(Window w, char* bitmapStr, unsigned int* width, unsigned int* height,

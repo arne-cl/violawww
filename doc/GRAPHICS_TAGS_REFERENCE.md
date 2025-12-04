@@ -38,7 +38,7 @@ Wei's proposal was an independent parallel effort, not an implementation of VRML
 | Feature | Status |
 |---------|--------|
 | Container (`<GRAPHICS>`) | ✅ Implemented |
-| Primitives (RECT, SQUARE, CIRCLE, OVAL, LINE, POLYGON) | ✅ Implemented |
+| Primitives (RECT, SQUARE, CIRCLE, OVAL, LINE, POLYGON, TEXT) | ✅ Implemented |
 | Position (`<POS>`) | ✅ Implemented |
 | Size (`<SIZE>`) | ✅ Implemented |
 | Colors (FGCOLOR, BGCOLOR, BDCOLOR) | ✅ Implemented |
@@ -205,6 +205,45 @@ A point defining a polygon vertex.
 |-----------|------|-------------|
 | `X` | number | X coordinate |
 | `Y` | number | Y coordinate |
+
+#### `<TEXT>`
+Text within a graphics container. Supports transformations (rotation, scaling) via XRender.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `ID` | string | Unique identifier |
+| `NAME` | string | Object name |
+
+The text content is placed between the opening and closing tags.
+
+**Example:**
+```html
+<TEXT ID="label1">
+  Hello World
+  <POS X=50 Y=100></POS>
+  <FGCOLOR NAME="blue"></FGCOLOR>
+</TEXT>
+```
+
+**With rotation:**
+```html
+<TEXT ID="rotated">
+  Rotated Text
+  <POS X=100 Y=80></POS>
+  <FGCOLOR NAME="red"></FGCOLOR>
+  <ROT Z=45>
+</TEXT>
+```
+
+**With scaling:**
+```html
+<TEXT ID="scaled">
+  Large Text
+  <POS X=50 Y=50></POS>
+  <FGCOLOR NAME="green"></FGCOLOR>
+  <SCALE X=2 Y=2>
+</TEXT>
+```
 
 ---
 
@@ -555,10 +594,6 @@ The `<ACTION>` and inline `<SCRIPT TYPE="viola">` tags are not implemented. The 
 ### Multi-User Synchronization
 
 The `SC` attribute for broadcasting state changes to other viewers is not implemented.
-
-### Other Tags
-
-- `<TEXT>` — text within graphics (use button LABEL for now)
 
 ---
 

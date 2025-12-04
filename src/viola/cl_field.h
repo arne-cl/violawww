@@ -29,6 +29,7 @@ long meth_field_drawLine(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_field_drawOval(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_field_drawRect(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_field_drawText(VObj* self, Packet* result, int argc, Packet argv[]);
+long meth_field_drawTextTransformed(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_field_eraseFillOval(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_field_eraseFillRect(VObj* self, Packet* result, int argc, Packet argv[]);
 long meth_field_eraseLine(VObj* self, Packet* result, int argc, Packet argv[]);

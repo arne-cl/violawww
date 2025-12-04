@@ -25,6 +25,9 @@
 		if (p == "" || p == "0" || p == "(NULL)") {
 			p = send("HTML_square", "getCurrentPrimitive");
 		}
+		if (p == "" || p == "0" || p == "(NULL)") {
+			p = send("HTML_text", "getCurrentPrimitive");
+		}
 		if (p != "" && p != "0" && p != "(NULL)") {
 			send(p, "setScale", scaleX, scaleY, scaleZ);
 		}

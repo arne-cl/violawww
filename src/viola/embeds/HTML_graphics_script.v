@@ -11,9 +11,18 @@
 	break;
 	case "addChild":
 		/* Child primitive registering itself - store in array */
+		/* Check for duplicates first */
 		childObj = arg[1];
-		gfxChildArr[gfxChildCount] = childObj;
-		gfxChildCount = gfxChildCount + 1;
+		isDup = 0;
+		for (di = 0; di < gfxChildCount; di++) {
+			if (gfxChildArr[di] == childObj) {
+				isDup = 1;
+			}
+		}
+		if (isDup == 0) {
+			gfxChildArr[gfxChildCount] = childObj;
+			gfxChildCount = gfxChildCount + 1;
+		}
 		return;
 	break;
 	case "setCurrentGfx":
@@ -535,6 +544,22 @@
 										textY = textY + 1;
 									}
 									drawText(textX, textY, 1, btnLabel);
+								}
+							}
+						}
+						/* Text - handle independently of transform branches */
+						if (shapeType == "text") {
+							textStr = send(childName, "getText");
+							if (textStr != "" && textStr != "0") {
+								if (shapeFG != "" && shapeFG != "0") {
+									set("FGColor", shapeFG);
+								} else {
+									set("FGColor", "black");
+								}
+								if (hasTransform == 1) {
+									drawTextTransformed(shapeX, shapeY, 1, textStr, rotZVal, sxVal, syVal);
+								} else {
+									drawText(shapeX, shapeY, 1, textStr);
 								}
 							}
 						}

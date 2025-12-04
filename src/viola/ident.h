@@ -277,6 +277,7 @@ enum {
     STR_drawPoints,
     STR_drawRect,
     STR_drawText,
+    STR_drawTextTransformed,
     STR_dtd,
     STR_dumpAll,
     STR_dumpHierarchy,
