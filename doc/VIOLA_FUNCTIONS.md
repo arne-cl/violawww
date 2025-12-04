@@ -1519,6 +1519,60 @@ drawFillPolygon(x0, y0, x1, y1, x2, y2, x3, y3, x4, y4);
 
 ---
 
+### beginPolygon()
+Resets the polygon buffer to start defining a new polygon. Use with `addPolygonPoint()` and `endFillPolygon()`/`endDrawPolygon()` for polygons with any number of points (up to 256).
+
+**Returns:** (int) 1
+
+**Example:**
+```c
+/* Draw a polygon with any number of points */
+beginPolygon();
+for (i = 0; i < numPoints; i++) {
+    addPolygonPoint(px[i], py[i]);
+}
+endFillPolygon();
+```
+
+---
+
+### addPolygonPoint(x, y)
+Adds a point to the polygon buffer. Must be called after `beginPolygon()`.
+
+**Parameters:**
+- `x` (int) - x-coordinate
+- `y` (int) - y-coordinate
+
+**Returns:** (int) current number of points in buffer
+
+---
+
+### endFillPolygon()
+Draws a filled polygon using points accumulated in the buffer. Requires at least 3 points. Clears the buffer after drawing.
+
+**Returns:** (int) 1 on success, 0 on error
+
+---
+
+### endDrawPolygon()
+Draws a polygon outline using points accumulated in the buffer. Connects all points and closes the polygon. Clears the buffer after drawing.
+
+**Returns:** (int) 1 on success, 0 on error
+
+**Example:**
+```c
+/* Draw a star outline */
+beginPolygon();
+for (i = 0; i < 10; i++) {
+    angle = i * 36 * 3.14159 / 180;
+    r = (i % 2 == 0) ? 100 : 50;
+    addPolygonPoint(cx + r * sin(angle), cy - r * cos(angle));
+}
+endDrawPolygon();
+```
+
+---
+
 ### drawText(x, y, fontID, text)
 Draws text at the specified position.
 

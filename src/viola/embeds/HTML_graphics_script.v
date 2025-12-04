@@ -119,116 +119,119 @@
 							if (shapeFG != "" && shapeFG != "0") {
 								set("FGColor", shapeFG);
 							}
-							if (numPoints >= 2) {
-								/* Get all points and optionally transform */
+							if (numPoints >= 3) {
+								/* Get all points, optionally transform, and add to polygon buffer */
+								beginPolygon();
 								for (pi = 0; pi < numPoints; pi++) {
-									tpx[pi] = send(childName, "getPointX", pi);
-									tpy[pi] = send(childName, "getPointY", pi);
+									tpx[0] = send(childName, "getPointX", pi);
+									tpy[0] = send(childName, "getPointY", pi);
 									
-							if (hasTransform == 1) {
-									/* Apply scale then rotation around axis */
-									tx = tpx[pi] - shapeAX;
-									ty = tpy[pi] - shapeAY;
-									tz = 0;
-									nx = 0;
-									ny = 0;
-									nz = 0;
-									/* Scale using float values */
-									tx = tx * sxVal;
-									ty = ty * syVal;
-									tz = tz * szVal;
-									/* Apply ROT Y (rotation around vertical axis - perspective left/right) */
-									if (rotYVal > 0.001 || rotYVal < -0.001) {
-										cosRY = cos(rotYVal);
-										sinRY = sin(rotYVal);
-										nx = (tx * cosRY) + (tz * sinRY);
-										nz = ((0 - tx) * sinRY) + (tz * cosRY);
-										tx = nx;
-										tz = nz;
+									if (hasTransform == 1) {
+										/* Apply scale then rotation around axis */
+										tx = tpx[0] - shapeAX;
+										ty = tpy[0] - shapeAY;
+										tz = 0;
+										nx = 0;
+										ny = 0;
+										nz = 0;
+										/* Scale using float values */
+										tx = tx * sxVal;
+										ty = ty * syVal;
+										tz = tz * szVal;
+										/* Apply ROT Y (rotation around vertical axis - perspective left/right) */
+										if (rotYVal > 0.001 || rotYVal < -0.001) {
+											cosRY = cos(rotYVal);
+											sinRY = sin(rotYVal);
+											nx = (tx * cosRY) + (tz * sinRY);
+											nz = ((0 - tx) * sinRY) + (tz * cosRY);
+											tx = nx;
+											tz = nz;
+										}
+										/* Apply ROT X (rotation around horizontal axis - perspective tilt) */
+										if (rotXVal > 0.001 || rotXVal < -0.001) {
+											cosRX = cos(rotXVal);
+											sinRX = sin(rotXVal);
+											ny = (ty * cosRX) - (tz * sinRX);
+											nz = (ty * sinRX) + (tz * cosRX);
+											ty = ny;
+											tz = nz;
+										}
+										/* Apply ROT Z (2D rotation on screen) */
+										if (rotZVal > 0.001 || rotZVal < -0.001) {
+											cosR = cos(rotZVal);
+											sinR = sin(rotZVal);
+											nx = (tx * cosR) - (ty * sinR);
+											ny = (tx * sinR) + (ty * cosR);
+											tx = nx;
+											ty = ny;
+										}
+										/* Perspective projection */
+										perspD = 500;
+										if (tz > 0.001 || tz < -0.001) {
+											perspScale = perspD / (perspD + tz);
+											tx = tx * perspScale;
+											ty = ty * perspScale;
+										}
+										/* Translate back */
+										tpx[0] = int(tx + shapeAX);
+										tpy[0] = int(ty + shapeAY);
 									}
-									/* Apply ROT X (rotation around horizontal axis - perspective tilt) */
-									if (rotXVal > 0.001 || rotXVal < -0.001) {
-										cosRX = cos(rotXVal);
-										sinRX = sin(rotXVal);
-										ny = (ty * cosRX) - (tz * sinRX);
-										nz = (ty * sinRX) + (tz * cosRX);
-										ty = ny;
-										tz = nz;
-									}
-									/* Apply ROT Z (2D rotation on screen) */
-									if (rotZVal > 0.001 || rotZVal < -0.001) {
-										cosR = cos(rotZVal);
-										sinR = sin(rotZVal);
-										nx = (tx * cosR) - (ty * sinR);
-										ny = (tx * sinR) + (ty * cosR);
-										tx = nx;
-										ty = ny;
-									}
-									/* Perspective projection */
-									perspD = 500;
-									if (tz > 0.001 || tz < -0.001) {
-										perspScale = perspD / (perspD + tz);
-										tx = tx * perspScale;
-										ty = ty * perspScale;
-									}
-									/* Translate back */
-									tpx[pi] = int(tx + shapeAX);
-									tpy[pi] = int(ty + shapeAY);
+									addPolygonPoint(tpx[0], tpy[0]);
 								}
-								}
-								/* Draw filled polygon based on number of points */
-								if (numPoints == 3) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2]);
-								}
-								if (numPoints == 4) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3]);
-								}
-								if (numPoints == 5) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4]);
-								}
-								if (numPoints == 6) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5]);
-								}
-								if (numPoints == 7) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6]);
-								}
-								if (numPoints == 8) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7]);
-								}
-								if (numPoints == 9) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7], tpx[8], tpy[8]);
-								}
-								if (numPoints == 10) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7], tpx[8], tpy[8], tpx[9], tpy[9]);
-								}
-								if (numPoints == 11) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7], tpx[8], tpy[8], tpx[9], tpy[9], tpx[10], tpy[10]);
-								}
-								if (numPoints == 12) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7], tpx[8], tpy[8], tpx[9], tpy[9], tpx[10], tpy[10], tpx[11], tpy[11]);
-								}
-								if (numPoints == 13) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7], tpx[8], tpy[8], tpx[9], tpy[9], tpx[10], tpy[10], tpx[11], tpy[11], tpx[12], tpy[12]);
-								}
-								if (numPoints == 14) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7], tpx[8], tpy[8], tpx[9], tpy[9], tpx[10], tpy[10], tpx[11], tpy[11], tpx[12], tpy[12], tpx[13], tpy[13]);
-								}
-								if (numPoints == 15) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7], tpx[8], tpy[8], tpx[9], tpy[9], tpx[10], tpy[10], tpx[11], tpy[11], tpx[12], tpy[12], tpx[13], tpy[13], tpx[14], tpy[14]);
-								}
-								if (numPoints >= 16) {
-									drawFillPolygon(tpx[0], tpy[0], tpx[1], tpy[1], tpx[2], tpy[2], tpx[3], tpy[3], tpx[4], tpy[4], tpx[5], tpy[5], tpx[6], tpy[6], tpx[7], tpy[7], tpx[8], tpy[8], tpx[9], tpy[9], tpx[10], tpy[10], tpx[11], tpy[11], tpx[12], tpy[12], tpx[13], tpy[13], tpx[14], tpy[14], tpx[15], tpy[15]);
-								}
+								/* Draw filled polygon */
+								endFillPolygon();
 								/* Draw border with BDCOLOR if set */
 								shapeBD = send(childName, "getBD");
 								if (shapeBD != "" && shapeBD != "0") {
 									set("FGColor", shapeBD);
-									for (pi = 0; pi < numPoints - 1; pi++) {
-										drawLine(tpx[pi], tpy[pi], tpx[pi + 1], tpy[pi + 1]);
+									/* Re-add points for border */
+									beginPolygon();
+									for (pi = 0; pi < numPoints; pi++) {
+										tpx[0] = send(childName, "getPointX", pi);
+										tpy[0] = send(childName, "getPointY", pi);
+										if (hasTransform == 1) {
+											tx = tpx[0] - shapeAX;
+											ty = tpy[0] - shapeAY;
+											tz = 0;
+											tx = tx * sxVal;
+											ty = ty * syVal;
+											tz = tz * szVal;
+											if (rotYVal > 0.001 || rotYVal < -0.001) {
+												cosRY = cos(rotYVal);
+												sinRY = sin(rotYVal);
+												nx = (tx * cosRY) + (tz * sinRY);
+												nz = ((0 - tx) * sinRY) + (tz * cosRY);
+												tx = nx;
+												tz = nz;
+											}
+											if (rotXVal > 0.001 || rotXVal < -0.001) {
+												cosRX = cos(rotXVal);
+												sinRX = sin(rotXVal);
+												ny = (ty * cosRX) - (tz * sinRX);
+												nz = (ty * sinRX) + (tz * cosRX);
+												ty = ny;
+												tz = nz;
+											}
+											if (rotZVal > 0.001 || rotZVal < -0.001) {
+												cosR = cos(rotZVal);
+												sinR = sin(rotZVal);
+												nx = (tx * cosR) - (ty * sinR);
+												ny = (tx * sinR) + (ty * cosR);
+												tx = nx;
+												ty = ny;
+											}
+											perspD = 500;
+											if (tz > 0.001 || tz < -0.001) {
+												perspScale = perspD / (perspD + tz);
+												tx = tx * perspScale;
+												ty = ty * perspScale;
+											}
+											tpx[0] = int(tx + shapeAX);
+											tpy[0] = int(ty + shapeAY);
+										}
+										addPolygonPoint(tpx[0], tpy[0]);
 									}
-									if (numPoints >= 3) {
-										drawLine(tpx[numPoints - 1], tpy[numPoints - 1], tpx[0], tpy[0]);
-									}
+									endDrawPolygon();
 								}
 							}
 						} else {

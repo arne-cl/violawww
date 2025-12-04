@@ -212,6 +212,22 @@ MethodInfo meths_field[] = {
         meth_field_drawFillPolygon,
     },
     {
+        STR_beginPolygon,
+        meth_field_beginPolygon,
+    },
+    {
+        STR_addPolygonPoint,
+        meth_field_addPolygonPoint,
+    },
+    {
+        STR_endFillPolygon,
+        meth_field_endFillPolygon,
+    },
+    {
+        STR_endDrawPolygon,
+        meth_field_endDrawPolygon,
+    },
+    {
         STR_drawLine,
         meth_field_drawLine,
     },
@@ -626,7 +642,7 @@ long meth_field_drawFillRect(VObj* self, Packet* result, int argc, Packet argv[]
 
 /*
  * drawFillPolygon(x0, y0, x1, y1, ...)
- * Draw filled polygon with variable number of points (3 to 8)
+ * Draw filled polygon with variable number of points (3 to 16)
  * Arguments come in pairs: x0,y0, x1,y1, x2,y2, ...
  */
 long meth_field_drawFillPolygon(VObj* self, Packet* result, int argc, Packet argv[]) {
@@ -650,6 +666,93 @@ long meth_field_drawFillPolygon(VObj* self, Packet* result, int argc, Packet arg
             return 1;
         }
     }
+    return 0;
+}
+
+/*
+ * Polygon buffer for begin/end API - supports unlimited points
+ */
+#define POLYGON_BUFFER_MAX 256
+static int polygon_px[POLYGON_BUFFER_MAX];
+static int polygon_py[POLYGON_BUFFER_MAX];
+static int polygon_npoints = 0;
+
+/*
+ * beginPolygon()
+ * Reset polygon buffer to start defining a new polygon
+ */
+long meth_field_beginPolygon(VObj* self, Packet* result, int argc, Packet argv[]) {
+    polygon_npoints = 0;
+    clearPacket(result);
+    return 1;
+}
+
+/*
+ * addPolygonPoint(x, y)
+ * Add a point to the polygon buffer
+ */
+long meth_field_addPolygonPoint(VObj* self, Packet* result, int argc, Packet argv[]) {
+    if (polygon_npoints < POLYGON_BUFFER_MAX) {
+        polygon_px[polygon_npoints] = (int)PkInfo2Int(&argv[0]);
+        polygon_py[polygon_npoints] = (int)PkInfo2Int(&argv[1]);
+        polygon_npoints++;
+    }
+    clearPacket(result);
+    result->type = PKT_INT;
+    result->info.i = polygon_npoints;
+    return 1;
+}
+
+/*
+ * endFillPolygon()
+ * Draw filled polygon using points from buffer
+ */
+long meth_field_endFillPolygon(VObj* self, Packet* result, int argc, Packet argv[]) {
+    clearPacket(result);
+    if (polygon_npoints < 3) {
+        return 0;
+    }
+    if (GET_window(self)) {
+        if (GET__classInfo(self) != &class_glass) {
+            GLPrepareObjColor(self);
+            GLDrawFillPolygon(GET_window(self), polygon_px, polygon_py, polygon_npoints);
+            polygon_npoints = 0;
+            return 1;
+        }
+    }
+    polygon_npoints = 0;
+    return 0;
+}
+
+/*
+ * endDrawPolygon()
+ * Draw polygon outline using points from buffer
+ */
+long meth_field_endDrawPolygon(VObj* self, Packet* result, int argc, Packet argv[]) {
+    int i;
+    clearPacket(result);
+    if (polygon_npoints < 2) {
+        return 0;
+    }
+    if (GET_window(self)) {
+        if (GET__classInfo(self) != &class_glass) {
+            GLPrepareObjColor(self);
+            for (i = 0; i < polygon_npoints - 1; i++) {
+                GLDrawLine(GET_window(self), 
+                    polygon_px[i], polygon_py[i],
+                    polygon_px[i+1], polygon_py[i+1]);
+            }
+            /* Close the polygon */
+            if (polygon_npoints >= 3) {
+                GLDrawLine(GET_window(self),
+                    polygon_px[polygon_npoints-1], polygon_py[polygon_npoints-1],
+                    polygon_px[0], polygon_py[0]);
+            }
+            polygon_npoints = 0;
+            return 1;
+        }
+    }
+    polygon_npoints = 0;
     return 0;
 }
 
