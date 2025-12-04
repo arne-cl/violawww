@@ -38,7 +38,7 @@ Wei's proposal was an independent parallel effort, not an implementation of VRML
 | Feature | Status |
 |---------|--------|
 | Container (`<GRAPHICS>`) | ✅ Implemented |
-| Primitives (RECT, CIRCLE, OVAL, LINE, POLYGON) | ✅ Implemented |
+| Primitives (RECT, SQUARE, CIRCLE, OVAL, LINE, POLYGON) | ✅ Implemented |
 | Position (`<POS>`) | ✅ Implemented |
 | Size (`<SIZE>`) | ✅ Implemented |
 | Colors (FGCOLOR, BGCOLOR, BDCOLOR) | ✅ Implemented |
@@ -99,6 +99,34 @@ A rectangle shape.
   <FGCOLOR NAME="blue"></FGCOLOR>
   <BDCOLOR NAME="red"></BDCOLOR>
 </RECT>
+```
+
+#### `<SQUARE>`
+A square shape (equal width and height). From the original Proto-VRML specification.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `ID` | string | Unique identifier |
+| `NAME` | string | Object name |
+
+**Example:**
+```html
+<SQUARE ID="sq1">
+  <POS X=20 Y=20></POS>
+  <SIZE X=60 Y=60></SIZE>
+  <FGCOLOR NAME="blue"></FGCOLOR>
+  <BDCOLOR NAME="red"></BDCOLOR>
+</SQUARE>
+```
+
+**With rotation:**
+```html
+<SQUARE ID="sq2">
+  <POS X=100 Y=30></POS>
+  <SIZE X=50 Y=50></SIZE>
+  <FGCOLOR NAME="yellow"></FGCOLOR>
+  <ROT Z=45>
+</SQUARE>
 ```
 
 #### `<CIRCLE>`
@@ -531,7 +559,6 @@ The `SC` attribute for broadcasting state changes to other viewers is not implem
 ### Other Tags
 
 - `<TEXT>` — text within graphics (use button LABEL for now)
-- `<SQUARE>` — use `<RECT>` with equal width/height instead
 
 ---
 

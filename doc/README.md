@@ -77,7 +77,7 @@ This was Wei's independent proposal for SGML-based 3D graphics, developed around
 
 Topics covered:
 - Container: `<GRAPHICS>` with WIDTH, HEIGHT
-- Primitives: `<RECT>`, `<CIRCLE>`, `<OVAL>`, `<LINE>`, `<POLYGON>`, `<POINT>`
+- Primitives: `<RECT>`, `<SQUARE>`, `<CIRCLE>`, `<OVAL>`, `<LINE>`, `<POLYGON>`, `<POINT>`
 - Transformations: `<POS>`, `<SIZE>`, `<ROT>` (X/Y/Z with perspective), `<SCALE>`, `<AXIS>`
 - Appearance: `<FGCOLOR>`, `<BGCOLOR>`, `<BDCOLOR>`
 - Interactive: `<BUTTON>` with LABEL, HREF, HINT, colors
