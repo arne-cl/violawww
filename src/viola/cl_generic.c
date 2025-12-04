@@ -50,8 +50,7 @@
 #include <ctype.h>
 
 /* For isURLVisited - access to document history */
-#include "../vw/vw.h"
-#include "../vw/history.h"
+#include "history_api.h"
 #include <math.h>
 #include <stdlib.h>
 #include <sys/file.h>
@@ -344,6 +343,7 @@ MethodInfo meths_generic[] = {
     {STR_setLinkColor, meth_generic_setLinkColor},
     {STR_setLinkVisitedColor, meth_generic_setLinkVisitedColor},
     {STR_resetLinkColors, meth_generic_resetLinkColors},
+    {STR_addURLToHistory, meth_generic_addURLToHistory},
     {STR_seta, meth_generic_set},
     {STR_setMouse, meth_generic_setMouse},
     {STR_setResource, meth_generic_setResource},
@@ -4181,7 +4181,7 @@ long meth_generic_sendToInterface(VObj* self, Packet* result, int argc, Packet a
  */
 long meth_generic_isURLVisited(VObj* self, Packet* result, int argc, Packet argv[]) {
     char* url;
-    DocViewInfo* dvi;
+    void* dvi;
     
     clearPacket(result);
     result->type = PKT_INT;
@@ -4199,13 +4199,18 @@ long meth_generic_isURLVisited(VObj* self, Packet* result, int argc, Packet argv
     if (docViews) {
         Box* bp = docViews;
         while (bp) {
-            dvi = (DocViewInfo*)bp->data;
+            dvi = bp->data;
             if (dvi && isURLInHistory(dvi, url)) {
                 result->info.i = 1;
                 return 1;
             }
             bp = bp->next;
         }
+    }
+    
+    /* For standalone viola, check file-based history */
+    if (isURLInHistory(NULL, url)) {
+        result->info.i = 1;
     }
     
     return 1;
@@ -4276,6 +4281,36 @@ long meth_generic_resetLinkColors(VObj* self, Packet* result, int argc, Packet a
     result->info.i = 1;
     
     GLResetLinkColors();
+    
+    return 1;
+}
+
+/*
+ * addURLToHistory(url)
+ *
+ * Add URL to browsing history.
+ * In VW mode, this is a no-op (VW handles history via message handlers).
+ * In standalone viola, this persists to ~/.viola_history.
+ */
+long meth_generic_addURLToHistory(VObj* self, Packet* result, int argc, Packet argv[]) {
+    char* url;
+    
+    clearPacket(result);
+    result->type = PKT_INT;
+    result->canFree = 0;
+    result->info.i = 0;
+    
+    if (argc < 1)
+        return 1;
+    
+    url = PkInfo2Str(&argv[0]);
+    if (url && *url) {
+        /* In standalone mode (docViews is NULL), persist to file */
+        if (!docViews) {
+            addURLToStandaloneHistory(url);
+        }
+        result->info.i = 1;
+    }
     
     return 1;
 }

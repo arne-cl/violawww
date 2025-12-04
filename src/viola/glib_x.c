@@ -2340,8 +2340,8 @@ int GLSetFGColor(VObj* self, char* colorname)
 /* Reset link colors to default (black) - called when stylesheet is loaded */
 void GLResetLinkColors(void)
 {
-    XSetForeground(display, gc_link, FGPixel);
-    XSetForeground(display, gc_link_visited, FGPixel);
+    XSetForeground(display, gc_link, DefaultFGPixel);
+    XSetForeground(display, gc_link_visited, DefaultFGPixel);
 }
 
 /* Set color for unvisited links from STG stylesheet */

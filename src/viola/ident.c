@@ -1227,6 +1227,8 @@ strNIntPair symList[] = {STR_BCard,
                          "setLinkVisitedColor", /* Set color for visited links */
                          STR_resetLinkColors,
                          "resetLinkColors", /* Reset link colors to default */
+                         STR_addURLToHistory,
+                         "addURLToHistory", /* Add URL to history (for standalone) */
                          0,
                          NULL};
 

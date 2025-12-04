@@ -30,4 +30,5 @@ examples/
 # macOS
 .DS_Store
 **/.DS_Store
+*.dSYM/
 *.log

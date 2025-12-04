@@ -620,6 +620,7 @@ enum {
     STR_setLinkColor, /* Set color for unvisited links */
     STR_setLinkVisitedColor, /* Set color for visited links */
     STR_resetLinkColors, /* Reset link colors to default (black) */
+    STR_addURLToHistory, /* Add URL to history (for standalone viola) */
     STR_LAST_OF_THE_PREDEFINED
 };
 

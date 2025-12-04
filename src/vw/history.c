@@ -28,6 +28,7 @@
 #include <Xm/Xm.h>
 
 #include "../viola/cexec.h"
+#include "../libWWW/HTParse.h"
 #include "callbacks.h"
 #include "cursor.h"
 #include "history.h"
@@ -128,31 +129,46 @@ void historySelect(DocViewInfo* dvi, char* url) {
 
 int isURLInHistory(DocViewInfo* dvi, char* url) {
     int i;
-    size_t urlLen, histLen;
+    char* canonicalURL;
+    char* canonicalHist;
     
     if (!dvi || !url || !dvi->historyList)
         return 0;
-    
-    urlLen = strlen(url);
     
     for (i = 0; i < dvi->nHistoryItems; i++) {
         if (!dvi->historyList[i])
             continue;
             
-        /* Exact match */
+        /* Exact match first (fast path) */
         if (!strcmp(url, dvi->historyList[i])) {
             return 1;
         }
         
-        /* For relative URLs, check if history entry ends with the URL */
-        /* e.g. url="page.html" matches "file://host/path/page.html" */
-        histLen = strlen(dvi->historyList[i]);
-        if (histLen > urlLen) {
-            char* suffix = dvi->historyList[i] + histLen - urlLen;
-            /* Check that URL matches the end and is preceded by '/' */
-            if (!strcmp(url, suffix) && *(suffix - 1) == '/') {
+        /* Try to resolve url relative to history entry as base.
+         * If url is "page.html" and history has "http://example.com/dir/index.html",
+         * HTParse will produce "http://example.com/dir/page.html".
+         * Then check if that matches any history entry.
+         */
+        canonicalURL = HTParse(url, dvi->historyList[i], PARSE_ALL);
+        if (canonicalURL) {
+            /* Simplify the URL (resolve ../ and ./) */
+            HTSimplify(canonicalURL);
+            
+            /* Check if the canonical URL matches any history entry */
+            if (!strcmp(canonicalURL, dvi->historyList[i])) {
+                free(canonicalURL);
                 return 1;
             }
+            
+            /* Also check against all other history entries */
+            int j;
+            for (j = 0; j < dvi->nHistoryItems; j++) {
+                if (dvi->historyList[j] && !strcmp(canonicalURL, dvi->historyList[j])) {
+                    free(canonicalURL);
+                    return 1;
+                }
+            }
+            free(canonicalURL);
         }
     }
     return 0;
@@ -391,4 +407,13 @@ void setHistoryListMH(char* arg[], int argc, void* clientData) {
         return;
 
     setHistoryList(dvip, (char**)&arg[2], argc - 2);
+}
+
+/*
+ * Stub for standalone viola's persistent history function.
+ * In VW mode, history is managed via message handlers, so this is a no-op.
+ */
+void addURLToStandaloneHistory(const char* url) {
+    (void)url;
+    /* No-op in VW mode - history is handled by historyAdd() */
 }

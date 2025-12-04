@@ -1865,9 +1865,9 @@ if (isURLVisited("http://www.example.com/page.html")) {
 }
 ```
 
-**Note:** In standalone Viola (without the VW Motif interface), this function always returns 0 since there is no persistent browsing history.
+**Note:** In standalone Viola (without the VW Motif interface), this function checks `~/.viola_history` for visited URLs. Use `addURLToHistory()` to add URLs to the persistent history.
 
-**See also:** `traversedForegroundColor` in STG_REFERENCE.md
+**See also:** `addURLToHistory`, `traversedForegroundColor` in STG_REFERENCE.md
 
 ---
 
@@ -1925,6 +1925,27 @@ setLinkColor("blue");  /* Now unvisited links are blue, visited remain black */
 ```
 
 **See also:** `setLinkColor`, `setLinkVisitedColor`
+
+---
+
+### addURLToHistory(url)
+Adds a URL to the browsing history.
+
+In VW mode (with the Motif GUI), this is a no-op because history is managed through the VW message handler system. In standalone viola, this persists the URL to `~/.viola_history` file, enabling visited link detection across sessions.
+
+**Parameters:**
+- `url` (string) - the URL to add to history
+
+**Returns:** (int) 1 on success, 0 on failure
+
+**Example:**
+```
+addURLToHistory("http://www.example.com/page.html");
+```
+
+**Note:** In standalone viola, URLs are stored in `~/.viola_history` (one URL per line, max 4096 entries). This enables `isURLVisited()` to detect previously visited links.
+
+**See also:** `isURLVisited`
 
 ---
 
