@@ -557,7 +557,7 @@
 									set("FGColor", "black");
 								}
 								if (hasTransform == 1) {
-									drawTextTransformed(shapeX, shapeY, 1, textStr, rotZVal, sxVal, syVal);
+									drawTextTransformed(shapeX, shapeY, 1, textStr, rotZVal, sxVal, syVal, shapeAX, shapeAY);
 								} else {
 									drawText(shapeX, shapeY, 1, textStr);
 								}

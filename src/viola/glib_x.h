@@ -263,9 +263,9 @@ int GLPaintTextLength(Window, GC, int, int, int, char*, int);
     GLPaintTextLength(w, gc_invert, fontID, x0, y0, str, length)
 
 /* Transformed text (with rotation and scaling via XRender) */
-int GLPaintTextTransformed(Window, GC, int, int, int, char*, double, double, double);
-#define GLDrawTextTransformed(w, fontID, x0, y0, str, rotZ, scaleX, scaleY) \
-    GLPaintTextTransformed(w, gc_fg, fontID, x0, y0, str, rotZ, scaleX, scaleY)
+int GLPaintTextTransformed(Window, GC, int, int, int, char*, double, double, double, int, int);
+#define GLDrawTextTransformed(w, fontID, x0, y0, str, rotZ, scaleX, scaleY, axisX, axisY) \
+    GLPaintTextTransformed(w, gc_fg, fontID, x0, y0, str, rotZ, scaleX, scaleY, axisX, axisY)
 
 /* bitmap
  */

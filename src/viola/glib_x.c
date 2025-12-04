@@ -1548,11 +1548,11 @@ int GLPaintTextLength(Window w, GC gc, int fontID, int x0, int y0, char* str, in
 /*
  * GLPaintTextTransformed - Draw text with rotation and scaling using XRender
  * rotZ is in degrees, scaleX/scaleY are scale factors (1.0 = normal)
- * Note: XRender scaling has issues with transparency, so we only use it for rotation.
- * For scale-only, we just draw normal text (scaling would require different fonts).
+ * axisX/axisY: rotation center (0,0 = use text center)
  */
 int GLPaintTextTransformed(Window w, GC gc, int fontID, int x0, int y0, 
-                           char* str, double rotZ, double scaleX, double scaleY)
+                           char* str, double rotZ, double scaleX, double scaleY,
+                           int axisX, int axisY)
 {
     if (!str || !*str) return 0;
     
@@ -1566,97 +1566,131 @@ int GLPaintTextTransformed(Window w, GC gc, int fontID, int x0, int y0,
         return GLPaintText(w, gc, fontID, x0, y0, str);
     }
     
-    /* For now, fall back to simple text for all transformations
-     * XRender has issues with clipping and transparency */
-    /* TODO: Fix XRender text rotation properly */
-    return GLPaintText(w, gc, fontID, x0, y0, str);
-    
-    /* Create a pixmap to render text into */
+    /* Create a pixmap with alpha channel for rotated text */
     /* For rotated text, we need space for the diagonal */
     double diagonal = sqrt((double)(textWidth * textWidth + textHeight * textHeight));
     double maxScale = (scaleX > scaleY) ? scaleX : scaleY;
-    int pixSize = (int)(diagonal * maxScale) + 40;  /* Extra padding for safety */
-    int pixWidth = pixSize;
-    int pixHeight = pixSize;
-    if (pixWidth < 1) pixWidth = 1;
-    if (pixHeight < 1) pixHeight = 1;
-    if (pixWidth > 2000) pixWidth = 2000;  /* Sanity limit */
-    if (pixHeight > 2000) pixHeight = 2000;
+    int pixSize = (int)(diagonal * maxScale) + 20;
+    if (pixSize < textWidth + 20) pixSize = textWidth + 20;
+    if (pixSize < 1) pixSize = 1;
+    if (pixSize > 500) pixSize = 500;  /* Reasonable limit */
     
-    Pixmap textPix = XCreatePixmap(display, w, pixWidth, pixHeight, screenDepth);
+    /* Find ARGB32 format for alpha support */
+    XRenderPictFormat* argbFormat = XRenderFindStandardFormat(display, PictStandardARGB32);
+    XRenderPictFormat* rgbFormat = XRenderFindVisualFormat(display, 
+        DefaultVisual(display, screenNumber));
+    if (!argbFormat || !rgbFormat) {
+        return GLPaintText(w, gc, fontID, x0, y0, str);  /* Fallback */
+    }
+    
+    /* Create 32-bit pixmap for alpha */
+    Pixmap textPix = XCreatePixmap(display, w, pixSize, pixSize, 32);
     if (!textPix) {
         return GLPaintText(w, gc, fontID, x0, y0, str);  /* Fallback */
     }
     
-    /* Clear pixmap with background (transparent) */
-    XSetForeground(display, gc_bg, 0);  /* Black = transparent for XRender */
-    XFillRectangle(display, textPix, gc_bg, 0, 0, pixWidth, pixHeight);
-    
-    /* Draw text in center of pixmap */
-    int tx = pixWidth / 2 - textWidth / 2;
-    int ty = pixHeight / 2 - textHeight / 2;
-    
-    XTextItem item;
-    item.chars = str;
-    item.nchars = (int)strlen(str);
-    item.delta = 0;
-    item.font = FontFont(fontID);
-    XDrawText(display, textPix, gc, tx, ty + textHeight - FontDescent(fontID), &item, 1);
-    
-    /* Create XRender pictures */
-    XRenderPictFormat* format = XRenderFindVisualFormat(display, 
-        DefaultVisual(display, screenNumber));
-    if (!format) {
-        XFreePixmap(display, textPix);
-        return GLPaintText(w, gc, fontID, x0, y0, str);  /* Fallback */
-    }
-    
+    /* Create picture with ARGB format */
     XRenderPictureAttributes pa;
-    pa.subwindow_mode = IncludeInferiors;
-    
-    Picture srcPic = XRenderCreatePicture(display, textPix, format, 
-                                          CPSubwindowMode, &pa);
-    Picture dstPic = XRenderCreatePicture(display, w, format, 
-                                          CPSubwindowMode, &pa);
-    
-    if (!srcPic || !dstPic) {
-        if (srcPic) XRenderFreePicture(display, srcPic);
-        if (dstPic) XRenderFreePicture(display, dstPic);
+    memset(&pa, 0, sizeof(pa));
+    Picture srcPic = XRenderCreatePicture(display, textPix, argbFormat, 0, &pa);
+    if (!srcPic) {
         XFreePixmap(display, textPix);
-        return GLPaintText(w, gc, fontID, x0, y0, str);  /* Fallback */
+        return GLPaintText(w, gc, fontID, x0, y0, str);
     }
     
-    /* Build transformation matrix */
-    /* XRender uses fixed-point 16.16 format */
+    /* Clear to transparent (alpha=0) */
+    XRenderColor transColor = {0, 0, 0, 0};
+    XRenderFillRectangle(display, PictOpSrc, srcPic, &transColor, 0, 0, pixSize, pixSize);
+    
+    /* Get current foreground color for text */
+    XGCValues gcv;
+    XGetGCValues(display, gc, GCForeground, &gcv);
+    XColor xcolor;
+    xcolor.pixel = gcv.foreground;
+    XQueryColor(display, DefaultColormap(display, screenNumber), &xcolor);
+    
+    /* Draw text as solid color with full alpha */
+    XRenderColor textColor;
+    textColor.red = xcolor.red;
+    textColor.green = xcolor.green;
+    textColor.blue = xcolor.blue;
+    textColor.alpha = 0xFFFF;
+    
+    /* Create a solid color picture for the text color */
+    XRenderPictureAttributes solidPa;
+    solidPa.repeat = True;
+    Pixmap solidPix = XCreatePixmap(display, w, 1, 1, 32);
+    Picture solidPic = XRenderCreatePicture(display, solidPix, argbFormat, CPRepeat, &solidPa);
+    XRenderFillRectangle(display, PictOpSrc, solidPic, &textColor, 0, 0, 1, 1);
+    
+    /* Create 1-bit mask from text */
+    Pixmap maskPix = XCreatePixmap(display, w, pixSize, pixSize, 1);
+    GC maskGC = XCreateGC(display, maskPix, 0, NULL);
+    XSetForeground(display, maskGC, 0);
+    XFillRectangle(display, maskPix, maskGC, 0, 0, pixSize, pixSize);
+    XSetForeground(display, maskGC, 1);
+    
+    /* Draw text into mask, centered */
+    int tx = pixSize / 2 - textWidth / 2;
+    int ty = pixSize / 2 - textHeight / 2 + textHeight - FontDescent(fontID);
+    XSetFont(display, maskGC, FontFont(fontID));
+    XDrawString(display, maskPix, maskGC, tx, ty, str, strlen(str));
+    XFreeGC(display, maskGC);
+    
+    /* Create mask picture (A1 format) */
+    XRenderPictFormat* a1Format = XRenderFindStandardFormat(display, PictStandardA1);
+    Picture maskPicture = XRenderCreatePicture(display, maskPix, a1Format, 0, NULL);
+    
+    /* Composite: solid color through text mask onto srcPic */
+    XRenderComposite(display, PictOpOver, solidPic, maskPicture, srcPic,
+                     0, 0, 0, 0, 0, 0, pixSize, pixSize);
+    
+    XRenderFreePicture(display, solidPic);
+    XRenderFreePicture(display, maskPicture);
+    XFreePixmap(display, solidPix);
+    XFreePixmap(display, maskPix);
+    
+    /* Now apply rotation transform to srcPic */
+    /* Rotation around axis point, or center if axis not specified */
     double radians = rotZ * M_PI / 180.0;
     double cosR = cos(radians);
     double sinR = sin(radians);
+    double cx, cy;
+    if (axisX != 0 || axisY != 0) {
+        /* Use axis relative to text position */
+        cx = axisX - x0 + pixSize / 2.0;
+        cy = axisY - y0 + pixSize / 2.0;
+    } else {
+        /* Default: center of pixmap (center of text) */
+        cx = pixSize / 2.0;
+        cy = pixSize / 2.0;
+    }
+    
+    /* Transform: translate to origin, rotate, translate back */
+    /* Combined matrix for rotation around (cx,cy):
+     * [cosR, sinR, cx - cx*cosR - cy*sinR]
+     * [-sinR, cosR, cy + cx*sinR - cy*cosR]
+     * [0, 0, 1]
+     */
+    double trX = cx - cx * cosR - cy * sinR;
+    double trY = cy + cx * sinR - cy * cosR;
     
     XTransform xform = {{
-        { XDoubleToFixed(cosR / scaleX), XDoubleToFixed(sinR / scaleX), XDoubleToFixed(0) },
-        { XDoubleToFixed(-sinR / scaleY), XDoubleToFixed(cosR / scaleY), XDoubleToFixed(0) },
+        { XDoubleToFixed(cosR), XDoubleToFixed(sinR), XDoubleToFixed(trX) },
+        { XDoubleToFixed(-sinR), XDoubleToFixed(cosR), XDoubleToFixed(trY) },
         { XDoubleToFixed(0), XDoubleToFixed(0), XDoubleToFixed(1) }
     }};
-    
     XRenderSetPictureTransform(display, srcPic, &xform);
     
-    /* Composite to destination - position so text center lands at x0,y0 */
+    /* Create destination picture */
+    Picture dstPic = XRenderCreatePicture(display, w, rgbFormat, 0, NULL);
+    
+    /* Composite rotated text to destination - center at x0, y0 */
     int destX = x0 - pixSize / 2;
     int destY = y0 - pixSize / 2;
     
-    /* Clamp to avoid negative coords causing clipping issues */
-    int srcX = 0, srcY = 0;
-    if (destX < 0) {
-        srcX = -destX;
-        destX = 0;
-    }
-    if (destY < 0) {
-        srcY = -destY;
-        destY = 0;
-    }
-    
     XRenderComposite(display, PictOpOver, srcPic, None, dstPic,
-                     srcX, srcY, 0, 0, destX, destY, pixWidth, pixHeight);
+                     0, 0, 0, 0, destX, destY, pixSize, pixSize);
     
     /* Cleanup */
     XRenderFreePicture(display, srcPic);
@@ -1665,6 +1699,7 @@ int GLPaintTextTransformed(Window w, GC gc, int fontID, int x0, int y0,
     
     return 1;
 }
+/* End of GLPaintTextTransformed */
 
 /*
 ** bitmap

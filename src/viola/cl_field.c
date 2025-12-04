@@ -866,10 +866,10 @@ long meth_field_drawText(VObj* self, Packet* result, int argc, Packet argv[]) {
 }
 
 /*
- * drawTextTransformed(x, y, fontID, text, rotZ, scaleX, scaleY)
+ * drawTextTransformed(x, y, fontID, text, rotZ, scaleX, scaleY, axisX, axisY)
  */
 long meth_field_drawTextTransformed(VObj* self, Packet* result, int argc, Packet argv[]) {
-    int x0, y0, fontID;
+    int x0, y0, fontID, axisX, axisY;
     double rotZ, scaleX, scaleY;
     
     x0 = (int)PkInfo2Int(&argv[0]);
@@ -878,13 +878,15 @@ long meth_field_drawTextTransformed(VObj* self, Packet* result, int argc, Packet
     rotZ = PkInfo2Flt(&argv[4]);
     scaleX = PkInfo2Flt(&argv[5]);
     scaleY = PkInfo2Flt(&argv[6]);
+    axisX = (argc > 7) ? (int)PkInfo2Int(&argv[7]) : 0;
+    axisY = (argc > 8) ? (int)PkInfo2Int(&argv[8]) : 0;
 
     clearPacket(result);
     if (GET_window(self) && GET_visible(self)) {
         if (GET__classInfo(self) != &class_glass) {
             GLPrepareObjColor(self);
             GLDrawTextTransformed(GET_window(self), fontID, x0, y0, 
-                                  PkInfo2Str(&argv[3]), rotZ, scaleX, scaleY);
+                                  PkInfo2Str(&argv[3]), rotZ, scaleX, scaleY, axisX, axisY);
             return 1;
         }
     }
