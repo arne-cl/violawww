@@ -5,8 +5,11 @@
 		return 0;
 	break;
 	case "D":
-		/* Send color to parent (GRAPHICS container) */
+		/* Send color to parent primitive or GRAPHICS container */
 		p = parent();
+		if (p == "" || p == "0" || p == "(NULL)") {
+			p = send("HTML_button", "getCurrentPrimitive");
+		}
 		if (p == "" || p == "0" || p == "(NULL)") {
 			p = send("HTML_graphics", "getCurrentGfx");
 		}

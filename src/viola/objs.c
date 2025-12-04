@@ -5406,6 +5406,34 @@ static SlotStruct objDesc_HTML_axis[] = {
     {(char*)0, (char*)0},
 };
 
+static char _slotValue_HTML_button0[] = "field";
+static char _slotValue_HTML_button1[] = "HTML_button";
+static char _slotValue_HTML_button2[] = {
+#include "embeds/HTML_button_script.v.h"
+};
+/* END OF FILE */
+
+static SlotStruct objDesc_HTML_button[] = {
+    {"class", _slotValue_HTML_button0},
+    {"name", _slotValue_HTML_button1},
+    {"script", _slotValue_HTML_button2},
+    {(char*)0, (char*)0},
+};
+
+static char _slotValue_HTML_hint0[] = "field";
+static char _slotValue_HTML_hint1[] = "HTML_hint";
+static char _slotValue_HTML_hint2[] = {
+#include "embeds/HTML_hint_script.v.h"
+};
+/* END OF FILE */
+
+static SlotStruct objDesc_HTML_hint[] = {
+    {"class", _slotValue_HTML_hint0},
+    {"name", _slotValue_HTML_hint1},
+    {"script", _slotValue_HTML_hint2},
+    {(char*)0, (char*)0},
+};
+
 /* === End of Proto-VRML Graphics Objects === */
 
 static char _slotValue_HTML_head0[] = "field";
@@ -6068,7 +6096,7 @@ static SlotStruct objDesc_HTML_ititle[] = {
     {(char*)0, (char*)0},
 };
 
-static char _slotValue_HTML_label0[] = "txtDisp";
+static char _slotValue_HTML_label0[] = "field";
 static char _slotValue_HTML_label1[] = "HTML_label";
 static char _slotValue_HTML_label2[] = {
 #include "embeds/HTML_label_script.v.h"
@@ -7466,6 +7494,10 @@ ObjsNamesStruct objsNames[] = {"HTML__box.v",
                                objDesc_HTML_scale,
                                "HTML_axis.v",
                                objDesc_HTML_axis,
+                               "HTML_button.v",
+                               objDesc_HTML_button,
+                               "HTML_hint.v",
+                               objDesc_HTML_hint,
                                "HTML_head.v",
                                objDesc_HTML_head,
                                "HTML_header_big.v",

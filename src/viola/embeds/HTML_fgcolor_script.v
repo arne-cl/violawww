@@ -22,6 +22,9 @@
 		if (p == "" || p == "0" || p == "(NULL)") {
 			p = send("HTML_polygon", "getCurrentPrimitive");
 		}
+		if (p == "" || p == "0" || p == "(NULL)") {
+			p = send("HTML_button", "getCurrentPrimitive");
+		}
 		if (p != "" && p != "0" && p != "(NULL)") {
 			if (colorName != "") {
 				send(p, "setFGColor", colorName);

@@ -23,6 +23,9 @@
 		if (p == "" || p == "0" || p == "(NULL)") {
 			p = send("HTML_polygon", "getCurrentPrimitive");
 		}
+		if (p == "" || p == "0" || p == "(NULL)") {
+			p = send("HTML_button", "getCurrentPrimitive");
+		}
 		if (p != "" && p != "0" && p != "(NULL)") {
 			send(p, "setPos", posX, posY);
 		}

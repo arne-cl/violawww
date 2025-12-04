@@ -378,14 +378,47 @@
 									}
 									drawFillOval(shapeX, shapeY, shapeX + shapeW, shapeY + shapeH);
 								}
-								if (shapeType == "line") {
-									drawLine(shapeX, shapeY, shapeX + shapeW, shapeY + shapeH);
+							if (shapeType == "line") {
+								drawLine(shapeX, shapeY, shapeX + shapeW, shapeY + shapeH);
+							}
+							if (shapeType == "button") {
+								/* Draw button with 3D effect */
+								btnBG = send(childName, "getBG");
+								btnLabel = send(childName, "getLabel");
+								/* Button background */
+								if (btnBG != "" && btnBG != "0") {
+									set("FGColor", btnBG);
+								} else {
+									set("FGColor", "#d0d0d0");
+								}
+								drawFillRect(shapeX, shapeY, shapeX + shapeW, shapeY + shapeH);
+								/* Top and left highlight (light) */
+								set("FGColor", "#ffffff");
+								drawLine(shapeX, shapeY, shapeX + shapeW, shapeY);
+								drawLine(shapeX, shapeY, shapeX, shapeY + shapeH);
+								/* Bottom and right shadow (dark) */
+								set("FGColor", "#808080");
+								drawLine(shapeX, shapeY + shapeH, shapeX + shapeW, shapeY + shapeH);
+								drawLine(shapeX + shapeW, shapeY, shapeX + shapeW, shapeY + shapeH);
+								/* Label text */
+								if (btnLabel != "" && btnLabel != "0") {
+									if (shapeFG != "" && shapeFG != "0") {
+										set("FGColor", shapeFG);
+									} else {
+										set("FGColor", "black");
+									}
+									/* Center text in button: drawText(x, y, size, text) */
+									/* Y is baseline, so use middle of button */
+									textX = shapeX + 6;
+									textY = shapeY + (shapeH / 2) + 4;
+									drawText(textX, textY, 1, btnLabel);
 								}
 							}
 						}
 					}
 				}
 			}
+		}
 		return;
 	break;
 	case "D":

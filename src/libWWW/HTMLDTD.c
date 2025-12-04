@@ -120,7 +120,9 @@ static attr author_attr[] = {{"HREF"}, {0}};
 
 static attr base_attr[] = {{"HREF"}, {0}};
 
-static attr button_attr[] = {{"HREF"}, {"ID"}, {"NAME"}, {0}};
+static attr button_attr[] = {{"HINT"}, {"HREF"}, {"ID"}, {"LABEL"}, {"NAME"}, {0}};
+#undef HTML_BUTTON_ATTRIBUTES
+#define HTML_BUTTON_ATTRIBUTES 5
 
 static attr changed_attr[] = {{"ID"}, {"IDREF"}, {0}};
 
@@ -433,7 +435,7 @@ static HTTag tags[] = {
     {"KBD", no_attr, 0, SGML_MIXED, style_validSubElements, style_validSubElementsCount},
     {"KEY", no_attr, 0, SGML_MIXED, 0, 0},
     {"L", l_attr, HTML_L_ATTRIBUTES, SGML_MIXED, l_validSubElements, l_validSubElementsCount},
-    {"LABEL", no_attr, 0, SGML_MIXED, 0, 0},
+    {"LABEL", no_attr, 0, SGML_CDATA, 0, 0},
     {"LI", shared_list_attr, 1, SGML_MIXED, li_validSubElements, li_validSubElementsCount},
     {"LINE", line_attr, HTML_LINE_ATTRIBUTES, SGML_MIXED, 0, 0},
     {"LINK", link_attr, HTML_LINK_ATTRIBUTES, SGML_EMPTY, 0, 0},

@@ -160,10 +160,10 @@ SIZE		HTML_size		0 0 0 1 0		0 0 0 0\n\
 FGCOLOR		HTML_fgcolor		0 0 0 1 0		0 0 0 0\n\
 BDCOLOR		HTML_bdcolor		0 0 0 1 0		0 0 0 0\n\
 BGCOLOR		HTML_bgcolor		0 0 0 1 0		0 0 0 0\n\
-#proto-vrml (not yet implemented)\n\
+#proto-vrml\n\
 AXIS 		HTML_axis		0 0 0 1 0		0 0 0 0\n\
-BUTTON 		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
-HINT		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
+BUTTON 		HTML_button		0 0 0 1 0		0 0 0 0\n\
+HINT		HTML_hint		0 0 0 1 0		0 0 0 0\n\
 ROT		HTML_rot		0 0 0 1 0		0 0 0 0\n\
 SCALE		HTML_scale		0 0 0 1 0		0 0 0 0\n\
 TEXT		HTML_ignore		1 0 0 0 0		0 0 0 0\n\
