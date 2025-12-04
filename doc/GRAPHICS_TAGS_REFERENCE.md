@@ -46,7 +46,9 @@ Wei's proposal was an independent parallel effort, not an implementation of VRML
 | 3D Rotation (`<ROT X=...>`, `<ROT Y=...>`) | ✅ Implemented with perspective |
 | Scale (`<SCALE>`) | ✅ Implemented |
 | Axis (`<AXIS>`) | ✅ Implemented |
-| Interactive scripting (`<ACTION>`, `<BUTTON>`) | ❌ Not implemented |
+| Button (`<BUTTON>`) | ✅ Implemented (visual, click, HREF) |
+| Hint (`<HINT>`) | ⚠️ Stored only (no tooltip display) |
+| Interactive scripting (`<ACTION>`, `<SCRIPT>`) | ❌ Not implemented |
 | Multi-user sync (`SC` attribute) | ❌ Not implemented |
 
 ---
@@ -309,6 +311,58 @@ Border color of a shape.
 
 ---
 
+### Interactive Elements
+
+#### `<BUTTON>`
+A clickable button within the graphics container.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `ID` | string | Unique identifier |
+| `NAME` | string | Object name |
+| `LABEL` | string | Button text |
+| `HINT` | string | Tooltip text (stored, not displayed) |
+| `HREF` | string | URL to load when clicked |
+
+The button renders with a 3D effect (raised appearance) and "depresses" when clicked.
+
+**Example:**
+```html
+<BUTTON ID="btn1" LABEL="Click Me" HINT="This is a tooltip">
+  <POS X=10 Y=10></POS>
+  <SIZE X=100 Y=30></SIZE>
+</BUTTON>
+```
+
+**With link:**
+```html
+<BUTTON ID="btnLink" LABEL="Visit Site" HREF="http://example.com">
+  <POS X=10 Y=50></POS>
+  <SIZE X=120 Y=30></SIZE>
+</BUTTON>
+```
+
+**Colored button:**
+```html
+<BUTTON ID="btnColor" LABEL="Green Button">
+  <POS X=10 Y=90></POS>
+  <SIZE X=100 Y=30></SIZE>
+  <BGCOLOR NAME="lightgreen"></BGCOLOR>
+  <FGCOLOR NAME="darkgreen"></FGCOLOR>
+</BUTTON>
+```
+
+#### `<HINT>`
+Tooltip text for a button (child element).
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `TEXT` | string | Hint text |
+
+**Note:** Currently stored but not displayed as tooltip.
+
+---
+
 ## Complete Examples
 
 ### Basic Shapes
@@ -450,10 +504,10 @@ The following features from the original design are **not implemented**:
 
 ### Interactive Scripting
 
-The `<ACTION>`, `<BUTTON>`, and inline `<SCRIPT TYPE="viola">` tags are not implemented. The original design proposed:
+The `<ACTION>` and inline `<SCRIPT TYPE="viola">` tags are not implemented. The original design proposed scripted buttons:
 
 ```html
-<!-- NOT IMPLEMENTED -->
+<!-- NOT IMPLEMENTED: Scripted button -->
 <BUTTON ID="btn">
   <ACTION>
     <SCRIPT TYPE="viola">
@@ -468,14 +522,15 @@ The `<ACTION>`, `<BUTTON>`, and inline `<SCRIPT TYPE="viola">` tags are not impl
 </BUTTON>
 ```
 
+**Note:** Basic `<BUTTON>` with `LABEL` and `HREF` attributes IS implemented — only the scripting part is missing.
+
 ### Multi-User Synchronization
 
 The `SC` attribute for broadcasting state changes to other viewers is not implemented.
 
 ### Other Tags
 
-- `<HINT>` — tooltip text
-- `<TEXT>` — text within graphics
+- `<TEXT>` — text within graphics (use button LABEL for now)
 - `<SQUARE>` — use `<RECT>` with equal width/height instead
 
 ---

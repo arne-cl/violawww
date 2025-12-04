@@ -385,6 +385,10 @@
 								/* Draw button with 3D effect */
 								btnBG = send(childName, "getBG");
 								btnLabel = send(childName, "getLabel");
+								isPressed = 0;
+								if (_pressedButton == childName) {
+									isPressed = 1;
+								}
 								/* Button background */
 								if (btnBG != "" && btnBG != "0") {
 									set("FGColor", btnBG);
@@ -392,14 +396,23 @@
 									set("FGColor", "#d0d0d0");
 								}
 								drawFillRect(shapeX, shapeY, shapeX + shapeW, shapeY + shapeH);
-								/* Top and left highlight (light) */
-								set("FGColor", "#ffffff");
-								drawLine(shapeX, shapeY, shapeX + shapeW, shapeY);
-								drawLine(shapeX, shapeY, shapeX, shapeY + shapeH);
-								/* Bottom and right shadow (dark) */
-								set("FGColor", "#808080");
-								drawLine(shapeX, shapeY + shapeH, shapeX + shapeW, shapeY + shapeH);
-								drawLine(shapeX + shapeW, shapeY, shapeX + shapeW, shapeY + shapeH);
+								if (isPressed == 1) {
+									/* Pressed: dark on top/left, light on bottom/right */
+									set("FGColor", "#606060");
+									drawLine(shapeX, shapeY, shapeX + shapeW, shapeY);
+									drawLine(shapeX, shapeY, shapeX, shapeY + shapeH);
+									set("FGColor", "#ffffff");
+									drawLine(shapeX, shapeY + shapeH, shapeX + shapeW, shapeY + shapeH);
+									drawLine(shapeX + shapeW, shapeY, shapeX + shapeW, shapeY + shapeH);
+								} else {
+									/* Normal: light on top/left, dark on bottom/right */
+									set("FGColor", "#ffffff");
+									drawLine(shapeX, shapeY, shapeX + shapeW, shapeY);
+									drawLine(shapeX, shapeY, shapeX, shapeY + shapeH);
+									set("FGColor", "#808080");
+									drawLine(shapeX, shapeY + shapeH, shapeX + shapeW, shapeY + shapeH);
+									drawLine(shapeX + shapeW, shapeY, shapeX + shapeW, shapeY + shapeH);
+								}
 								/* Label text */
 								if (btnLabel != "" && btnLabel != "0") {
 									if (shapeFG != "" && shapeFG != "0") {
@@ -407,10 +420,16 @@
 									} else {
 										set("FGColor", "black");
 									}
-									/* Center text in button: drawText(x, y, size, text) */
+									/* Center text in button */
 									labelW = textWidth(1, btnLabel);
+									labelH = charHeight(1);
 									textX = shapeX + ((shapeW - labelW) / 2);
-									textY = shapeY + (shapeH / 2) + 5;
+									textY = shapeY + ((shapeH + labelH) / 2) - 3;
+									/* Shift text when pressed */
+									if (isPressed == 1) {
+										textX = textX + 1;
+										textY = textY + 1;
+									}
 									drawText(textX, textY, 1, btnLabel);
 								}
 							}
@@ -488,8 +507,47 @@
 		gHeight = 0;
 		gfxChildCount = 0;
 		_registeredAsCurrent = 0;
+		_pressedButton = "";
 		/* Use document colors */
 		SGMLBuildDoc_setColors();
+		return;
+	break;
+	case "buttonPress":
+		/* Find button under mouse and mark as pressed */
+		mx = arg[1];
+		my = arg[2];
+		for (bi = 0; bi < gfxChildCount; bi++) {
+			btn = gfxChildArr[bi];
+			if (btn != "" && exist(btn) == 1) {
+				if (send(btn, "getShapeType") == "button") {
+					bx = send(btn, "getX");
+					by = send(btn, "getY");
+					bw = send(btn, "getW");
+					bh = send(btn, "getH");
+					if (mx >= bx && mx <= bx + bw && my >= by && my <= bh + by) {
+						_pressedButton = btn;
+						send(self(), "expose");
+						return;
+					}
+				}
+			}
+		}
+		return;
+	break;
+	case "buttonRelease":
+		/* Release button and trigger action */
+		if (_pressedButton != "" && exist(_pressedButton) == 1) {
+			href = send(_pressedButton, "getHref");
+			_pressedButton = "";
+			send(self(), "expose");
+			if (href != "" && href != "0") {
+				loadDoc(href);
+			}
+		}
+		return;
+	break;
+	case "mouseMove":
+		/* Show hint for button under mouse (hint stored but not displayed yet) */
 		return;
 	break;
 	}
