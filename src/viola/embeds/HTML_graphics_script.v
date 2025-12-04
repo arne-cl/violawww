@@ -11,18 +11,9 @@
 	break;
 	case "addChild":
 		/* Child primitive registering itself - store in array */
-		/* Check for duplicates first */
 		childObj = arg[1];
-		isDup = 0;
-		for (di = 0; di < gfxChildCount; di++) {
-			if (gfxChildArr[di] == childObj) {
-				isDup = 1;
-			}
-		}
-		if (isDup == 0) {
-			gfxChildArr[gfxChildCount] = childObj;
-			gfxChildCount = gfxChildCount + 1;
-		}
+		gfxChildArr[gfxChildCount] = childObj;
+		gfxChildCount = gfxChildCount + 1;
 		return;
 	break;
 	case "setCurrentGfx":
@@ -316,10 +307,14 @@
 											tx = tx * perspScale;
 											ty = ty * perspScale;
 										}
-										addPolygonPoint(int(centerX + tx), int(centerY + ty));
-									}
-									/* Draw filled ellipse */
-									endFillPolygon();
+									addPolygonPoint(int(centerX + tx), int(centerY + ty));
+								}
+								/* Set fill color before drawing */
+								if (shapeFG != "" && shapeFG != "0") {
+									set("FGColor", shapeFG);
+								}
+								/* Draw filled ellipse */
+								endFillPolygon();
 									
 									/* Draw border with BDCOLOR if set */
 									shapeBD = send(childName, "getBD");
