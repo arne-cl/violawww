@@ -37,6 +37,8 @@ Wei's proposal was an independent parallel effort, not an implementation of VRML
 
 ---
 
+<img width="636" height="853" src="https://github.com/user-attachments/assets/0252356e-258a-4d4a-a53b-5c601bf10893" />
+
 ## Implementation Status
 
 | Feature | Status |
