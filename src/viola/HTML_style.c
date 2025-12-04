@@ -146,7 +146,7 @@ LABEL		HTML_label		0 0 0 0 0		0 0 0 0\n\
 BYLINE		HTML_byline		0 0 0 0 0		0 0 0 0\n\
 BASE		HTML_base		0 0 0 0 0		0 0 0 0\n\
 CHANGED		HTML_changed		0 0 0 0 0		0 0 0 0\n\
-#proto-vrml graphics (implemented)\n\
+#proto-vrml graphics\n\
 GRAPHICS	HTML_graphics		0 0 0 1 0		5 5 5 5\n\
 RECT		HTML_rect		0 0 0 1 0		0 0 0 0\n\
 CIRCLE 		HTML_circle		0 0 0 1 0		0 0 0 0\n\
@@ -160,7 +160,6 @@ SIZE		HTML_size		0 0 0 1 0		0 0 0 0\n\
 FGCOLOR		HTML_fgcolor		0 0 0 1 0		0 0 0 0\n\
 BDCOLOR		HTML_bdcolor		0 0 0 1 0		0 0 0 0\n\
 BGCOLOR		HTML_bgcolor		0 0 0 1 0		0 0 0 0\n\
-#proto-vrml\n\
 AXIS 		HTML_axis		0 0 0 1 0		0 0 0 0\n\
 BUTTON 		HTML_button		0 0 0 1 0		0 0 0 0\n\
 HINT		HTML_hint		0 0 0 1 0		0 0 0 0\n\
