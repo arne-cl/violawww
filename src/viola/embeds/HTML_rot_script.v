@@ -22,6 +22,9 @@
 		if (p == "" || p == "0" || p == "(NULL)") {
 			p = send("HTML_polygon", "getCurrentPrimitive");
 		}
+		if (p == "" || p == "0" || p == "(NULL)") {
+			p = send("HTML_square", "getCurrentPrimitive");
+		}
 		if (p != "" && p != "0" && p != "(NULL)") {
 			if (hasX == 1) {
 				send(p, "setRotX", myRotX);

@@ -1,29 +1,128 @@
 
 	switch (arg[0]) {
+	case "setCurrentPrimitive":
+		_currentPrimitive = arg[1];
+		return;
+	break;
+	case "getCurrentPrimitive":
+		return _currentPrimitive;
+	break;
+	case "getShapeType":
+		return "square";
+	break;
+	case "getX":
+		return posX;
+	break;
+	case "getY":
+		return posY;
+	break;
+	case "getW":
+		return sizeVal;
+	break;
+	case "getH":
+		return sizeVal;
+	break;
+	case "getFG":
+		return fgColor;
+	break;
+	case "getBD":
+		return bdColor;
+	break;
+	case "getRotX":
+		return _rotX;
+	break;
+	case "getRotY":
+		return _rotY;
+	break;
+	case "getRotZ":
+		return _rotZ;
+	break;
+	case "getRot":
+		return _rotZ;
+	break;
+	case "getScaleX":
+		return _scaleX;
+	break;
+	case "getScaleY":
+		return _scaleY;
+	break;
+	case "getScaleZ":
+		return _scaleZ;
+	break;
+	case "getAxisX":
+		return _axisX;
+	break;
+	case "getAxisY":
+		return _axisY;
+	break;
+	case "getAxisZ":
+		return _axisZ;
+	break;
 	case "expose":
-		print("[SQUARE] expose: drawing at ", posX, ",", posY, " size ", sizeX, "\n");
-		if (sizeX > 0) {
-			if (filled) {
-				drawFillRect(posX, posY, posX + sizeX, posY + sizeX);
+		return;
+	break;
+	case 8:
+		/* End of tag processing - register with parent now */
+		if (_savedParent != "" && _savedParent != "0" && _savedParent != "(NULL)") {
+			if (findPattern(_savedParent, "HTML_graphics") >= 0) {
+				send(_savedParent, "addChild", self());
 			}
-			drawRect(posX, posY, posX + sizeX, posY + sizeX);
 		}
 		return;
 	break;
 	case "D":
-		print("[SQUARE] D: done\n");
-		return 0;
+		/* Register with parent container (fallback) */
+		if (_parentID != "" && _parentID != "0") {
+			parentObj = send("HTML_graphics", "findGfx", _parentID);
+			if (parentObj != "" && parentObj != "0" && exist(parentObj) == 1) {
+				send(parentObj, "addChild", self());
+			}
+		} else {
+			p = _savedParent;
+			if (p == "" || p == "0" || p == "(NULL)") {
+				p = send("HTML_graphics", "getCurrentGfx");
+			}
+			if (p != "" && p != "0" && p != "(NULL)" && findPattern(p, "HTML_graphics") >= 0) {
+				send(p, "addChild", self());
+			}
+		}
+		return 1;
 	break;
 	case "R":
-		print("[SQUARE] R: ignored (inline)\n");
 		return 0;
 	break;
 	case "AA":
-		print("[SQUARE] AA: ", arg[1], "=", arg[2], "\n");
+		/* Register self as current primitive for child tags */
+		send("HTML_square", "setCurrentPrimitive", self());
+		/* Save parent on first attribute */
+		if (_savedParent == "" || _savedParent == "0" || _savedParent == "(NULL)") {
+			_savedParent = parent();
+			if (_savedParent == "" || _savedParent == "0" || _savedParent == "(NULL)") {
+				_savedParent = send("HTML_graphics", "getCurrentGfx");
+			}
+		}
 		switch (arg[1]) {
 		case "ID":
 		case "NAME":
 			tagID = arg[2];
+		break;
+		case "PARENT":
+			_parentID = arg[2];
+		break;
+		case "X":
+			posX = int(arg[2]);
+		break;
+		case "Y":
+			posY = int(arg[2]);
+		break;
+		case "SIZE":
+			sizeVal = int(arg[2]);
+		break;
+		case "FGCOLOR":
+			fgColor = arg[2];
+		break;
+		case "BDCOLOR":
+			bdColor = arg[2];
 		break;
 		}
 		return;
@@ -32,32 +131,73 @@
 		return;
 	break;
 	case "setPos":
-		print("[SQUARE] setPos: ", arg[1], ",", arg[2], "\n");
 		posX = int(arg[1]);
 		posY = int(arg[2]);
 		return;
 	break;
 	case "setSize":
-		/* For SQUARE, use the smaller of X and Y to keep it square */
-		print("[SQUARE] setSize: ", arg[1], ",", arg[2], "\n");
-		sizeX = int(arg[1]);
-		sizeY = int(arg[2]);
-		if (sizeY < sizeX) sizeX = sizeY;
+		/* For SQUARE, use only the first value or smaller of X,Y */
+		sx = int(arg[1]);
+		sy = int(arg[2]);
+		if (sy > 0 && sy < sx) {
+			sizeVal = sy;
+		} else {
+			sizeVal = sx;
+		}
 		return;
 	break;
 	case "setFGColor":
-		print("[SQUARE] setFGColor: ", arg[1], "\n");
-		set("FGColor", arg[1]);
+		fgColor = arg[1];
 		return;
 	break;
 	case "setBDColor":
-		print("[SQUARE] setBDColor: ", arg[1], "\n");
-		set("BDColor", arg[1]);
+		bdColor = arg[1];
 		return;
 	break;
 	case "setFilled":
-		print("[SQUARE] setFilled: ", arg[1], "\n");
 		filled = int(arg[1]);
+		return;
+	break;
+	case "setRotX":
+		_rotX = float(arg[1]);
+		return;
+	break;
+	case "setRotY":
+		_rotY = float(arg[1]);
+		return;
+	break;
+	case "setRotZ":
+		_rotZ = float(arg[1]);
+		return;
+	break;
+	case "setRot":
+		if (isBlank(arg[1]) == 0) {
+			_rotX = float(arg[1]);
+		}
+		if (isBlank(arg[2]) == 0) {
+			_rotY = float(arg[2]);
+		}
+		if (isBlank(arg[3]) == 0) {
+			_rotZ = float(arg[3]);
+		}
+		return;
+	break;
+	case "setScale":
+		_scaleX = float(arg[1]);
+		_scaleY = float(arg[2]);
+		if (isBlank(arg[3]) == 0) {
+			_scaleZ = float(arg[3]);
+		}
+		return;
+	break;
+	case "setAxis":
+		_axisX = int(arg[1]);
+		_axisY = int(arg[2]);
+		if (isBlank(arg[3]) == 0) {
+			_axisZ = int(arg[3]);
+		} else {
+			_axisZ = 0;
+		}
 		return;
 	break;
 	case "config":
@@ -71,16 +211,21 @@
 	break;
 	case "init":
 		usual();
+		_savedParent = parent();
 		posX = 0;
 		posY = 0;
-		sizeX = 0;
-		sizeY = 0;
-		filled = 1;
-		color = getResource("Viola.foreground_doc");
-		if (isBlank(color) == 1) color = "black";
-		set("FGColor", color);
-		set("BDColor", color);
-		print("[SQUARE] init: done\n");
+		sizeVal = 0;
+		fgColor = "black";
+		bdColor = "";
+		_rotX = 0.0;
+		_rotY = 0.0;
+		_rotZ = 0.0;
+		_scaleX = 1.0;
+		_scaleY = 1.0;
+		_scaleZ = 1.0;
+		_axisX = 0;
+		_axisY = 0;
+		_axisZ = 0;
 		return;
 	break;
 	}

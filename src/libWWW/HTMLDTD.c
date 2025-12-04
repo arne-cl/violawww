@@ -333,9 +333,9 @@ static HTMLElement th_validSubElements[] = {
 };
 
 /* Valid children for GRAPHICS container */
-#define graphics_validSubElementsCount 14
+#define graphics_validSubElementsCount 15
 static HTMLElement graphics_validSubElements[] = {
-    HTML_RECT, HTML_CIRCLE, HTML_OVAL, HTML_LINE, HTML_POLYGON, HTML_POINT,
+    HTML_RECT, HTML_SQUARE, HTML_CIRCLE, HTML_OVAL, HTML_LINE, HTML_POLYGON, HTML_POINT,
     HTML_POS, HTML_SIZE, HTML_ROT, HTML_SCALE, HTML_AXIS,
     HTML_FGCOLOR, HTML_BDCOLOR, HTML_BGCOLOR
 };

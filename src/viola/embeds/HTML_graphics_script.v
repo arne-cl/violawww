@@ -423,8 +423,8 @@
 									}
 								
 								/* Draw transformed shape as polygon */
-								if (shapeType == "rect") {
-									/* Draw filled polygon for rotated rect */
+								if (shapeType == "rect" || shapeType == "square") {
+									/* Draw filled polygon for rotated rect/square */
 									drawFillPolygon(cx[0], cy[0], cx[1], cy[1], cx[2], cy[2], cx[3], cy[3]);
 									/* Border with different color if set */
 									if (shapeBD != "" && shapeBD != "0") {
@@ -447,7 +447,7 @@
 									hasBorder = 1;
 								}
 								
-								if (shapeType == "rect") {
+								if (shapeType == "rect" || shapeType == "square") {
 									/* Draw border first if set (outside the fill) */
 									if (hasBorder == 1) {
 										set("FGColor", shapeBD);
