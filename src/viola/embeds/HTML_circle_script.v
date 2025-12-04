@@ -62,18 +62,20 @@
 		return;
 	break;
 	case "D":
-		/* Register with parent container */
-		p = _savedParent;
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_graphics", "getCurrentGfx");
-		}
-		if (p != "" && p != "0" && p != "(NULL)" && findPattern(p, "HTML_graphics") >= 0) {
-			send(p, "addChild", self());
-		}
+		/* Handler D not called for SGML_MIXED tags, registration done in AA */
 		return 1; /* Keep object alive */
 	break;
 	case "R":
 		return 0;
+	break;
+	case 8:
+		/* End of tag processing - register with parent now */
+		if (_savedParent != "" && _savedParent != "0" && _savedParent != "(NULL)") {
+			if (findPattern(_savedParent, "HTML_graphics") >= 0) {
+				send(_savedParent, "addChild", self());
+			}
+		}
+		return;
 	break;
 	case "AA":
 		/* Register self as current primitive for child tags */
