@@ -1566,15 +1566,18 @@ int GLPaintTextTransformed(Window w, GC gc, int fontID, int x0, int y0,
         return GLPaintText(w, gc, fontID, x0, y0, str);
     }
     
-    /* If only scale (no rotation), just draw normal text - 
-     * XRender has issues with transparency for scaling */
-    if (rotZ < 0.001 && rotZ > -0.001) {
-        return GLPaintText(w, gc, fontID, x0, y0, str);
-    }
+    /* For now, fall back to simple text for all transformations
+     * XRender has issues with clipping and transparency */
+    /* TODO: Fix XRender text rotation properly */
+    return GLPaintText(w, gc, fontID, x0, y0, str);
     
     /* Create a pixmap to render text into */
-    int pixWidth = (int)(textWidth * scaleX + textHeight * scaleY) + 10;
-    int pixHeight = (int)(textWidth * scaleX + textHeight * scaleY) + 10;
+    /* For rotated text, we need space for the diagonal */
+    double diagonal = sqrt((double)(textWidth * textWidth + textHeight * textHeight));
+    double maxScale = (scaleX > scaleY) ? scaleX : scaleY;
+    int pixSize = (int)(diagonal * maxScale) + 40;  /* Extra padding for safety */
+    int pixWidth = pixSize;
+    int pixHeight = pixSize;
     if (pixWidth < 1) pixWidth = 1;
     if (pixHeight < 1) pixHeight = 1;
     if (pixWidth > 2000) pixWidth = 2000;  /* Sanity limit */
@@ -1637,12 +1640,23 @@ int GLPaintTextTransformed(Window w, GC gc, int fontID, int x0, int y0,
     
     XRenderSetPictureTransform(display, srcPic, &xform);
     
-    /* Composite to destination */
-    int destX = x0 - pixWidth / 2;
-    int destY = y0 - pixHeight / 2;
+    /* Composite to destination - position so text center lands at x0,y0 */
+    int destX = x0 - pixSize / 2;
+    int destY = y0 - pixSize / 2;
+    
+    /* Clamp to avoid negative coords causing clipping issues */
+    int srcX = 0, srcY = 0;
+    if (destX < 0) {
+        srcX = -destX;
+        destX = 0;
+    }
+    if (destY < 0) {
+        srcY = -destY;
+        destY = 0;
+    }
     
     XRenderComposite(display, PictOpOver, srcPic, None, dstPic,
-                     0, 0, 0, 0, destX, destY, pixWidth, pixHeight);
+                     srcX, srcY, 0, 0, destX, destY, pixWidth, pixHeight);
     
     /* Cleanup */
     XRenderFreePicture(display, srcPic);
