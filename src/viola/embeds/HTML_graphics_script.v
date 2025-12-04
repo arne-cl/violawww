@@ -106,6 +106,10 @@
 						if (shapeType == "polygon") {
 							/* Polygon uses points */
 							numPoints = send(childName, "getPoints");
+							shapeFG = send(childName, "getFG");
+							if (shapeFG != "" && shapeFG != "0") {
+								set("FGColor", shapeFG);
+							}
 							if (numPoints >= 2) {
 								/* Get all points and optionally transform */
 								for (pi = 0; pi < numPoints; pi++) {

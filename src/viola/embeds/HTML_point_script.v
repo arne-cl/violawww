@@ -7,10 +7,13 @@
 	case "D":
 		/* Send point to parent polygon */
 		p = parent();
+		print("[POINT D] parent()=", p, "\n");
 		if (p == "" || p == "0" || p == "(NULL)") {
 			p = send("HTML_polygon", "getCurrentPrimitive");
+			print("[POINT D] getCurrentPrimitive=", p, "\n");
 		}
 		if (p != "" && p != "0" && p != "(NULL)") {
+			print("[POINT D] sending addPoint(", pointX, ",", pointY, ") to ", p, "\n");
 			send(p, "addPoint", pointX, pointY);
 		}
 		return 0;
