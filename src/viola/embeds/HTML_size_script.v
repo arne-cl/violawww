@@ -5,7 +5,6 @@
 		return 0;
 	break;
 	case "AA":
-		print("[SIZE] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "X":
 			sizeX = int(arg[2]);
@@ -13,7 +12,6 @@
 		case "Y":
 			sizeY = int(arg[2]);
 			/* Y is typically last - send to parent now */
-			print("[SIZE] sending setSize to parent: ", sizeX, ",", sizeY, "\n");
 			send(parent(), "setSize", sizeX, sizeY);
 		break;
 		case "Z":
@@ -39,7 +37,6 @@
 		sizeX = 0;
 		sizeY = 0;
 		sizeZ = 0;
-		print("[SIZE] init: done\n");
 		return;
 	break;
 	}

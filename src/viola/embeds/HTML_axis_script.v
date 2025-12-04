@@ -5,7 +5,6 @@
 		return 0;
 	break;
 	case "AA":
-		print("[AXIS] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "X":
 			axisX = int(arg[2]);
@@ -17,12 +16,12 @@
 		break;
 		case "Z":
 			axisZ = int(arg[2]);
+			hasZ = 1;
 		break;
 		}
-		/* Send when we have both X and Y */
+		/* Send whenever we have at least X/Y; Z is optional */
 		if (hasX == 1 && hasY == 1) {
-			print("[AXIS] sending setAxis to parent: ", axisX, ",", axisY, "\n");
-			send(parent(), "setAxis", axisX, axisY);
+			send(parent(), "setAxis", axisX, axisY, axisZ);
 		}
 		return;
 	break;
@@ -45,7 +44,7 @@
 		axisZ = 0;
 		hasX = 0;
 		hasY = 0;
-		print("[AXIS] init: done\n");
+		hasZ = 0;
 		return;
 	break;
 	}

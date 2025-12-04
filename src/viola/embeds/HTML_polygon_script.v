@@ -16,20 +16,38 @@
 	case "getFG":
 		return fgColor;
 	break;
+	case "getBD":
+		return bdColor;
+	break;
+	case "getRotX":
+		return _rotX;
+	break;
+	case "getRotY":
+		return _rotY;
+	break;
+	case "getRotZ":
+		return _rotZ;
+	break;
 	case "getRot":
-		return get("gfxRotZ");
+		return _rotZ;
 	break;
 	case "getScaleX":
-		return get("gfxScaleX");
+		return _scaleX;
 	break;
 	case "getScaleY":
-		return get("gfxScaleY");
+		return _scaleY;
+	break;
+	case "getScaleZ":
+		return _scaleZ;
 	break;
 	case "getAxisX":
-		return get("gfxAxisX");
+		return _axisX;
 	break;
 	case "getAxisY":
-		return get("gfxAxisY");
+		return _axisY;
+	break;
+	case "getAxisZ":
+		return _axisZ;
 	break;
 	case "expose":
 		return;
@@ -37,9 +55,7 @@
 	case "D":
 		/* Register with parent container */
 		p = parent();
-		print("[POLYGON] D: done with ", pointCount, " points, parent=", p, "\n");
 		if (findPattern(p, "HTML_graphics") >= 0) {
-			print("[POLYGON] D: registering with GRAPHICS parent\n");
 			send(p, "addChild", self());
 		}
 		return 1; /* Keep object alive */
@@ -48,7 +64,6 @@
 		return 0;
 	break;
 	case "AA":
-		print("[POLYGON] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "ID":
 		case "NAME":
@@ -61,32 +76,59 @@
 		return;
 	break;
 	case "addPoint":
-		print("[POLYGON] addPoint[", pointCount, "]: ", arg[1], ",", arg[2], "\n");
 		pointsX[pointCount] = int(arg[1]);
 		pointsY[pointCount] = int(arg[2]);
 		pointCount = pointCount + 1;
 		return;
 	break;
 	case "setFGColor":
-		print("[POLYGON] setFGColor: ", arg[1], "\n");
 		fgColor = arg[1];
 		return;
 	break;
+	case "setBDColor":
+		bdColor = arg[1];
+		return;
+	break;
+	case "setRotX":
+		_rotX = float(arg[1]);
+		return;
+	break;
+	case "setRotY":
+		_rotY = float(arg[1]);
+		return;
+	break;
+	case "setRotZ":
+		_rotZ = float(arg[1]);
+		return;
+	break;
 	case "setRot":
-		print("[POLYGON] setRot: ", arg[1], " degrees\n");
-		set("gfxRotZ", arg[1]);
+		if (isBlank(arg[1]) == 0) {
+			_rotX = float(arg[1]);
+		}
+		if (isBlank(arg[2]) == 0) {
+			_rotY = float(arg[2]);
+		}
+		if (isBlank(arg[3]) == 0) {
+			_rotZ = float(arg[3]);
+		}
 		return;
 	break;
 	case "setScale":
-		print("[POLYGON] setScale: ", arg[1], ",", arg[2], "\n");
-		set("gfxScaleX", arg[1]);
-		set("gfxScaleY", arg[2]);
+		_scaleX = float(arg[1]);
+		_scaleY = float(arg[2]);
+		if (isBlank(arg[3]) == 0) {
+			_scaleZ = float(arg[3]);
+		}
 		return;
 	break;
 	case "setAxis":
-		print("[POLYGON] setAxis: ", arg[1], ",", arg[2], "\n");
-		set("gfxAxisX", arg[1]);
-		set("gfxAxisY", arg[2]);
+		_axisX = int(arg[1]);
+		_axisY = int(arg[2]);
+		if (isBlank(arg[3]) == 0) {
+			_axisZ = int(arg[3]);
+		} else {
+			_axisZ = 0;
+		}
 		return;
 	break;
 	case "config":
@@ -102,7 +144,16 @@
 		usual();
 		pointCount = 0;
 		fgColor = "black";
-		print("[POLYGON] init: done\n");
+		bdColor = "";
+		_rotX = 0.0;
+		_rotY = 0.0;
+		_rotZ = 0.0;
+		_scaleX = 1.0;
+		_scaleY = 1.0;
+		_scaleZ = 1.0;
+		_axisX = 0;
+		_axisY = 0;
+		_axisZ = 0;
 		return;
 	break;
 	}

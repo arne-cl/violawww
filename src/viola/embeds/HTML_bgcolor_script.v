@@ -5,18 +5,15 @@
 		return 0;
 	break;
 	case "AA":
-		print("[BGCOLOR] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "NAME":
 			colorName = arg[2];
 			/* Send immediately */
-			print("[BGCOLOR] sending setBGColor to parent: ", colorName, "\n");
 			send(parent(), "setBGColor", colorName);
 		break;
 		case "RGB":
 			colorRGB = arg[2];
 			/* Send immediately */
-			print("[BGCOLOR] sending setBGColor (RGB) to parent: ", colorRGB, "\n");
 			send(parent(), "setBGColor", colorRGB);
 		break;
 		}
@@ -38,7 +35,6 @@
 		usual();
 		colorName = "";
 		colorRGB = "";
-		print("[BGCOLOR] init: done\n");
 		return;
 	break;
 	}

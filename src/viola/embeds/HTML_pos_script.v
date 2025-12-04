@@ -5,7 +5,6 @@
 		return 0;
 	break;
 	case "AA":
-		print("[POS] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "X":
 			posX = int(arg[2]);
@@ -13,7 +12,6 @@
 		case "Y":
 			posY = int(arg[2]);
 			/* Y is typically last - send to parent now */
-			print("[POS] sending setPos to parent: ", posX, ",", posY, "\n");
 			send(parent(), "setPos", posX, posY);
 		break;
 		case "Z":
@@ -39,7 +37,6 @@
 		posX = 0;
 		posY = 0;
 		posZ = 0;
-		print("[POS] init: done\n");
 		return;
 	break;
 	}

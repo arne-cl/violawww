@@ -112,6 +112,8 @@ static attr a_attr[] = {/* Should be ID */
 
 static attr attr_attr[] = {{"ID"}, {0}};
 
+static attr axis_attr[] = {{"X"}, {"Y"}, {"Z"}, {0}};
+
 static attr address_attr[] = {{"ALIGN"}, {"BORDER"}, {"FOLD"}, {"LABEL"}, {0}};
 
 static attr author_attr[] = {{"HREF"}, {0}};
@@ -355,7 +357,7 @@ static HTTag tags[] = {
     {"ADDRESS", address_attr, HTML_ADDRESS_ATTRIBUTES, SGML_MIXED, 0, 0},
     {"ATTR", attr_attr, HTML_ATTR_ATTRIBUTES, SGML_LITTERAL, 0, 0},
     {"AUTHOR", author_attr, HTML_AUTHOR_ATTRIBUTES, SGML_EMPTY, 0, 0},
-    {"AXIS", no_attr, 0, SGML_EMPTY, 0, 0},
+    {"AXIS", axis_attr, HTML_AXIS_ATTRIBUTES, SGML_EMPTY, 0, 0},
     {"B", no_attr, 0, SGML_MIXED, style_validSubElements, style_validSubElementsCount},
     {"BASE", base_attr, HTML_BASE_ATTRIBUTES, SGML_EMPTY, 0, 0},
     {"BDCOLOR", color_attr, HTML_COLOR_ATTRIBUTES, SGML_MIXED, 0, 0},

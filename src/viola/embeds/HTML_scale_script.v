@@ -5,7 +5,6 @@
 		return 0;
 	break;
 	case "AA":
-		print("[SCALE] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "X":
 			scaleX = float(arg[2]);
@@ -19,10 +18,9 @@
 			scaleZ = float(arg[2]);
 		break;
 		}
-		/* Send when we have both X and Y */
+		/* Send when we have both X and Y (Z is optional) */
 		if (hasX == 1 && hasY == 1) {
-			print("[SCALE] sending setScale to parent: ", scaleX, ",", scaleY, "\n");
-			send(parent(), "setScale", scaleX, scaleY);
+			send(parent(), "setScale", scaleX, scaleY, scaleZ);
 		}
 		return;
 	break;
@@ -45,7 +43,6 @@
 		scaleZ = 1;
 		hasX = 0;
 		hasY = 0;
-		print("[SCALE] init: done\n");
 		return;
 	break;
 	}

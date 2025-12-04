@@ -189,6 +189,11 @@ Attribute numbers
 #define HTML_ATTR_ID 0
 #define HTML_ATTR_ATTRIBUTES 1
 
+#define HTML_AXIS_X 0
+#define HTML_AXIS_Y 1
+#define HTML_AXIS_Z 2
+#define HTML_AXIS_ATTRIBUTES 3
+
 #define HTML_AUTHOR_HREF 0
 #define HTML_AUTHOR_ATTRIBUTES 1
 

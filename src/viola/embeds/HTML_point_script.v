@@ -5,7 +5,6 @@
 		return 0;
 	break;
 	case "AA":
-		print("[POINT] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "ID":
 			tagID = arg[2];
@@ -16,7 +15,6 @@
 		case "Y":
 			pointY = int(arg[2]);
 			/* Y is last - send to parent polygon now */
-			print("[POINT] sending addPoint to parent: ", pointX, ",", pointY, "\n");
 			send(parent(), "addPoint", pointX, pointY);
 		break;
 		}
@@ -38,7 +36,6 @@
 		usual();
 		pointX = 0;
 		pointY = 0;
-		print("[POINT] init: done\n");
 		return;
 	break;
 	}

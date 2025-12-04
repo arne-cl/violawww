@@ -9,16 +9,16 @@
 			gfxChildren = concat(gfxChildren, " ", childObj);
 		}
 		gfxChildCount = gfxChildCount + 1;
-		print("[GRAPHICS] ", self(), " addChild: ", childObj, " count=", gfxChildCount, "\n");
 		return;
 	break;
 	case "setBGColor":
 		/* Set background color from BGCOLOR child tag */
-		print("[GRAPHICS] setBGColor: ", arg[1], "\n");
 		set("BGColor", arg[1]);
 		return;
 	break;
 	case "expose":
+		/* Let parent class draw background first */
+		usual();
 		/* Container draws all children using own window */
 		childList = gfxChildren;
 		if (gfxChildCount > 0 && isBlank(childList) == 0) {
@@ -48,29 +48,75 @@
 						/* Query child for shape type, color, and transforms */
 						shapeType = send(childName, "getShapeType");
 						shapeFG = send(childName, "getFG");
-						shapeRot = send(childName, "getRot");
+						shapeBD = send(childName, "getBD");
+						/* Get rotation for all 3 axes */
+						shapeRotX = send(childName, "getRotX");
+						shapeRotY = send(childName, "getRotY");
+						shapeRotZ = send(childName, "getRotZ");
+						/* Get scale for all 3 axes */
 						shapeSX = send(childName, "getScaleX");
 						shapeSY = send(childName, "getScaleY");
+						shapeSZ = send(childName, "getScaleZ");
+						/* Get axis center */
 						shapeAX = send(childName, "getAxisX");
 						shapeAY = send(childName, "getAxisY");
+						shapeAZ = send(childName, "getAxisZ");
 						
 						/* Set color */
-						if (isBlank(shapeFG) == 0) {
+						if (shapeFG != "") {
 							set("FGColor", shapeFG);
 						}
 						
 						/* Check if we have transforms to apply */
-						/* Default values: rot=0 (or "0" or "1" when undefined), scale=1 */
-						/* Note: undefined slots return "1" in Viola */
+						/* Handle empty/missing values - use defaults */
 						hasTransform = 0;
-						rotVal = float(shapeRot);
-						sxVal = float(shapeSX);
-						syVal = float(shapeSY);
-						/* Rotation: anything non-zero except undefined "1" */
-						if (rotVal > 1.001 || (rotVal > 0.001 && rotVal < 0.999)) hasTransform = 1;
+						/* Rotation X (perspective tilt forward/back) */
+						if (isBlank(shapeRotX) == 1) {
+							rotXVal = 0.0;
+						} else {
+							rotXVal = float(shapeRotX);
+						}
+						/* Rotation Y (perspective turn left/right) */
+						if (isBlank(shapeRotY) == 1) {
+							rotYVal = 0.0;
+						} else {
+							rotYVal = float(shapeRotY);
+						}
+						/* Rotation Z (2D rotation on screen) */
+						if (isBlank(shapeRotZ) == 1) {
+							rotZVal = 0.0;
+						} else {
+							rotZVal = float(shapeRotZ);
+						}
+						/* For backward compatibility */
+						rotVal = rotZVal;
+						/* Scale X */
+						if (isBlank(shapeSX) == 1 || shapeSX == "0" || shapeSX == "0.0") {
+							sxVal = 1.0;
+						} else {
+							sxVal = float(shapeSX);
+						}
+						/* Scale Y */
+						if (isBlank(shapeSY) == 1 || shapeSY == "0" || shapeSY == "0.0") {
+							syVal = 1.0;
+						} else {
+							syVal = float(shapeSY);
+						}
+						/* Scale Z (affects perspective depth) */
+						if (isBlank(shapeSZ) == 1 || shapeSZ == "0" || shapeSZ == "0.0") {
+							szVal = 1.0;
+						} else {
+							szVal = float(shapeSZ);
+						}
+						/* Rotation Z: anything non-zero */
+						if (rotZVal > 0.001 || rotZVal < -0.001) hasTransform = 1;
+						/* Rotation X/Y: perspective transforms */
+						if (rotXVal > 0.001 || rotXVal < -0.001) hasTransform = 1;
+						if (rotYVal > 0.001 || rotYVal < -0.001) hasTransform = 1;
 						/* Scale: anything not 1.0 */
 						if (sxVal > 1.001 || sxVal < 0.999) hasTransform = 1;
 						if (syVal > 1.001 || syVal < 0.999) hasTransform = 1;
+						if (szVal > 1.001 || szVal < 0.999) hasTransform = 1;
 						
 						if (shapeType == "polygon") {
 							/* Polygon uses points */
@@ -81,26 +127,56 @@
 									tpx[pi] = send(childName, "getPointX", pi);
 									tpy[pi] = send(childName, "getPointY", pi);
 									
-									if (hasTransform == 1) {
-										/* Apply scale then rotation around axis */
-										tx = tpx[pi] - shapeAX;
-										ty = tpy[pi] - shapeAY;
-										/* Scale */
-										tx = tx * shapeSX;
-										ty = ty * shapeSY;
-										/* Rotate */
-										if (shapeRot != 0) {
-											cosR = cos(shapeRot);
-											sinR = sin(shapeRot);
-											nx = tx * cosR - ty * sinR;
-											ny = tx * sinR + ty * cosR;
-											tx = nx;
-											ty = ny;
-										}
-										/* Translate back */
-										tpx[pi] = int(tx + shapeAX);
-										tpy[pi] = int(ty + shapeAY);
+							if (hasTransform == 1) {
+									/* Apply scale then rotation around axis */
+									tx = tpx[pi] - shapeAX;
+									ty = tpy[pi] - shapeAY;
+									tz = 0;
+									nx = 0;
+									ny = 0;
+									nz = 0;
+									/* Scale using float values */
+									tx = tx * sxVal;
+									ty = ty * syVal;
+									tz = tz * szVal;
+									/* Apply ROT Y (rotation around vertical axis - perspective left/right) */
+									if (rotYVal > 0.001 || rotYVal < -0.001) {
+										cosRY = cos(rotYVal);
+										sinRY = sin(rotYVal);
+										nx = (tx * cosRY) + (tz * sinRY);
+										nz = ((0 - tx) * sinRY) + (tz * cosRY);
+										tx = nx;
+										tz = nz;
 									}
+									/* Apply ROT X (rotation around horizontal axis - perspective tilt) */
+									if (rotXVal > 0.001 || rotXVal < -0.001) {
+										cosRX = cos(rotXVal);
+										sinRX = sin(rotXVal);
+										ny = (ty * cosRX) - (tz * sinRX);
+										nz = (ty * sinRX) + (tz * cosRX);
+										ty = ny;
+										tz = nz;
+									}
+									/* Apply ROT Z (2D rotation on screen) */
+									if (rotZVal > 0.001 || rotZVal < -0.001) {
+										cosR = cos(rotZVal);
+										sinR = sin(rotZVal);
+										nx = (tx * cosR) - (ty * sinR);
+										ny = (tx * sinR) + (ty * cosR);
+										tx = nx;
+										ty = ny;
+									}
+									/* Perspective projection */
+									perspD = 500;
+									if (tz > 0.001 || tz < -0.001) {
+										perspScale = perspD / (perspD + tz);
+										tx = tx * perspScale;
+										ty = ty * perspScale;
+									}
+									/* Translate back */
+									tpx[pi] = int(tx + shapeAX);
+									tpy[pi] = int(ty + shapeAY);
+								}
 								}
 								/* Draw lines connecting all points */
 								for (pi = 0; pi < numPoints - 1; pi++) {
@@ -119,94 +195,198 @@
 							shapeH = send(childName, "getH");
 							
 							if (hasTransform == 1) {
-								/* Convert shape to 4 corners for transformation */
-								/* Top-left, top-right, bottom-right, bottom-left */
-								cx[0] = shapeX;
-								cy[0] = shapeY;
-								cx[1] = shapeX + shapeW;
-								cy[1] = shapeY;
-								cx[2] = shapeX + shapeW;
-								cy[2] = shapeY + shapeH;
-								cx[3] = shapeX;
-								cy[3] = shapeY + shapeH;
-								
 								/* Use center of shape as default axis if not specified */
+								origAX = shapeAX;
+								origAY = shapeAY;
 								if (shapeAX == 0 && shapeAY == 0) {
-									shapeAX = shapeX + shapeW / 2;
-									shapeAY = shapeY + shapeH / 2;
+									origAX = shapeX + shapeW / 2;
+									origAY = shapeY + shapeH / 2;
 								}
 								
-								/* Transform all 4 corners */
-								for (ci = 0; ci < 4; ci++) {
-									tx = cx[ci] - shapeAX;
-									ty = cy[ci] - shapeAY;
-									/* Scale */
-									tx = tx * shapeSX;
-									ty = ty * shapeSY;
-									/* Rotate */
-									if (shapeRot != 0) {
-										cosR = cos(shapeRot);
-										sinR = sin(shapeRot);
-										nx = tx * cosR - ty * sinR;
-										ny = tx * sinR + ty * cosR;
-										tx = nx;
-										ty = ny;
-									}
-									/* Translate back */
-									cx[ci] = int(tx + shapeAX);
-									cy[ci] = int(ty + shapeAY);
-								}
-								
-								/* Draw transformed shape as polygon */
-								if (shapeType == "rect") {
-									/* Fill with 4 triangles from center */
-									/* For simplicity, just draw outline */
-									drawLine(cx[0], cy[0], cx[1], cy[1]);
-									drawLine(cx[1], cy[1], cx[2], cy[2]);
-									drawLine(cx[2], cy[2], cx[3], cy[3]);
-									drawLine(cx[3], cy[3], cx[0], cy[0]);
-								}
+								/* For oval/circle, skip corner transformation and draw directly */
 								if (shapeType == "circle" || shapeType == "oval") {
-									/* Approximate with 16-point polygon for rotated/scaled ellipse */
-									centerX = shapeAX;
-									centerY = shapeAY;
-									radiusX = (shapeW / 2) * shapeSX;
-									radiusY = (shapeH / 2) * shapeSY;
+									/* Draw ellipse with 16-point polygon */
+									centerX = origAX;
+									centerY = origAY;
+									radiusX = shapeW / 2;
+									radiusY = shapeH / 2;
 									
 									for (ai = 0; ai < 16; ai++) {
 										angle = ai * 22.5; /* 360/16 = 22.5 degrees */
-										epx = centerX + radiusX * cos(angle);
-										epy = centerY + radiusY * sin(angle);
-										/* Apply rotation */
-										if (shapeRot != 0) {
-											tx = epx - centerX;
-											ty = epy - centerY;
-											cosR = cos(shapeRot);
-											sinR = sin(shapeRot);
-											epx = int(centerX + tx * cosR - ty * sinR);
-											epy = int(centerY + tx * sinR + ty * cosR);
+										/* Start with ellipse point */
+										tx = radiusX * cos(angle);
+										ty = radiusY * sin(angle);
+										tz = 0;
+										nx = 0;
+										ny = 0;
+										nz = 0;
+										/* Scale */
+										tx = tx * sxVal;
+										ty = ty * syVal;
+										tz = tz * szVal;
+										/* Apply ROT Y */
+										if (rotYVal > 0.001 || rotYVal < -0.001) {
+											cosRY = cos(rotYVal);
+											sinRY = sin(rotYVal);
+											nx = (tx * cosRY) + (tz * sinRY);
+											nz = ((0 - tx) * sinRY) + (tz * cosRY);
+											tx = nx;
+											tz = nz;
 										}
-										ellipseX[ai] = epx;
-										ellipseY[ai] = epy;
+										/* Apply ROT X */
+										if (rotXVal > 0.001 || rotXVal < -0.001) {
+											cosRX = cos(rotXVal);
+											sinRX = sin(rotXVal);
+											ny = (ty * cosRX) - (tz * sinRX);
+											nz = (ty * sinRX) + (tz * cosRX);
+											ty = ny;
+											tz = nz;
+										}
+										/* Apply ROT Z */
+										if (rotZVal > 0.001 || rotZVal < -0.001) {
+											cosR = cos(rotZVal);
+											sinR = sin(rotZVal);
+											nx = (tx * cosR) - (ty * sinR);
+											ny = (tx * sinR) + (ty * cosR);
+											tx = nx;
+											ty = ny;
+										}
+										/* Perspective */
+										perspD = 500;
+										if (tz > 0.001 || tz < -0.001) {
+											perspScale = perspD / (perspD + tz);
+											tx = tx * perspScale;
+											ty = ty * perspScale;
+										}
+										ellipseX[ai] = int(centerX + tx);
+										ellipseY[ai] = int(centerY + ty);
 									}
 									/* Draw the ellipse outline */
 									for (ai = 0; ai < 15; ai++) {
 										drawLine(ellipseX[ai], ellipseY[ai], ellipseX[ai + 1], ellipseY[ai + 1]);
 									}
 									drawLine(ellipseX[15], ellipseY[15], ellipseX[0], ellipseY[0]);
+								} else {
+									/* For rect/line, transform 4 corners */
+									cx[0] = shapeX;
+									cy[0] = shapeY;
+									cx[1] = shapeX + shapeW;
+									cy[1] = shapeY;
+									cx[2] = shapeX + shapeW;
+									cy[2] = shapeY + shapeH;
+									cx[3] = shapeX;
+									cy[3] = shapeY + shapeH;
+								
+									/* Transform all 4 corners */
+									for (ci = 0; ci < 4; ci++) {
+										tx = cx[ci] - origAX;
+										ty = cy[ci] - origAY;
+										tz = 0;
+										nx = 0;
+										ny = 0;
+										nz = 0;
+										/* Scale using float values */
+										tx = tx * sxVal;
+										ty = ty * syVal;
+										tz = tz * szVal;
+										/* Apply ROT Y (rotation around vertical axis - perspective left/right) */
+										if (rotYVal > 0.001 || rotYVal < -0.001) {
+											cosRY = cos(rotYVal);
+											sinRY = sin(rotYVal);
+											nx = (tx * cosRY) + (tz * sinRY);
+											nz = ((0 - tx) * sinRY) + (tz * cosRY);
+											tx = nx;
+											tz = nz;
+										}
+										/* Apply ROT X (rotation around horizontal axis - perspective tilt) */
+										if (rotXVal > 0.001 || rotXVal < -0.001) {
+											cosRX = cos(rotXVal);
+											sinRX = sin(rotXVal);
+											ny = (ty * cosRX) - (tz * sinRX);
+											nz = (ty * sinRX) + (tz * cosRX);
+											ty = ny;
+											tz = nz;
+										}
+										/* Apply ROT Z (2D rotation on screen) */
+										if (rotZVal > 0.001 || rotZVal < -0.001) {
+											cosR = cos(rotZVal);
+											sinR = sin(rotZVal);
+											nx = (tx * cosR) - (ty * sinR);
+											ny = (tx * sinR) + (ty * cosR);
+											tx = nx;
+											ty = ny;
+										}
+										/* Perspective projection */
+										perspD = 500;
+										if (tz > 0.001 || tz < -0.001) {
+											perspScale = perspD / (perspD + tz);
+											tx = tx * perspScale;
+											ty = ty * perspScale;
+										}
+										/* Translate back */
+										cx[ci] = int(tx + origAX);
+										cy[ci] = int(ty + origAY);
+									}
+								
+								/* Draw transformed shape as polygon */
+								if (shapeType == "rect") {
+									/* Draw filled outline (rotated rect is 4 lines) */
+									drawLine(cx[0], cy[0], cx[1], cy[1]);
+									drawLine(cx[1], cy[1], cx[2], cy[2]);
+									drawLine(cx[2], cy[2], cx[3], cy[3]);
+									drawLine(cx[3], cy[3], cx[0], cy[0]);
+									/* Border with different color if set */
+									if (shapeBD != "" && shapeBD != "0") {
+										set("FGColor", shapeBD);
+										drawLine(cx[0], cy[0], cx[1], cy[1]);
+										drawLine(cx[1], cy[1], cx[2], cy[2]);
+										drawLine(cx[2], cy[2], cx[3], cy[3]);
+										drawLine(cx[3], cy[3], cx[0], cy[0]);
+									}
 								}
-								if (shapeType == "line") {
-									drawLine(cx[0], cy[0], cx[2], cy[2]);
-								}
+									if (shapeType == "line") {
+										drawLine(cx[0], cy[0], cx[2], cy[2]);
+									}
+								} /* end else rect/line */
 							} else {
 								/* No transform - draw normally */
+								/* Helper: check if border color is valid (not empty, not "0") */
+								hasBorder = 0;
+								if (shapeBD != "" && shapeBD != "0") {
+									hasBorder = 1;
+								}
+								
 								if (shapeType == "rect") {
+									/* Draw border first if set (outside the fill) */
+									if (hasBorder == 1) {
+										set("FGColor", shapeBD);
+										/* Draw 2-pixel thick border outside */
+										drawFillRect(shapeX - 2, shapeY - 2, shapeX + shapeW + 2, shapeY + shapeH + 2);
+									}
+									/* Draw fill on top */
+									if (shapeFG != "") {
+										set("FGColor", shapeFG);
+									}
 									drawFillRect(shapeX, shapeY, shapeX + shapeW, shapeY + shapeH);
 								}
 								if (shapeType == "circle") {
+									if (hasBorder == 1) {
+										set("FGColor", shapeBD);
+										drawFillOval(shapeX - 2, shapeY - 2, shapeX + shapeW + 2, shapeY + shapeH + 2);
+									}
+									if (shapeFG != "") {
+										set("FGColor", shapeFG);
+									}
 									drawFillOval(shapeX, shapeY, shapeX + shapeW, shapeY + shapeH);
 								}
 								if (shapeType == "oval") {
+									if (hasBorder == 1) {
+										set("FGColor", shapeBD);
+										drawFillOval(shapeX - 2, shapeY - 2, shapeX + shapeW + 2, shapeY + shapeH + 2);
+									}
+									if (shapeFG != "") {
+										set("FGColor", shapeFG);
+									}
 									drawFillOval(shapeX, shapeY, shapeX + shapeW, shapeY + shapeH);
 								}
 								if (shapeType == "line") {
@@ -222,15 +402,13 @@
 		return;
 	break;
 	case "D":
-		/* Done building - nothing special needed */
-		print("[GRAPHICS] D: done building\n");
+		/* Done building */
 		return 1;
 	break;
 	case "R":
 		/* arg[1]	y
 		 * arg[2]	width
 		 */
-		print("[GRAPHICS] R: y=", arg[1], " width=", arg[2], "\n");
 		if (style == 0) style = SGMLGetStyle("HTML", "GRAPHICS");
 		vspan = style[0];
 		set("y", arg[1] + vspan);
@@ -249,11 +427,9 @@
 		}
 		
 		vspan += get("height") + style[1];
-		print("[GRAPHICS] R: final size ", width(), "x", height(), " vspan=", vspan, "\n");
 		return vspan;
 	break;
 	case "AA":
-		print("[GRAPHICS] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "ID":
 		case "NAME":
@@ -289,7 +465,6 @@
 		gfxChildren = "";
 		/* Use document colors */
 		SGMLBuildDoc_setColors();
-		print("[GRAPHICS] init: done\n");
 		return;
 	break;
 	}

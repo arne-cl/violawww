@@ -5201,19 +5201,12 @@ static char _slotValue_HTML_rect1[] = "HTML_rect";
 static char _slotValue_HTML_rect2[] = {
 #include "embeds/HTML_rect_script.v.h"
 };
-static char _slotValue_gfxRot0[] = "0";
-static char _slotValue_gfxScale1[] = "1";
 /* END OF FILE */
 
 static SlotStruct objDesc_HTML_rect[] = {
     {"class", _slotValue_HTML_rect0},
     {"name", _slotValue_HTML_rect1},
     {"script", _slotValue_HTML_rect2},
-    {"gfxRotZ", _slotValue_gfxRot0},
-    {"gfxScaleX", _slotValue_gfxScale1},
-    {"gfxScaleY", _slotValue_gfxScale1},
-    {"gfxAxisX", _slotValue_gfxRot0},
-    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5228,11 +5221,6 @@ static SlotStruct objDesc_HTML_circle[] = {
     {"class", _slotValue_HTML_circle0},
     {"name", _slotValue_HTML_circle1},
     {"script", _slotValue_HTML_circle2},
-    {"gfxRotZ", _slotValue_gfxRot0},
-    {"gfxScaleX", _slotValue_gfxScale1},
-    {"gfxScaleY", _slotValue_gfxScale1},
-    {"gfxAxisX", _slotValue_gfxRot0},
-    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5247,11 +5235,6 @@ static SlotStruct objDesc_HTML_oval[] = {
     {"class", _slotValue_HTML_oval0},
     {"name", _slotValue_HTML_oval1},
     {"script", _slotValue_HTML_oval2},
-    {"gfxRotZ", _slotValue_gfxRot0},
-    {"gfxScaleX", _slotValue_gfxScale1},
-    {"gfxScaleY", _slotValue_gfxScale1},
-    {"gfxAxisX", _slotValue_gfxRot0},
-    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5280,11 +5263,6 @@ static SlotStruct objDesc_HTML_line[] = {
     {"class", _slotValue_HTML_line0},
     {"name", _slotValue_HTML_line1},
     {"script", _slotValue_HTML_line2},
-    {"gfxRotZ", _slotValue_gfxRot0},
-    {"gfxScaleX", _slotValue_gfxScale1},
-    {"gfxScaleY", _slotValue_gfxScale1},
-    {"gfxAxisX", _slotValue_gfxRot0},
-    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 
@@ -5299,11 +5277,6 @@ static SlotStruct objDesc_HTML_polygon[] = {
     {"class", _slotValue_HTML_polygon0},
     {"name", _slotValue_HTML_polygon1},
     {"script", _slotValue_HTML_polygon2},
-    {"gfxRotZ", _slotValue_gfxRot0},
-    {"gfxScaleX", _slotValue_gfxScale1},
-    {"gfxScaleY", _slotValue_gfxScale1},
-    {"gfxAxisX", _slotValue_gfxRot0},
-    {"gfxAxisY", _slotValue_gfxRot0},
     {(char*)0, (char*)0},
 };
 

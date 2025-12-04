@@ -5,19 +5,22 @@
 		return 0;
 	break;
 	case "AA":
-		print("[ROT] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "X":
-			rotX = float(arg[2]);
+			myRotX = float(arg[2]);
+			hasX = 1;
+			/* Send X rotation immediately - only set X, leave others as 0 */
+			send(parent(), "setRotX", myRotX);
 		break;
 		case "Y":
-			rotY = float(arg[2]);
+			myRotY = float(arg[2]);
+			hasY = 1;
+			send(parent(), "setRotY", myRotY);
 		break;
 		case "Z":
-			rotZ = float(arg[2]);
-			/* Z rotation is the 2D rotation - send to parent */
-			print("[ROT] sending setRot to parent: ", rotZ, " degrees\n");
-			send(parent(), "setRot", rotZ);
+			myRotZ = float(arg[2]);
+			hasZ = 1;
+			send(parent(), "setRotZ", myRotZ);
 		break;
 		}
 		return;
@@ -39,7 +42,9 @@
 		rotX = 0;
 		rotY = 0;
 		rotZ = 0;
-		print("[ROT] init: done\n");
+		hasX = 0;
+		hasY = 0;
+		hasZ = 0;
 		return;
 	break;
 	}

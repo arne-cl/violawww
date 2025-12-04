@@ -18,20 +18,38 @@
 	case "getFG":
 		return fgColor;
 	break;
+	case "getBD":
+		return bdColor;
+	break;
+	case "getRotX":
+		return _rotX;
+	break;
+	case "getRotY":
+		return _rotY;
+	break;
+	case "getRotZ":
+		return _rotZ;
+	break;
 	case "getRot":
-		return get("gfxRotZ");
+		return _rotZ;
 	break;
 	case "getScaleX":
-		return get("gfxScaleX");
+		return _scaleX;
 	break;
 	case "getScaleY":
-		return get("gfxScaleY");
+		return _scaleY;
+	break;
+	case "getScaleZ":
+		return _scaleZ;
 	break;
 	case "getAxisX":
-		return get("gfxAxisX");
+		return _axisX;
 	break;
 	case "getAxisY":
-		return get("gfxAxisY");
+		return _axisY;
+	break;
+	case "getAxisZ":
+		return _axisZ;
 	break;
 	case "expose":
 		return;
@@ -39,10 +57,8 @@
 	case "D":
 		/* Register with parent container */
 		p = parent();
-		print("[OVAL] D: done, self=", self(), " parent=", p, "\n");
 		/* Only register if parent is a GRAPHICS container */
 		if (findPattern(p, "HTML_graphics") >= 0) {
-			print("[OVAL] D: registering with GRAPHICS parent\n");
 			send(p, "addChild", self());
 		}
 		return 1; /* Keep object alive */
@@ -51,7 +67,6 @@
 		return 0;
 	break;
 	case "AA":
-		print("[OVAL] AA: ", arg[1], "=", arg[2], "\n");
 		switch (arg[1]) {
 		case "ID":
 		case "NAME":
@@ -64,37 +79,63 @@
 		return;
 	break;
 	case "setPos":
-		print("[OVAL] setPos: ", arg[1], ",", arg[2], "\n");
 		posX = int(arg[1]);
 		posY = int(arg[2]);
 		return;
 	break;
 	case "setSize":
-		print("[OVAL] setSize: ", arg[1], ",", arg[2], "\n");
 		sizeX = int(arg[1]);
 		sizeY = int(arg[2]);
 		return;
 	break;
 	case "setFGColor":
-		print("[OVAL] setFGColor: ", arg[1], "\n");
 		fgColor = arg[1];
 		return;
 	break;
+	case "setBDColor":
+		bdColor = arg[1];
+		return;
+	break;
+	case "setRotX":
+		_rotX = float(arg[1]);
+		return;
+	break;
+	case "setRotY":
+		_rotY = float(arg[1]);
+		return;
+	break;
+	case "setRotZ":
+		_rotZ = float(arg[1]);
+		return;
+	break;
 	case "setRot":
-		print("[OVAL] setRot: ", arg[1], " degrees\n");
-		set("gfxRotZ", arg[1]);
+		if (isBlank(arg[1]) == 0) {
+			_rotX = float(arg[1]);
+		}
+		if (isBlank(arg[2]) == 0) {
+			_rotY = float(arg[2]);
+		}
+		if (isBlank(arg[3]) == 0) {
+			_rotZ = float(arg[3]);
+		}
 		return;
 	break;
 	case "setScale":
-		print("[OVAL] setScale: ", arg[1], ",", arg[2], "\n");
-		set("gfxScaleX", arg[1]);
-		set("gfxScaleY", arg[2]);
+		_scaleX = float(arg[1]);
+		_scaleY = float(arg[2]);
+		if (isBlank(arg[3]) == 0) {
+			_scaleZ = float(arg[3]);
+		}
 		return;
 	break;
 	case "setAxis":
-		print("[OVAL] setAxis: ", arg[1], ",", arg[2], "\n");
-		set("gfxAxisX", arg[1]);
-		set("gfxAxisY", arg[2]);
+		_axisX = int(arg[1]);
+		_axisY = int(arg[2]);
+		if (isBlank(arg[3]) == 0) {
+			_axisZ = int(arg[3]);
+		} else {
+			_axisZ = 0;
+		}
 		return;
 	break;
 	case "config":
@@ -113,7 +154,16 @@
 		sizeX = 0;
 		sizeY = 0;
 		fgColor = "black";
-		print("[OVAL] init: done\n");
+		bdColor = "";
+		_rotX = 0.0;
+		_rotY = 0.0;
+		_rotZ = 0.0;
+		_scaleX = 1.0;
+		_scaleY = 1.0;
+		_scaleZ = 1.0;
+		_axisX = 0;
+		_axisY = 0;
+		_axisZ = 0;
 		return;
 	break;
 	}
