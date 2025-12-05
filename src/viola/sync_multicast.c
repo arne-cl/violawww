@@ -22,6 +22,20 @@
 /* External function to register socket with Xt input handler */
 extern void registerSyncSocket(int fd);
 
+/*
+ * djb2 hash function - simple and effective for strings
+ */
+static unsigned int djb2_hash(const char* str)
+{
+    unsigned int hash = 5381;
+    int c;
+    
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    
+    return hash;
+}
+
 /* Broadcast port for sync messages */
 #define SYNC_PORT 54379
 
@@ -118,11 +132,23 @@ int sync_multicast_init(void)
 }
 
 /*
- * Set current page hash
+ * Set current page URL - computes hash for filtering
  */
-void sync_multicast_set_page(unsigned int hash)
+void sync_multicast_set_page(const char* url)
 {
-    sync_state.page_hash = hash;
+    if (url && url[0]) {
+        sync_state.page_hash = djb2_hash(url);
+    } else {
+        sync_state.page_hash = 0;
+    }
+}
+
+/*
+ * Get current page hash
+ */
+unsigned int sync_multicast_get_hash(void)
+{
+    return sync_state.page_hash;
 }
 
 /*

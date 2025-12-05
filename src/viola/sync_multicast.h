@@ -16,9 +16,15 @@
 int sync_multicast_init(void);
 
 /*
- * Set current page hash for filtering incoming messages.
+ * Set current page URL for filtering incoming messages.
+ * Computes hash internally.
  */
-void sync_multicast_set_page(unsigned int hash);
+void sync_multicast_set_page(const char* url);
+
+/*
+ * Get current page hash.
+ */
+unsigned int sync_multicast_get_hash(void);
 
 /*
  * Broadcast a sync message to all peers.

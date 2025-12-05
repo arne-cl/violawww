@@ -970,6 +970,24 @@ Boolean doViolaIdle(XtPointer clientData) {
     return False;  /* Continue calling this workproc */
 }
 
+/* Send a wake-up event to ensure main loop processes timers */
+void wakeUpEventLoop(void) {
+    XClientMessageEvent ev;
+    Display* dpy = XtDisplay(topWidget);
+    Window win = XtWindow(topWidget);
+    
+    if (!dpy || !win) return;
+    
+    memset(&ev, 0, sizeof(ev));
+    ev.type = ClientMessage;
+    ev.window = win;
+    ev.message_type = XInternAtom(dpy, "VIOLA_WAKEUP", False);
+    ev.format = 32;
+    
+    XSendEvent(dpy, win, False, NoEventMask, (XEvent*)&ev);
+    XFlush(dpy);
+}
+
 /* Timer callback for sync polling - called every 50ms */
 static void syncTimerCallback(XtPointer clientData, XtIntervalId* id) {
     (void)clientData;
@@ -979,9 +997,22 @@ static void syncTimerCallback(XtPointer clientData, XtIntervalId* id) {
     XtAppAddTimeOut(appCon, 50, syncTimerCallback, NULL);  /* 50ms = 20 Hz */
 }
 
-/* Register sync socket - starts periodic polling timer */
+/* Input callback for sync socket - called when data is available */
+static void syncInputCallback(XtPointer clientData, int* source, XtInputId* id) {
+    (void)clientData;
+    (void)source;
+    (void)id;
+    discovery_process();  /* Process immediately when data arrives */
+    wakeUpEventLoop();    /* Force UI update */
+}
+
+/* Register sync socket - uses both input handler and timer for reliability */
 void registerSyncSocket(int fd) {
     if (fd >= 0) {
+        /* Register input handler for immediate response */
+        XtAppAddInput(appCon, fd, (XtPointer)XtInputReadMask, 
+                      syncInputCallback, NULL);
+        /* Also register timer as fallback */
         XtAppAddTimeOut(appCon, 50, syncTimerCallback, NULL);
     }
 }

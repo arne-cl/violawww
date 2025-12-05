@@ -73,6 +73,7 @@ void doViolaEvent(Widget widget, XtPointer clientData, XEvent* event, Boolean* c
 Boolean doViolaIdle(XtPointer clientData);
 void resizeViola(Widget widget, XtPointer clientData, XEvent* event, Boolean* continueDispatch);
 void registerSyncSocket(int fd);  /* Register sync socket for immediate notification */
+void wakeUpEventLoop(void);       /* Send wake-up event to main loop */
 
 void scrollBarValueChanged(Widget sbar, XtPointer clientData, XtPointer callData);
 void mouseWheelScrollEH(Widget w, XtPointer clientData, XEvent* evt, Boolean* cont);

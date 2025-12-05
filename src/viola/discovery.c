@@ -152,17 +152,15 @@ void discovery_dispatch_sync(const char* id, const char* func, const char* args)
 }
 
 /* ============================================================================
- * macOS Implementation - Bonjour/DNS-SD
+ * macOS Implementation - UDP Broadcast
  * ============================================================================
- * Uses Apple's DNS Service Discovery framework which is built into macOS.
- * Registers a "_violawww._tcp" service and browses for other instances.
+ * Uses UDP broadcast for sync between browsers on same network.
+ * Bonjour is no longer needed - sync works via page hash filtering.
  */
 #ifdef __DARWIN__
 
-#include "discovery_bonjour.h"
-
 int discovery_init(void) {
-    return discovery_bonjour_init();
+    return 1;  /* Lazy init in discovery_set_page */
 }
 
 void discovery_set_page(const char* url) {
@@ -174,35 +172,28 @@ void discovery_set_page(const char* url) {
     /* Lazy initialization - discovery is enabled on first set_page call */
     static int lazy_init_done = 0;
     if (!lazy_init_done) {
-        fprintf(stderr, "[Discovery] Initializing (page has SC attributes)\n");
-        discovery_bonjour_init();
-        sync_multicast_init();  /* Initialize UDP multicast for fast sync */
+        sync_multicast_init();  /* Initialize UDP broadcast for sync */
         lazy_init_done = 1;
     }
     
-    fprintf(stderr, "[Discovery] Page: %s\n", url ? url : "(null)");
-    discovery_bonjour_set_page(url);
-    
-    /* Set page hash for multicast filtering */
-    sync_multicast_set_page(discovery_bonjour_get_hash());
+    /* Set page URL for sync filtering */
+    sync_multicast_set_page(url);
 }
 
 void discovery_process(void) {
-    discovery_bonjour_process();
-    sync_multicast_process();  /* Process UDP multicast messages */
+    sync_multicast_process();  /* Process UDP sync messages */
 }
 
 int discovery_get_fd(void) {
-    return discovery_bonjour_get_fd();
+    return sync_multicast_get_fd();
 }
 
 void discovery_shutdown(void) {
-    discovery_bonjour_shutdown();
     sync_multicast_shutdown();
 }
 
 unsigned int discovery_get_hash(void) {
-    return discovery_bonjour_get_hash();
+    return sync_multicast_get_hash();
 }
 
 int discovery_supported(void) {
@@ -211,12 +202,11 @@ int discovery_supported(void) {
 
 void discovery_broadcast(const char* id, const char* func, const char* args) {
     if (!discovery_enabled_flag) return;
-    /* Use UDP multicast for fast sync (DNS-SD TXT is too slow) */
     sync_multicast_broadcast(id, func, args);
 }
 
 unsigned int discovery_get_seq(void) {
-    return discovery_bonjour_get_seq();
+    return 0;  /* Sequence tracking not needed without Bonjour */
 }
 
 /* ============================================================================

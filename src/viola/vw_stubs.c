@@ -196,3 +196,8 @@ void registerSyncSocket(int fd) {
     (void)fd;
     /* In standalone viola, sync processing happens via polling in event loop */
 }
+
+/* Stub for wakeUpEventLoop - no Xt in standalone viola */
+void wakeUpEventLoop(void) {
+    /* No-op in standalone mode */
+}
