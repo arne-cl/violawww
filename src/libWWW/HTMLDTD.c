@@ -126,7 +126,9 @@ static attr button_attr[] = {{"HINT"}, {"HREF"}, {"ID"}, {"LABEL"}, {"NAME"}, {0
 
 static attr changed_attr[] = {{"ID"}, {"IDREF"}, {0}};
 
-static attr color_attr[] = {{"NAME"}, {"RGB"}, {0}};
+static attr color_attr[] = {{"NAME"}, {"RGB"}, {"SC"}, {0}};
+#undef HTML_COLOR_ATTRIBUTES
+#define HTML_COLOR_ATTRIBUTES 3
 
 static attr circle_attr[] = {{"HINT"}, {"ID"}, {"NAME"}, {0}};
 #undef HTML_CIRCLE_ATTRIBUTES

@@ -128,6 +128,13 @@
 	break;
 	case "setFGColor":
 		fgColor = arg[1];
+		if (discoveryIsRemote() == 0) {
+			if (getVariable("_sc_fgcolor") != "") {
+				discoveryBroadcast(get("name"), "setFGColor", arg[1]);
+			}
+		} else {
+			send(_savedParent, "expose");
+		}
 		return;
 	break;
 	case "setRotX":

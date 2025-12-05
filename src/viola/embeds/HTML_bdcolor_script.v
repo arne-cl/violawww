@@ -45,6 +45,14 @@
 		case "RGB":
 			colorRGB = arg[2];
 		break;
+		case "SC":
+			/* Enable sync for border color on parent primitive */
+			p = parent();
+			if (p != "" && p != "0" && p != "(NULL)") {
+				send(p, "setVariable", "_sc_bdcolor", "1");
+			}
+			discoveryEnable();
+		break;
 		}
 		return;
 	break;

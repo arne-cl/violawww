@@ -30,6 +30,14 @@
 		case "RGB":
 			colorRGB = arg[2];
 		break;
+		case "SC":
+			/* Enable sync for background color on parent */
+			p = parent();
+			if (p != "" && p != "0" && p != "(NULL)") {
+				send(p, "setVariable", "_sc_bgcolor", "1");
+			}
+			discoveryEnable();
+		break;
 		}
 		return;
 	break;
