@@ -201,3 +201,10 @@ void registerSyncSocket(int fd) {
 void wakeUpEventLoop(void) {
     /* No-op in standalone mode */
 }
+
+#ifdef __APPLE__
+/* Stub for vw_start_wakeup_timer - no need in standalone viola */
+void vw_start_wakeup_timer(void) {
+    /* No-op in standalone mode - no XQuartz event loop issues */
+}
+#endif

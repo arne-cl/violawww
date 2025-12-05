@@ -57,6 +57,14 @@
 #include "../viola/cexec.h"
 #include "../viola/file.h"
 #include "../viola/msgHandler.h"
+
+#ifdef __APPLE__
+/* Forward declaration for wakeup timer state */
+static int wakeup_timer_started = 0;
+static Display *gcd_dpy = NULL;
+static Window gcd_win = 0;
+static Atom gcd_wakeup_atom = 0;
+#endif
 #include "callbacks.h"
 #include "catalog.h"
 #include "cursor.h"
@@ -104,6 +112,48 @@ XmFontList titleFontList;
 void checkForDebugOutput(int argc, char* argv[]);
 DocViewInfo* makeBrowserInterface(Widget shell, char* shellName, DocViewInfo* parentInfo, int argc, char* argv[]);
 DocViewInfo* makeClonePageInterface(Widget shell, char* shellName, DocViewInfo* parentInfo);
+
+#ifdef __APPLE__
+/*
+ * vw_start_wakeup_timer - Start GCD timer to wake up event loop
+ *
+ * macOS/XQuartz workaround: XQuartz freezes event delivery when cursor
+ * is not over window. This timer sends synthetic X events to wake up
+ * the event loop, needed for sync message processing between browsers.
+ *
+ * Called from sync_multicast_init() when UDP broadcast is enabled.
+ */
+void vw_start_wakeup_timer(void)
+{
+    if (wakeup_timer_started) return;
+    if (!gcd_dpy || !gcd_win) return;  /* Not initialized yet */
+    
+    wakeup_timer_started = 1;
+    
+    dispatch_source_t timer = dispatch_source_create(
+        DISPATCH_SOURCE_TYPE_TIMER, 0, 0, 
+        dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0));
+    
+    dispatch_source_set_timer(timer, 
+        dispatch_time(DISPATCH_TIME_NOW, 0),
+        50 * NSEC_PER_MSEC,   /* 50ms interval = 20 Hz */
+        10 * NSEC_PER_MSEC);  /* 10ms leeway */
+    
+    dispatch_source_set_event_handler(timer, ^{
+        XClientMessageEvent ev = {0};
+        ev.type = ClientMessage;
+        ev.window = gcd_win;
+        ev.message_type = gcd_wakeup_atom;
+        ev.format = 32;
+        XSendEvent(gcd_dpy, gcd_win, False, NoEventMask, (XEvent*)&ev);
+        XFlush(gcd_dpy);
+    });
+    
+    dispatch_resume(timer);
+    
+    fprintf(stderr, "[VW] Wakeup timer started for sync\n");
+}
+#endif
 
 static String fallback_resources[] = {
     /*
@@ -319,46 +369,17 @@ int main(int argc, char* argv[])
 
     /* 
      * Event loop with periodic idle processing.
-     * On macOS/XQuartz, we use a GCD timer to send synthetic X events
-     * that wake up the event loop even when cursor is not over window.
+     * On macOS/XQuartz, the wakeup timer is started on-demand when
+     * UDP broadcast sync is enabled (via vw_start_wakeup_timer).
      */
     {
         Display *dpy = XtDisplay(topWidget);
         
 #ifdef __APPLE__
-        /* 
-         * macOS/XQuartz workaround: XQuartz freezes event delivery when 
-         * cursor is not over window. Use native GCD timer to periodically 
-         * send synthetic X events that wake up the event loop.
-         */
-        static Display *gcd_dpy;
-        static Window gcd_win;
-        static Atom gcd_wakeup_atom;
-        
+        /* Initialize wakeup atom for later use */
         gcd_dpy = dpy;
         gcd_win = XtWindow(topWidget);
         gcd_wakeup_atom = XInternAtom(dpy, "_VW_WAKEUP", False);
-        
-        dispatch_source_t timer = dispatch_source_create(
-            DISPATCH_SOURCE_TYPE_TIMER, 0, 0, 
-            dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0));
-        
-        dispatch_source_set_timer(timer, 
-            dispatch_time(DISPATCH_TIME_NOW, 0),
-            50 * NSEC_PER_MSEC,   /* 50ms interval = 20 Hz */
-            10 * NSEC_PER_MSEC);  /* 10ms leeway */
-        
-        dispatch_source_set_event_handler(timer, ^{
-            XClientMessageEvent ev = {0};
-            ev.type = ClientMessage;
-            ev.window = gcd_win;
-            ev.message_type = gcd_wakeup_atom;
-            ev.format = 32;
-            XSendEvent(gcd_dpy, gcd_win, False, NoEventMask, (XEvent*)&ev);
-            XFlush(gcd_dpy);
-        });
-        
-        dispatch_resume(timer);
 #endif
         
         while (1) {

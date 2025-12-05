@@ -22,6 +22,11 @@
 /* External function to register socket with Xt input handler */
 extern void registerSyncSocket(int fd);
 
+#ifdef __APPLE__
+/* External function to start wakeup timer when sync is enabled */
+extern void vw_start_wakeup_timer(void);
+#endif
+
 /*
  * djb2 hash function - simple and effective for strings
  */
@@ -135,6 +140,11 @@ int sync_multicast_init(void)
     
     /* Register with Xt for immediate notification when data arrives */
     registerSyncSocket(sock);
+    
+#ifdef __APPLE__
+    /* Start wakeup timer now that sync is enabled */
+    vw_start_wakeup_timer();
+#endif
     
     return 1;
 }
