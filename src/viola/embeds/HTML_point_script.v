@@ -7,9 +7,6 @@
 	case "D":
 		/* Send point to parent polygon */
 		p = parent();
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_polygon", "getCurrentPrimitive");
-		}
 		if (p != "" && p != "0" && p != "(NULL)") {
 			send(p, "addPoint", pointX, pointY);
 		}

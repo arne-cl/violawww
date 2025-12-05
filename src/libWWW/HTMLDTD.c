@@ -198,9 +198,9 @@ static attr oval_attr[] = {{"HINT"}, {"ID"}, {"NAME"}, {0}};
 
 static attr point_attr[] = {{"ID"}, {"X"}, {"Y"}, {0}};
 
-static attr polygon_attr[] = {{"HINT"}, {"ID"}, {"NAME"}, {0}};
+static attr polygon_attr[] = {{"HINT"}, {"ID"}, {"NAME"}, {"POINTS"}, {0}};
 #undef HTML_POLYGON_ATTRIBUTES
-#define HTML_POLYGON_ATTRIBUTES 3
+#define HTML_POLYGON_ATTRIBUTES 4
 
 static attr pos_attr[] = {{"SC"}, {"X"}, {"Y"}, {"Z"}, {0}};
 

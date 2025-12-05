@@ -7,27 +7,6 @@
 	case "D":
 		/* Send rotation to parent primitive */
 		p = parent();
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_rect", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_circle", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_oval", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_line", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_polygon", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_square", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_text", "getCurrentPrimitive");
-		}
 		if (p != "" && p != "0" && p != "(NULL)") {
 			if (hasX == 1) {
 				send(p, "setRotX", myRotX);

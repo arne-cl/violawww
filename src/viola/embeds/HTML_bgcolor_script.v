@@ -7,6 +7,7 @@
 	case "D":
 		/* Send color to parent primitive or GRAPHICS container */
 		p = parent();
+		/* Fallback for BUTTON or GRAPHICS which may have broken parent() */
 		if (p == "" || p == "0" || p == "(NULL)") {
 			p = send("HTML_button", "getCurrentPrimitive");
 		}

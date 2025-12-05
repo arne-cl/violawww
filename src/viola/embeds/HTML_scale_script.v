@@ -7,27 +7,6 @@
 	case "D":
 		/* Send scale to parent primitive */
 		p = parent();
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_rect", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_circle", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_oval", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_line", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_polygon", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_square", "getCurrentPrimitive");
-		}
-		if (p == "" || p == "0" || p == "(NULL)") {
-			p = send("HTML_text", "getCurrentPrimitive");
-		}
 		if (p != "" && p != "0" && p != "(NULL)") {
 			send(p, "setScale", scaleX, scaleY, scaleZ);
 			/* Set SC flag on parent shape if SC attribute was present */

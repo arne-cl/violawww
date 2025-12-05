@@ -135,6 +135,34 @@
 		case "HINT":
 			hintText = arg[2];
 		break;
+		case "POINTS":
+			/* Parse points string: "x1,y1 x2,y2 x3,y3 ..." */
+			pointsStr = arg[2];
+			pointCount = 0;
+			pairStart = 0;
+			for (i = 0; i <= length(pointsStr); i++) {
+				ch = nthchar(pointsStr, i);
+				if (ch == " " || ch == "" || i == length(pointsStr)) {
+					/* Extract x,y pair */
+					pairStr = substring(pointsStr, pairStart, i - pairStart);
+					if (pairStr != "") {
+						/* Find comma separator */
+						foundComma = 0;
+						for (j = 0; j < length(pairStr); j++) {
+							if (foundComma == 0 && nthchar(pairStr, j) == ",") {
+								xStr = substring(pairStr, 0, j);
+								yStr = substring(pairStr, j + 1, length(pairStr) - j - 1);
+								pointsX[pointCount] = int(xStr);
+								pointsY[pointCount] = int(yStr);
+								pointCount = pointCount + 1;
+								foundComma = 1;
+							}
+						}
+					}
+					pairStart = i + 1;
+				}
+			}
+		break;
 		}
 		return;
 	break;
