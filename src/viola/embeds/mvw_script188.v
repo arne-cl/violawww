@@ -61,6 +61,9 @@
 			}
 			send(pageObj, "shownPositionV", sliderPos);
 		} else {
+			/* Reset discovery flag for new page load */
+			discoveryReset();
+
 			if (arg[] == 2)
 			  normURL = send("normalizeURL", "normalizeURL", arg[1]);
 			else 
@@ -170,6 +173,10 @@
 
 			pageHeight = send(pageObj, "vspan");
 			send(self(), "configShare");
+
+			/* Notify peer discovery service after document is parsed
+			 * (only active if page contains SC attributes) */
+			discoverySetPage(normURL);
 		}
 		if (docObj != 0) {
 			title = send(pageObj, "queryTitle");

@@ -48,6 +48,7 @@
 
 #include "../libXPM/xpm.h"
 #include "../viola/ast.h"
+#include "../viola/discovery.h"
 #include "../viola/cexec.h"
 #include "../viola/file.h"
 #include "../viola/msgHandler.h"
@@ -308,6 +309,8 @@ int main(int argc, char* argv[])
         else
             sendMessage1(dvip->violaDocViewObj, "home");
     }
+
+    /* Peer discovery is initialized on-demand when SC attribute is found */
 
     while (1) {
         XtAppNextEvent(appCon, &event);

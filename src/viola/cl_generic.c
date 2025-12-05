@@ -17,6 +17,7 @@
 #include "cl_generic.h"
 #include "ast.h"
 #include "attr.h"
+#include "discovery.h"
 #include "cexec.h"
 #include "cgen.h"
 #include "cl_txtDisp.h"
@@ -230,6 +231,9 @@ MethodInfo meths_generic[] = {
     {STR_asciiVal, meth_generic_asciiVal},
     {STR_bell, meth_generic_bell},
     {STR_bellVolume, meth_generic_bellVolume},
+    {STR_discoverySetPage, meth_generic_discoverySetPage},
+    {STR_discoveryEnable, meth_generic_discoveryEnable},
+    {STR_discoveryReset, meth_generic_discoveryReset},
     {STR_char, meth_generic_char},
     {STR_charHeight, meth_generic_charHeight},
     {STR_clear, meth_generic_clear},
@@ -1991,6 +1995,48 @@ long meth_generic_bellVolume(VObj* self, Packet* result, int argc, Packet argv[]
     result->type = PKT_INT;
     result->canFree = 0;
     result->info.i = SLBellVolume(PkInfo2Int(argv));
+    return 1;
+}
+
+/*
+ * discoverySetPage(<url>)
+ *
+ * Notify peer discovery service of current page URL.
+ * Used for detecting when multiple browsers view the same page.
+ *
+ * Result: unaffected
+ * Return: 1 if successful, 0 if error occured
+ */
+long meth_generic_discoverySetPage(VObj* self, Packet* result, int argc, Packet argv[]) {
+    char* url;
+    
+    clearPacket(result);
+    if (argc < 1) return 0;
+    
+    url = PkInfo2Str(&argv[0]);
+    if (url && *url) {
+        discovery_set_page(url);
+    }
+    return 1;
+}
+
+/*
+ * discoveryEnable()
+ * Enable peer discovery for the current page (called when SC attribute is found)
+ */
+long meth_generic_discoveryEnable(VObj* self, Packet* result, int argc, Packet argv[]) {
+    clearPacket(result);
+    discovery_enable();
+    return 1;
+}
+
+/*
+ * discoveryReset()
+ * Reset discovery enabled flag (called at start of new page load)
+ */
+long meth_generic_discoveryReset(VObj* self, Packet* result, int argc, Packet argv[]) {
+    clearPacket(result);
+    discovery_reset();
     return 1;
 }
 

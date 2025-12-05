@@ -38,6 +38,10 @@
 	break;
 	case "AA":
 		switch (arg[1]) {
+		case "SC":
+			/* SC attribute enables peer discovery for sync */
+			discoveryEnable();
+		break;
 		case "X":
 			sizeX = int(arg[2]);
 		break;

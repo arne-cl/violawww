@@ -35,6 +35,7 @@
 
 #include "../viola/ast.h"
 #include "../viola/attr.h"
+#include "../viola/discovery.h"
 #include "../viola/cexec.h"
 #include "../viola/hash.h"
 #include "../viola/ident.h"
@@ -965,6 +966,7 @@ void doViolaEvent(Widget widget, XtPointer clientData, XEvent* event, Boolean* c
 
 Boolean doViolaIdle(XtPointer clientData) {
     violaIdleEvent();
+    discovery_process();  /* Process peer discovery events */
     return False;  /* Continue calling this workproc */
 }
 

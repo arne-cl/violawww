@@ -278,12 +278,12 @@ VIOLA_SRCS = $(VIOLA_DIR)/DefaultStyles.c $(VIOLA_DIR)/ast.c $(VIOLA_DIR)/attr.c
              $(VIOLA_DIR)/vlist.c $(VIOLA_DIR)/HTML_share.c $(VIOLA_DIR)/htmath.c \
              $(VIOLA_DIR)/viola.c $(VIOLA_DIR)/msgHandler.c $(VIOLA_DIR)/objs.c \
              $(VIOLA_DIR)/HTML_style.c $(VIOLA_DIR)/memory_debug.c \
-             $(VIOLA_DIR)/vw_stubs.c
+             $(VIOLA_DIR)/vw_stubs.c $(VIOLA_DIR)/discovery.c
 VIOLA_OBJS = $(VIOLA_SRCS:.c=.o)
 
-# macOS-specific: Objective-C sound library
+# macOS-specific: Objective-C sound library and Bonjour peer discovery
 ifeq ($(UNAME_S),Darwin)
-VIOLA_OBJS += $(VIOLA_DIR)/slib_darwin.o
+VIOLA_OBJS += $(VIOLA_DIR)/slib_darwin.o $(VIOLA_DIR)/discovery_bonjour.o
 endif
 
 .PHONY: viola

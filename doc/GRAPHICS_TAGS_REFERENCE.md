@@ -55,7 +55,7 @@ Wei's proposal was an independent parallel effort, not an implementation of VRML
 | Button (`<BUTTON>`) | ✅ Implemented (visual, click, HREF, colors) |
 | Hint (HINT attribute) | ✅ Shown in status bar on hover (all shapes) |
 | Interactive scripting (`<ACTION>`, `<SCRIPT>`) | ✅ Implemented for all shapes |
-| Multi-user sync (`SC` attribute) | ❌ Not implemented |
+| Multi-user sync (`SC` attribute) | ✅ Peer discovery implemented (macOS) |
 
 ---
 
@@ -633,7 +633,41 @@ The following features from the original design are **not implemented**:
 
 ### Multi-User Synchronization
 
-The `SC` attribute for broadcasting state changes to other viewers is not implemented.
+### Multi-User Synchronization (SC Attribute)
+
+The `SC` (synchronization) attribute enables peer discovery for collaborative viewing. When a page contains any `SC` attribute on `<POS>`, `<SIZE>`, `<ROT>`, or `<SCALE>` tags, ViolaWWW will:
+
+1. Register itself on the local network via Bonjour/DNS-SD (macOS)
+2. Discover other ViolaWWW instances on the network
+3. Log a message when another browser is viewing the same page
+
+**Example:**
+```html
+<GRAPHICS WIDTH=200 HEIGHT=200>
+  <RECT ID="syncRect">
+    <POS SC X=50 Y=50></POS>
+    <ROT SC Z=0></ROT>
+    <SIZE X=80 Y=60></SIZE>
+    <FGCOLOR NAME="blue"></FGCOLOR>
+  </RECT>
+</GRAPHICS>
+```
+
+When two ViolaWWW browsers view this page, console output shows:
+```
+[Discovery] Enabled by SC attribute
+[Discovery] Initializing (page has SC attributes)
+[Bonjour] Peer discovery active
+[Bonjour] Page changed: abc123 file:///path/to/page.html
+[Bonjour] *** PEER MATCH! ViolaWWW-Host-12345 is viewing the same page ***
+```
+
+**Platform Support:**
+- **macOS**: Full support via Bonjour/DNS-SD
+- **Linux**: Planned (Avahi)
+- **Other**: No-op (discovery functions compile but do nothing)
+
+**Note:** The current implementation provides peer discovery (finding browsers on the same page). Full state synchronization (broadcasting property changes) is planned for future development.
 
 ---
 

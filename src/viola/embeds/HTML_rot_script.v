@@ -43,6 +43,10 @@
 	break;
 	case "AA":
 		switch (arg[1]) {
+		case "SC":
+			/* SC attribute enables peer discovery for sync */
+			discoveryEnable();
+		break;
 		case "X":
 			myRotX = float(arg[2]);
 			hasX = 1;
