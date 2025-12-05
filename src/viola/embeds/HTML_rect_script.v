@@ -78,7 +78,7 @@
 			if (p == "" || p == "0" || p == "(NULL)") {
 				p = send("HTML_graphics", "getCurrentGfx");
 			}
-			if (p != "" && p != "0" && p != "(NULL)" && findPattern(p, "HTML_graphics") >= 0) {
+			if (p != "" && p != "0" && p != "(NULL)") {
 				send(p, "addChild", self());
 			}
 		}
@@ -102,6 +102,7 @@
 		case "ID":
 		case "NAME":
 			tagID = arg[2];
+			set("name", arg[2]);
 		break;
 		case "PARENT":
 			/* Find GRAPHICS by ID and register with it */

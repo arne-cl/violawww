@@ -3775,6 +3775,7 @@ long meth_generic_print(VObj* self, Packet* result, int argc, Packet argv[]) {
             return 0;
         }
     }
+    fflush(stdout);
     return 1;
 }
 

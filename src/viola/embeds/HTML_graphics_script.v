@@ -31,7 +31,19 @@
 		return;
 	break;
 	case "expose":
-		/* Let parent class draw background first */
+		/* Clear graphics area first to prevent ghosting */
+		gx = get("x");
+		gy = get("y");
+		gw = get("width");
+		gh = get("height");
+		/* Fill with background color to clear properly */
+		bgc = get("BGColor");
+		if (bgc == "" || bgc == "0") {
+			bgc = "#c0c0c0";
+		}
+		set("FGColor", bgc);
+		drawFillRect(0, 0, gw, gh);
+		/* Let parent class draw background/border */
 		usual();
 		/* Container draws all children using array */
 		if (gfxChildCount > 0) {
@@ -602,6 +614,7 @@
 		case "ID":
 		case "NAME":
 			tagID = arg[2];
+			set("name", arg[2]);
 		break;
 		case "WIDTH":
 			gWidth = int(arg[2]);

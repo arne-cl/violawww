@@ -16,7 +16,17 @@
 		content = get("label");
 		if (strlen(content) > 0) {
 			/* Check if TYPE="viola" or TYPE=viola is present */
-			typeIdx = findPattern(content, "viola");
+			/* Must match the attribute, not just any occurrence of "viola" */
+			typeIdx = findPattern(content, "TYPE=\"viola\"");
+			if (typeIdx <= 0) {
+				typeIdx = findPattern(content, "TYPE=viola");
+			}
+			if (typeIdx <= 0) {
+				typeIdx = findPattern(content, "type=\"viola\"");
+			}
+			if (typeIdx <= 0) {
+				typeIdx = findPattern(content, "type=viola");
+			}
 			if (typeIdx > 0) {
 				/* Find the first > after SCRIPT tag (marks end of opening tag) */
 				gtIdx = findPattern(content, ">");

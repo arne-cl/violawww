@@ -84,6 +84,7 @@
 		case "ID":
 		case "NAME":
 			tagID = arg[2];
+			set("name", arg[2]);
 		break;
 		}
 		return;

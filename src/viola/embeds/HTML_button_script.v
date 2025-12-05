@@ -98,6 +98,7 @@
 		case "ID":
 		case "NAME":
 			tagID = arg[2];
+			set("name", arg[2]);
 		break;
 		case "HREF":
 			hrefURL = arg[2];

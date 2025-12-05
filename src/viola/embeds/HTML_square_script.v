@@ -64,9 +64,7 @@
 	case 8:
 		/* End of tag processing - register with parent now */
 		if (_savedParent != "" && _savedParent != "0" && _savedParent != "(NULL)") {
-			if (findPattern(_savedParent, "HTML_graphics") >= 0) {
-				send(_savedParent, "addChild", self());
-			}
+			send(_savedParent, "addChild", self());
 		}
 		return;
 	break;
@@ -82,7 +80,7 @@
 			if (p == "" || p == "0" || p == "(NULL)") {
 				p = send("HTML_graphics", "getCurrentGfx");
 			}
-			if (p != "" && p != "0" && p != "(NULL)" && findPattern(p, "HTML_graphics") >= 0) {
+			if (p != "" && p != "0" && p != "(NULL)") {
 				send(p, "addChild", self());
 			}
 		}
@@ -105,6 +103,7 @@
 		case "ID":
 		case "NAME":
 			tagID = arg[2];
+			set("name", arg[2]);
 		break;
 		case "PARENT":
 			_parentID = arg[2];
