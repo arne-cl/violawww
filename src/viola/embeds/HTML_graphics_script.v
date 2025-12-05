@@ -43,8 +43,7 @@
 		}
 		set("FGColor", bgc);
 		drawFillRect(0, 0, gw, gh);
-		/* Let parent class draw background/border */
-		usual();
+		/* Skip usual() - it causes style[] access errors */
 		/* Container draws all children using array */
 		if (gfxChildCount > 0) {
 			/* Draw each child from array */
@@ -584,16 +583,16 @@
 		/* arg[1]	y
 		 * arg[2]	width
 		 */
-		if (style == 0) style = SGMLGetStyle("HTML", "GRAPHICS");
-		vspan = style[0];
+		/* Use fixed margins instead of SGMLGetStyle to avoid array issues */
+		vspan = 5;  /* top margin */
 		set("y", arg[1] + vspan);
-		set("x", style[2]);
+		set("x", 5);  /* left margin */
 		
 		/* Use WIDTH/HEIGHT attributes if set, otherwise use available width */
 		if (gWidth > 0) {
 			set("width", gWidth);
 		} else {
-			set("width", arg[2] - get("x") - style[3]);
+			set("width", arg[2] - 10);  /* minus left+right margin */
 		}
 		if (gHeight > 0) {
 			set("height", gHeight);
@@ -601,7 +600,7 @@
 			set("height", 100); /* default height */
 		}
 		
-		vspan += get("height") + style[1];
+		vspan += get("height") + 5;  /* plus bottom margin */
 		return vspan;
 	break;
 	case "AA":
