@@ -133,6 +133,39 @@ int main(int argc, char *argv[]) {
     setenv("VIOLA_PATH", viola_path, 1);
     setenv("PLOT_PATH", plot_path, 1);
     
+    /* Set GS_LIB for bundled Ghostscript resources */
+    {
+        char gs_lib[MAX_PATH];
+        char gs_resources[MAX_PATH];
+        snprintf(gs_resources, sizeof(gs_resources), "%s/ghostscript", resources_dir);
+        /* GS_LIB expects paths to lib, Resource, fonts directories */
+        snprintf(gs_lib, sizeof(gs_lib), "%s/lib:%s/Resource/Init:%s/Resource:%s/fonts:%s/iccprofiles",
+                 gs_resources, gs_resources, gs_resources, gs_resources, gs_resources);
+        setenv("GS_LIB", gs_lib, 1);
+        setenv("GS_FONTPATH", gs_resources, 1);
+    }
+    
+    /* Note: Custom-built ImageMagick (via scripts/build-imagemagick.sh) has
+     * hardcoded paths to /Applications/ViolaWWW.app/Contents/Resources/ImageMagick
+     * and does NOT need environment variables. In fact, setting MAGICK_* vars
+     * will break it by overriding the correct compiled paths.
+     * 
+     * For system ImageMagick (brew install imagemagick), it will use its own paths.
+     */
+    
+    /* Add MacOS directory and common tool paths to PATH
+     * This allows bundled tools (like onsgmls, gs) and Homebrew tools (like ImageMagick) to be found
+     */
+    {
+        const char *old_path = getenv("PATH");
+        char new_path[8192];
+        snprintf(new_path, sizeof(new_path), "%s:/opt/homebrew/bin:/usr/local/bin%s%s",
+                 exe_dir,
+                 old_path ? ":" : "",
+                 old_path ? old_path : "");
+        setenv("PATH", new_path, 1);
+    }
+    
     /* Ensure DISPLAY is set */
     if (getenv("DISPLAY") == NULL) {
         setenv("DISPLAY", XQUARTZ_DISPLAY, 1);

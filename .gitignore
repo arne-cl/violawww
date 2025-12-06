@@ -42,3 +42,6 @@ dmg/XQuartz-*.pkg
 resources/ViolaWWW.icns
 resources/ViolaWWW.iconset/
 src/launcher/launcher
+
+# Built ImageMagick (platform-specific, build with scripts/build-imagemagick.sh)
+build/imagemagick/

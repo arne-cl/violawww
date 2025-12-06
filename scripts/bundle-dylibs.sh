@@ -10,15 +10,37 @@ APP_RESOURCES="${3:-}"
 PROCESSED_FILE=$(mktemp)
 DEPS_FILE=$(mktemp)
 ALL_PATHS_FILE=$(mktemp)
+RPATH_DEPS_FILE=$(mktemp)
+
+# Common library search paths for resolving @rpath
+RPATH_SEARCH_DIRS="/opt/homebrew/lib /usr/local/lib /opt/X11/lib"
 
 # Get non-system dependencies of a file (returns original paths as seen in binary)
 get_deps() {
     otool -L "$1" 2>/dev/null | tail -n +2 | awk '{print $1}' | while read dep; do
         case "$dep" in
-            /usr/lib/*|/System/*|@*) ;;
+            /usr/lib/*|/System/*) ;;
+            @executable_path/*|@loader_path/*) ;;
+            @rpath/*) 
+                # Extract library name from @rpath/libname.dylib
+                libname="${dep#@rpath/}"
+                echo "@rpath:$libname" >> "$RPATH_DEPS_FILE"
+                ;;
             *) echo "$dep" ;;
         esac
     done
+}
+
+# Resolve @rpath library to actual path
+resolve_rpath() {
+    local libname="$1"
+    for dir in $RPATH_SEARCH_DIRS; do
+        if [ -f "$dir/$libname" ]; then
+            echo "$dir/$libname"
+            return 0
+        fi
+    done
+    return 1
 }
 
 # Check if already processed (by library name, not path)
@@ -65,6 +87,22 @@ if [ -f "$APP_MACOS/sgmlsA2B" ]; then
     collect_deps "$APP_MACOS/sgmlsA2B"
 fi
 
+if [ -f "$APP_MACOS/onsgmls" ]; then
+    echo "Processing onsgmls..."
+    collect_deps "$APP_MACOS/onsgmls"
+fi
+
+if [ -f "$APP_MACOS/gs" ]; then
+    echo "Processing gs (Ghostscript)..."
+    collect_deps "$APP_MACOS/gs"
+fi
+
+# Process custom-built ImageMagick if present
+if [ -f "$APP_MACOS/magick" ]; then
+    echo "Processing magick (ImageMagick)..."
+    collect_deps "$APP_MACOS/magick"
+fi
+
 # Also process vplot if it exists in Resources
 VPLOT_PATH="$APP_RESOURCES/vplot_dir/vplot"
 if [ -n "$APP_RESOURCES" ] && [ -f "$VPLOT_PATH" ]; then
@@ -80,6 +118,67 @@ while read dep; do
     cp "$dep" "$APP_FRAMEWORKS/"
     chmod 755 "$APP_FRAMEWORKS/$libname"
 done < "$DEPS_FILE"
+
+# Phase 2.5: Resolve and copy @rpath dependencies
+# First, scan all copied libraries for @rpath references
+echo "Scanning for @rpath dependencies..."
+> "$RPATH_DEPS_FILE"  # Clear
+for lib in "$APP_FRAMEWORKS"/*.dylib; do
+    [ -f "$lib" ] || continue
+    otool -L "$lib" 2>/dev/null | tail -n +2 | awk '{print $1}' | while read dep; do
+        case "$dep" in
+            @rpath/*)
+                libname="${dep#@rpath/}"
+                echo "$libname" >> "$RPATH_DEPS_FILE"
+                ;;
+        esac
+    done
+done
+
+# Copy missing @rpath libraries and record all @rpath references for path fixing
+if [ -s "$RPATH_DEPS_FILE" ]; then
+    sort -u "$RPATH_DEPS_FILE" > "${RPATH_DEPS_FILE}.sorted"
+    mv "${RPATH_DEPS_FILE}.sorted" "$RPATH_DEPS_FILE"
+    
+    while read libname; do
+        # Always record @rpath reference for path fixing (even if library exists)
+        echo "@rpath/$libname" >> "$ALL_PATHS_FILE"
+        
+        if [ ! -f "$APP_FRAMEWORKS/$libname" ]; then
+            resolved=$(resolve_rpath "$libname")
+            if [ -n "$resolved" ] && [ -f "$resolved" ]; then
+                echo "  Copying $libname (from @rpath)"
+                cp "$resolved" "$APP_FRAMEWORKS/"
+                chmod 755 "$APP_FRAMEWORKS/$libname"
+                echo "$resolved" >> "$ALL_PATHS_FILE"
+            else
+                echo "  Warning: Cannot resolve @rpath/$libname"
+            fi
+        fi
+    done < "$RPATH_DEPS_FILE"
+    
+    # Recursively check new libraries for more @rpath deps (one level deep)
+    for lib in "$APP_FRAMEWORKS"/*.dylib; do
+        [ -f "$lib" ] || continue
+        otool -L "$lib" 2>/dev/null | tail -n +2 | awk '{print $1}' | while read dep; do
+            case "$dep" in
+                @rpath/*)
+                    libname="${dep#@rpath/}"
+                    if [ ! -f "$APP_FRAMEWORKS/$libname" ]; then
+                        resolved=$(resolve_rpath "$libname")
+                        if [ -n "$resolved" ] && [ -f "$resolved" ]; then
+                            echo "  Copying $libname (from @rpath, level 2)"
+                            cp "$resolved" "$APP_FRAMEWORKS/"
+                            chmod 755 "$APP_FRAMEWORKS/$libname"
+                            echo "$resolved" >> "$ALL_PATHS_FILE"
+                            echo "@rpath/$libname" >> "$ALL_PATHS_FILE"
+                        fi
+                    fi
+                    ;;
+            esac
+        done
+    done
+fi
 
 # Get unique paths (some libs may be referenced via different paths)
 sort -u "$ALL_PATHS_FILE" > "${ALL_PATHS_FILE}.sorted"
@@ -97,6 +196,31 @@ if [ -f "$APP_MACOS/sgmlsA2B" ]; then
     while read dep; do
         libname=$(basename "$dep")
         install_name_tool -change "$dep" "@executable_path/../Frameworks/$libname" "$APP_MACOS/sgmlsA2B" 2>/dev/null || true
+    done < "$ALL_PATHS_FILE"
+fi
+
+if [ -f "$APP_MACOS/onsgmls" ]; then
+    echo "Fixing paths in onsgmls..."
+    while read dep; do
+        libname=$(basename "$dep")
+        install_name_tool -change "$dep" "@executable_path/../Frameworks/$libname" "$APP_MACOS/onsgmls" 2>/dev/null || true
+    done < "$ALL_PATHS_FILE"
+fi
+
+if [ -f "$APP_MACOS/gs" ]; then
+    echo "Fixing paths in gs..."
+    while read dep; do
+        libname=$(basename "$dep")
+        install_name_tool -change "$dep" "@executable_path/../Frameworks/$libname" "$APP_MACOS/gs" 2>/dev/null || true
+    done < "$ALL_PATHS_FILE"
+fi
+
+# Fix paths in magick if present
+if [ -f "$APP_MACOS/magick" ]; then
+    echo "Fixing paths in magick..."
+    while read dep; do
+        libname=$(basename "$dep")
+        install_name_tool -change "$dep" "@executable_path/../Frameworks/$libname" "$APP_MACOS/magick" 2>/dev/null || true
     done < "$ALL_PATHS_FILE"
 fi
 
@@ -119,7 +243,15 @@ echo "Fixing library IDs and cross-references..."
 # Build change arguments file (one call with all -change flags is much faster)
 CHANGE_ARGS_FILE=$(mktemp)
 while read dep; do
-    depname=$(basename "$dep")
+    # Handle @rpath references specially
+    case "$dep" in
+        @rpath/*)
+            depname="${dep#@rpath/}"
+            ;;
+        *)
+            depname=$(basename "$dep")
+            ;;
+    esac
     echo "-change"
     echo "$dep"
     echo "@executable_path/../Frameworks/$depname"
@@ -154,10 +286,19 @@ echo "Re-signing binaries..."
 codesign --force --sign - "$APP_MACOS/vw" 2>/dev/null || true
 codesign --force --sign - "$APP_MACOS/vw.bin" 2>/dev/null || true
 [ -f "$APP_MACOS/sgmlsA2B" ] && codesign --force --sign - "$APP_MACOS/sgmlsA2B" 2>/dev/null || true
+[ -f "$APP_MACOS/onsgmls" ] && codesign --force --sign - "$APP_MACOS/onsgmls" 2>/dev/null || true
+[ -f "$APP_MACOS/gs" ] && codesign --force --sign - "$APP_MACOS/gs" 2>/dev/null || true
+[ -f "$APP_MACOS/magick" ] && codesign --force --sign - "$APP_MACOS/magick" 2>/dev/null || true
 [ -f "$VPLOT_PATH" ] && codesign --force --sign - "$VPLOT_PATH" 2>/dev/null || true
 for lib in "$APP_FRAMEWORKS"/*.dylib; do
     [ -f "$lib" ] && codesign --force --sign - "$lib" 2>/dev/null || true
 done
+# Re-sign ImageMagick modules
+if [ -d "$MAGICK_CODERS" ]; then
+    for so in "$MAGICK_CODERS"/*.so; do
+        [ -f "$so" ] && codesign --force --sign - "$so" 2>/dev/null || true
+    done
+fi
 echo "Done"
 
-rm -f "$PROCESSED_FILE" "$DEPS_FILE" "$ALL_PATHS_FILE"
+rm -f "$PROCESSED_FILE" "$DEPS_FILE" "$ALL_PATHS_FILE" "$RPATH_DEPS_FILE"

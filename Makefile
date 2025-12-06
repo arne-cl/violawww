@@ -716,6 +716,70 @@ app: $(VW) $(LAUNCHER)
 		echo "Copying sgmlsA2B..."; \
 		cp $(SGMLSA2B) $(APP_MACOS)/sgmlsA2B; \
 	fi
+	@# Bundle onsgmls from OpenSP if available (for HMML support)
+	@if [ -x /opt/homebrew/bin/onsgmls ]; then \
+		echo "Bundling onsgmls (OpenSP)..."; \
+		cp /opt/homebrew/bin/onsgmls $(APP_MACOS)/onsgmls; \
+	elif [ -x /usr/local/bin/onsgmls ]; then \
+		echo "Bundling onsgmls (OpenSP)..."; \
+		cp /usr/local/bin/onsgmls $(APP_MACOS)/onsgmls; \
+	else \
+		echo "Note: onsgmls not found, HMML support will require OpenSP installation"; \
+	fi
+	@# Bundle Ghostscript if available (for PostScript support)
+	@GS_PATH=$$(which gs 2>/dev/null); \
+	if [ -n "$$GS_PATH" ] && [ -x "$$GS_PATH" ]; then \
+		echo "Bundling Ghostscript (gs)..."; \
+		GS_REAL=$$(realpath "$$GS_PATH"); \
+		cp "$$GS_REAL" $(APP_MACOS)/gs; \
+		GS_DIR=$$(dirname "$$GS_REAL"); \
+		GS_SHARE=$$(dirname "$$GS_DIR")/share/ghostscript; \
+		if [ -d "$$GS_SHARE" ]; then \
+			echo "Bundling Ghostscript resources..."; \
+			mkdir -p $(APP_RESOURCES)/ghostscript; \
+			cp -r "$$GS_SHARE"/lib $(APP_RESOURCES)/ghostscript/ 2>/dev/null || true; \
+			cp -r "$$GS_SHARE"/Resource $(APP_RESOURCES)/ghostscript/ 2>/dev/null || true; \
+			cp -r "$$GS_SHARE"/iccprofiles $(APP_RESOURCES)/ghostscript/ 2>/dev/null || true; \
+			cp -r "$$GS_SHARE"/fonts $(APP_RESOURCES)/ghostscript/ 2>/dev/null || true; \
+		fi; \
+	else \
+		echo "Note: Ghostscript not found, PostScript support will require installation"; \
+	fi
+	@# Bundle custom-built ImageMagick if available (built with scripts/build-imagemagick.sh)
+	@# Static build: all coders are compiled into libMagickCore, no module loading needed
+	@if [ -d build/imagemagick/bin ] && [ -x build/imagemagick/bin/magick ]; then \
+		echo "Bundling custom ImageMagick (static coders)..."; \
+		cp build/imagemagick/bin/magick $(APP_MACOS)/magick; \
+		echo "Copying ImageMagick libraries to Frameworks..."; \
+		for lib in build/imagemagick/lib/*.dylib; do \
+			[ -f "$$lib" ] || continue; \
+			libname=$$(basename "$$lib"); \
+			cp "$$lib" $(APP_FRAMEWORKS)/; \
+			chmod 755 $(APP_FRAMEWORKS)/$$libname; \
+		done; \
+		echo "Fixing ImageMagick library paths..."; \
+		for lib in $(APP_FRAMEWORKS)/libMagick*.dylib; do \
+			[ -f "$$lib" ] || continue; \
+			libname=$$(basename "$$lib"); \
+			install_name_tool -id "@executable_path/../Frameworks/$$libname" "$$lib" 2>/dev/null || true; \
+			for dep in $$(otool -L "$$lib" | grep "/Applications/ViolaWWW.app" | awk '{print $$1}'); do \
+				depname=$$(basename "$$dep"); \
+				install_name_tool -change "$$dep" "@executable_path/../Frameworks/$$depname" "$$lib" 2>/dev/null || true; \
+			done; \
+		done; \
+		for dep in $$(otool -L $(APP_MACOS)/magick | grep "/Applications/ViolaWWW.app" | awk '{print $$1}'); do \
+			depname=$$(basename "$$dep"); \
+			install_name_tool -change "$$dep" "@executable_path/../Frameworks/$$depname" $(APP_MACOS)/magick 2>/dev/null || true; \
+		done; \
+		mkdir -p $(APP_RESOURCES)/ImageMagick; \
+		cp -r build/imagemagick/etc $(APP_RESOURCES)/ImageMagick/; \
+		cp -r build/imagemagick/share $(APP_RESOURCES)/ImageMagick/ 2>/dev/null || true; \
+		cp -r build/imagemagick/lib/ImageMagick-*/config-* $(APP_RESOURCES)/ImageMagick/ 2>/dev/null || true; \
+	else \
+		echo "Note: Custom ImageMagick not found. To bundle it:"; \
+		echo "      ./scripts/build-imagemagick.sh"; \
+		echo "      (Or use system ImageMagick via: brew install imagemagick)"; \
+	fi
 	@echo "Copying resources..."
 	@cp -r res $(APP_RESOURCES)/
 	@cp LICENSE.md $(APP_RESOURCES)/ 2>/dev/null || true
@@ -789,6 +853,9 @@ dmg: app
 	@strip -x $(APP_MACOS)/vw 2>/dev/null || true
 	@strip -x $(APP_MACOS)/vw.bin 2>/dev/null || true
 	@strip -x $(APP_MACOS)/sgmlsA2B 2>/dev/null || true
+	@strip -x $(APP_MACOS)/onsgmls 2>/dev/null || true
+	@strip -x $(APP_MACOS)/gs 2>/dev/null || true
+	@strip -x $(APP_MACOS)/magick 2>/dev/null || true
 	@for lib in $(APP_FRAMEWORKS)/*.dylib; do \
 		strip -x "$$lib" 2>/dev/null || true; \
 	done

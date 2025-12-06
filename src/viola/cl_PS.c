@@ -30,6 +30,89 @@
 #include "utils.h"
 #include <ctype.h>
 #include <string.h>
+#include <unistd.h>
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#include <libgen.h>
+#endif
+
+/*
+ * Search paths for Ghostscript (gs).
+ * The program will first look in the same directory as the executable,
+ * then fall back to standard paths.
+ * 
+ * On macOS with Homebrew: brew install ghostscript
+ * On Linux: apt-get install ghostscript
+ */
+static const char *gs_search_paths[] = {
+    "/opt/homebrew/bin/gs",     /* macOS Homebrew (Apple Silicon) */
+    "/usr/local/bin/gs",        /* macOS Homebrew (Intel) / Linux local */
+    "/usr/bin/gs",              /* Linux system */
+    "/opt/local/bin/gs",        /* MacPorts */
+    NULL
+};
+
+/* Buffer to hold the discovered gs path */
+static char gs_path[4096] = "";
+
+/*
+ * Find Ghostscript executable.
+ * First checks the same directory as this executable (for app bundles),
+ * then searches standard paths.
+ */
+static const char* find_gs(void) {
+    char exe_path[4096];
+    char exe_dir[4096];
+    char candidate[4096];
+    
+    if (gs_path[0] != '\0') {
+        return gs_path;
+    }
+    
+#ifdef __APPLE__
+    /* Get path to this executable */
+    uint32_t size = sizeof(exe_path);
+    if (_NSGetExecutablePath(exe_path, &size) == 0) {
+        /* Get directory containing the executable */
+        char *dir = dirname(exe_path);
+        strncpy(exe_dir, dir, sizeof(exe_dir) - 1);
+        exe_dir[sizeof(exe_dir) - 1] = '\0';
+        
+        /* Check for gs in the same directory */
+        snprintf(candidate, sizeof(candidate), "%s/gs", exe_dir);
+        if (access(candidate, X_OK) == 0) {
+            strncpy(gs_path, candidate, sizeof(gs_path) - 1);
+            return gs_path;
+        }
+    }
+#else
+    /* Linux: use /proc/self/exe */
+    ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
+    if (len > 0) {
+        exe_path[len] = '\0';
+        char *dir = dirname(exe_path);
+        strncpy(exe_dir, dir, sizeof(exe_dir) - 1);
+        exe_dir[sizeof(exe_dir) - 1] = '\0';
+        
+        snprintf(candidate, sizeof(candidate), "%s/gs", exe_dir);
+        if (access(candidate, X_OK) == 0) {
+            strncpy(gs_path, candidate, sizeof(gs_path) - 1);
+            return gs_path;
+        }
+    }
+#endif
+    
+    /* Search standard paths */
+    for (int i = 0; gs_search_paths[i] != NULL; i++) {
+        if (access(gs_search_paths[i], X_OK) == 0) {
+            strncpy(gs_path, gs_search_paths[i], sizeof(gs_path) - 1);
+            return gs_path;
+        }
+    }
+    
+    /* Not found - return "gs" and hope it's in PATH */
+    return "gs";
+}
 
 SlotInfo cl_PS_NCSlots[] = {0};
 SlotInfo cl_PS_NPSlots[] = {0};
@@ -150,7 +233,7 @@ long helper_PS_set(VObj* self, Packet* result, int argc, Packet argv[], long lab
             printf("buff=>%s<\n", buff);
             /*			setenv("GHOSTVIEW", buff, True);*/
             /*			setenv("DISPLAY", itoa(display...), True);*/
-            sprintf(buff, "gs %s", GET_label(self));
+            sprintf(buff, "%s %s", find_gs(), GET_label(self));
             system(buff);
 
             SET__label(self, 0);

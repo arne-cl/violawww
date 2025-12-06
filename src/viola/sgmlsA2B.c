@@ -13,15 +13,89 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <libgen.h>
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
 
 /*
- * Path to the SGML parser (onsgmls from OpenSP package).
+ * Search paths for the SGML parser (onsgmls from OpenSP package).
+ * The program will first look for onsgmls in the same directory as sgmlsA2B,
+ * then fall back to standard paths.
+ * 
  * On macOS with Homebrew: brew install open-sp
  * On Linux: apt-get install opensp
  */
-#ifndef SGMLS_PATH
-#define SGMLS_PATH "/opt/homebrew/bin/onsgmls"
+static const char *onsgmls_search_paths[] = {
+    "/opt/homebrew/bin/onsgmls",     /* macOS Homebrew (Apple Silicon) */
+    "/usr/local/bin/onsgmls",        /* macOS Homebrew (Intel) / Linux local */
+    "/usr/bin/onsgmls",              /* Linux system */
+    "/opt/local/bin/onsgmls",        /* MacPorts */
+    NULL
+};
+
+/* Buffer to hold the discovered onsgmls path */
+static char onsgmls_path[4096] = "";
+
+/*
+ * Find onsgmls executable.
+ * First checks the same directory as this executable (for app bundles),
+ * then searches standard paths.
+ */
+static const char* find_onsgmls(void) {
+    char exe_path[4096];
+    char exe_dir[4096];
+    char candidate[4096];
+    
+    if (onsgmls_path[0] != '\0') {
+        return onsgmls_path;
+    }
+    
+#ifdef __APPLE__
+    /* Get path to this executable */
+    uint32_t size = sizeof(exe_path);
+    if (_NSGetExecutablePath(exe_path, &size) == 0) {
+        /* Get directory containing the executable */
+        char *dir = dirname(exe_path);
+        strncpy(exe_dir, dir, sizeof(exe_dir) - 1);
+        exe_dir[sizeof(exe_dir) - 1] = '\0';
+        
+        /* Check for onsgmls in the same directory */
+        snprintf(candidate, sizeof(candidate), "%s/onsgmls", exe_dir);
+        if (access(candidate, X_OK) == 0) {
+            strncpy(onsgmls_path, candidate, sizeof(onsgmls_path) - 1);
+            return onsgmls_path;
+        }
+    }
+#else
+    /* Linux: use /proc/self/exe */
+    ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
+    if (len > 0) {
+        exe_path[len] = '\0';
+        char *dir = dirname(exe_path);
+        strncpy(exe_dir, dir, sizeof(exe_dir) - 1);
+        exe_dir[sizeof(exe_dir) - 1] = '\0';
+        
+        snprintf(candidate, sizeof(candidate), "%s/onsgmls", exe_dir);
+        if (access(candidate, X_OK) == 0) {
+            strncpy(onsgmls_path, candidate, sizeof(onsgmls_path) - 1);
+            return onsgmls_path;
+        }
+    }
 #endif
+    
+    /* Search standard paths */
+    for (int i = 0; onsgmls_search_paths[i] != NULL; i++) {
+        if (access(onsgmls_search_paths[i], X_OK) == 0) {
+            strncpy(onsgmls_path, onsgmls_search_paths[i], sizeof(onsgmls_path) - 1);
+            return onsgmls_path;
+        }
+    }
+    
+    /* Not found - return first path (will fail with clear error) */
+    return onsgmls_search_paths[0];
+}
 
 static int verbose = 0;
 
@@ -448,7 +522,7 @@ int main(int argc, char** argv)
         fprintf(stderr, "usage: %s DTDname [sdecl] file\n", argv[0]);
         exit(1);
     }
-    snprintf(cmd, sizeof(cmd), "%s %s %s 2>/dev/null", SGMLS_PATH, sdecl, doc);
+    snprintf(cmd, sizeof(cmd), "%s %s %s 2>/dev/null", find_onsgmls(), sdecl, doc);
     fp = popen(cmd, "r");
     if (!fp) {
         fprintf(stderr, "popen() failed\n");
