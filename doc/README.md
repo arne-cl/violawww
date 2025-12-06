@@ -188,7 +188,7 @@ Topics covered:
 
 ---
 
-я## System Integration
+## System Integration
 
 ### [EXTERNAL_DEPENDENCIES.md](EXTERNAL_DEPENDENCIES.md)
 External programs and environment variables used by ViolaWWW.
@@ -199,6 +199,17 @@ Topics covered:
 - Environment variables (VIOLA_PATH, DISPLAY, GS_LIB, etc.)
 - Platform-specific notes (macOS, Homebrew)
 - Installation requirements
+
+### [BUILD_PROCESS.md](BUILD_PROCESS.md)
+macOS app bundle and DMG creation internals.
+
+Topics covered:
+- App bundle structure (`ViolaWWW.app`)
+- Build stages (`make app`, `make dmg`)
+- Dynamic library bundling (`bundle-dylibs.sh`)
+- DMG creation with custom background
+- ImageMagick custom build process
+- Path resolution and troubleshooting
 
 ---
 
