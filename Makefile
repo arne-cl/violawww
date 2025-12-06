@@ -867,11 +867,17 @@ app: $(VW) $(LAUNCHER)
 	@if [ -f $(APP_RESOURCES)/vplot_dir/vplot ]; then \
 		strip -x $(APP_RESOURCES)/vplot_dir/vplot 2>/dev/null || true; \
 	fi
-	@# Re-sign after stripping
-	@codesign --force --sign - $(APP_MACOS)/* 2>/dev/null || true
+	@# Clear extended attributes that interfere with code signing
+	@chmod -R u+w $(APP_BUNDLE)
+	@xattr -cr $(APP_BUNDLE) 2>/dev/null || true
+	@# Re-sign after stripping (nested components first, then bundle with --deep)
+	@for bin in $(APP_MACOS)/*; do \
+		codesign --force --sign - "$$bin" 2>/dev/null || true; \
+	done
 	@for lib in $(APP_FRAMEWORKS)/*.dylib; do \
 		codesign --force --sign - "$$lib" 2>/dev/null || true; \
 	done
+	@codesign --force --sign - --deep $(APP_BUNDLE)
 	@echo ""
 	@echo "=== $(APP_NAME).app built successfully! ==="
 	@du -sh $(APP_BUNDLE)
