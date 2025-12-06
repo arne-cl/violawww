@@ -159,6 +159,14 @@ This version brings ViolaWWW into the modern web era while preserving its unique
 - **Files**: `examples/plot.v`, `examples/vplot.v`
 - **Documentation**: [VPLOT_REFERENCE.md](doc/VPLOT_REFERENCE.md)
 
+#### macOS Distribution
+- Native macOS application bundle (ViolaWWW.app)
+- Standalone launcher with automatic XQuartz detection and startup
+- Dynamic library bundling (no Homebrew required at runtime)
+- DMG installer with retro-style background and XQuartz package
+- Universal support for Finder launch and terminal execution
+- **Files**: `src/launcher/launcher.c`, `scripts/bundle-dylibs.sh`, `scripts/create-dmg.sh`
+
 #### Infrastructure Improvements
 - 64-bit architecture support (from 32-bit original)
 - Socket timeouts (30s for HTTP/HTTPS, 5s for Wayback API)
@@ -223,6 +231,29 @@ make test
 Two binaries will be generated:
 - `src/viola/viola` - Pure XLib version (smaller, no Motif required)
 - `src/vw/vw` - Motif version (polished GUI)
+
+### macOS App Bundle & DMG
+
+Build a standalone macOS application bundle with bundled libraries:
+
+```bash
+# Build ViolaWWW.app bundle
+make app
+
+# Create distributable DMG with custom background
+make dmg
+
+# Or use custom DMG script with retro-style installer
+make dmg-custom
+```
+
+The app bundle includes:
+- Native macOS launcher with automatic XQuartz startup
+- All required dynamic libraries bundled (no Homebrew needed at runtime)
+- XQuartz installer package for easy dependency installation
+- Retro-style DMG background with installation instructions
+
+**Note**: XQuartz is still required to run ViolaWWW, but it's included in the DMG for convenience.
 
 ### Running
 
@@ -627,6 +658,7 @@ Contributions are welcome! Areas of interest:
 - Proto-VRML graphics tags implementation (GRAPHICS, RECT, CIRCLE, POLYGON, ROT, SCALE, SC sync, etc.)
 - TTY interface restoration for external process communication
 - VPLOT 3D surface plotter implementation
+- macOS app bundle with native launcher and DMG distribution
 - Socket timeouts and error handling
 - Modern build system improvements
 - Comprehensive test suite
