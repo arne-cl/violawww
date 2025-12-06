@@ -188,6 +188,20 @@ Topics covered:
 
 ---
 
+## System Integration
+
+### [EXTERNAL_DEPENDENCIES.md](EXTERNAL_DEPENDENCIES.md)
+External programs and environment variables used by ViolaWWW.
+
+Topics covered:
+- Required external programs (onsgmls, gs, magick, telnet)
+- Program search paths and lookup order
+- Environment variables (VIOLA_PATH, DISPLAY, GS_LIB, etc.)
+- Platform-specific notes (macOS, Homebrew)
+- Installation requirements
+
+---
+
 ## Historical Context
 
 ViolaWWW (1991-1994) was one of the first graphical web browsers and pioneered many features that were later standardized:
@@ -206,20 +220,6 @@ ViolaWWW (1991-1994) was one of the first graphical web browsers and pioneered m
 | VPLOT (3D visualization) | WebGL, Three.js |
 
 As Tim Berners-Lee noted in 1993: *"HMML is in fact already an extension of HTML for multimedia from O'Reilly."*
-
----
-
-## System Integration
-
-### [EXTERNAL_DEPENDENCIES.md](EXTERNAL_DEPENDENCIES.md)
-External programs and environment variables used by ViolaWWW.
-
-Topics covered:
-- Required external programs (onsgmls, gs, magick, telnet)
-- Program search paths and lookup order
-- Environment variables (VIOLA_PATH, DISPLAY, GS_LIB, etc.)
-- Platform-specific notes (macOS, Homebrew)
-- Installation requirements
 
 ---
 
