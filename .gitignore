@@ -45,3 +45,6 @@ src/launcher/launcher
 
 # Built ImageMagick (platform-specific, build with scripts/build-imagemagick.sh)
 build/imagemagick/
+
+# Downloaded source archives
+build/downloads/

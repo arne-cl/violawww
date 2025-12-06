@@ -24,6 +24,8 @@ INSTALL_PREFIX="/Applications/ViolaWWW.app/Contents/Resources/ImageMagick"
 # Build directory
 BUILD_DIR="/tmp/imagemagick-build-$$"
 INSTALL_DIR="$PROJECT_DIR/build/imagemagick"
+CACHE_DIR="$PROJECT_DIR/build/downloads"
+ARCHIVE_FILE="$CACHE_DIR/ImageMagick-${IM_VERSION}.tar.gz"
 
 echo "=== Building ImageMagick ${IM_VERSION} for ViolaWWW ==="
 echo "Install prefix: $INSTALL_PREFIX"
@@ -33,15 +35,20 @@ echo ""
 # Create directories
 mkdir -p "$BUILD_DIR"
 mkdir -p "$INSTALL_DIR"
+mkdir -p "$CACHE_DIR"
 
-# Download source
-echo "Downloading ImageMagick..."
-curl -L "$IM_URL" -o "$BUILD_DIR/imagemagick.tar.gz"
+# Download source (if not cached)
+if [ -f "$ARCHIVE_FILE" ]; then
+    echo "Using cached archive: $ARCHIVE_FILE"
+else
+    echo "Downloading ImageMagick..."
+    curl -L --progress-bar "$IM_URL" -o "$ARCHIVE_FILE"
+fi
 
 # Extract
 echo "Extracting..."
 cd "$BUILD_DIR"
-tar -xzf imagemagick.tar.gz
+tar -xzf "$ARCHIVE_FILE"
 cd ImageMagick-*
 
 # Configure with statically-linked coders (no module loading needed)

@@ -10,13 +10,10 @@ The build process consists of several stages:
 
 ```
 make app          →  ViolaWWW.app (self-contained bundle)
-make dmg          →  ViolaWWW.dmg (distributable installer)
+make dmg          →  ViolaWWW.dmg (distributable installer with XQuartz)
 ```
 
-Optional pre-build step for ImageMagick:
-```
-./scripts/build-imagemagick.sh  →  build/imagemagick/ (custom build)
-```
+ImageMagick is built automatically from source during `make app` if not already built.
 
 ---
 
@@ -35,7 +32,7 @@ ViolaWWW.app/
 │   │   ├── sgmlsA2B            # HMML binary converter
 │   │   ├── onsgmls             # SGML parser (from OpenSP)
 │   │   ├── gs                  # Ghostscript
-│   │   ├── magick              # ImageMagick (if built)
+│   │   ├── magick              # ImageMagick
 │   │   ├── telnet              # Telnet client
 │   │   └── rlogin              # Remote login (optional)
 │   ├── Frameworks/             # Dynamic libraries
@@ -52,7 +49,7 @@ ViolaWWW.app/
 │       │   ├── Resource/
 │       │   ├── fonts/
 │       │   └── iccprofiles/
-│       ├── ImageMagick/        # IM config (if built)
+│       ├── ImageMagick/        # IM config
 │       │   ├── etc/
 │       │   └── config-Q16HDRI/
 │       └── vplot_dir/          # VPLOT resources
@@ -283,6 +280,8 @@ SetFile -a C ViolaWWW.dmg
 ---
 
 ## ImageMagick Custom Build
+
+ImageMagick is built automatically from source during `make app` if `build/imagemagick/` doesn't exist.
 
 ### Why Custom Build?
 

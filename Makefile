@@ -154,7 +154,6 @@ help:
 	@echo "macOS targets:"
 	@echo "  app        - Build ViolaWWW.app bundle"
 	@echo "  dmg        - Create ViolaWWW.dmg for distribution"
-	@echo "  dmg-custom - Create DMG with custom background"
 	@echo "  clean-app  - Remove app bundle and DMG"
 
 # ============================================================================
@@ -764,41 +763,40 @@ app: $(VW) $(LAUNCHER)
 	else \
 		echo "Note: rlogin not found (optional), install via: brew install inetutils"; \
 	fi
-	@# Bundle custom-built ImageMagick if available (built with scripts/build-imagemagick.sh)
-	@# Static build: all coders are compiled into libMagickCore, no module loading needed
-	@if [ -d build/imagemagick/bin ] && [ -x build/imagemagick/bin/magick ]; then \
-		echo "Bundling custom ImageMagick (static coders)..."; \
-		cp build/imagemagick/bin/magick $(APP_MACOS)/magick; \
-		echo "Copying ImageMagick libraries to Frameworks..."; \
-		for lib in build/imagemagick/lib/*.dylib; do \
-			[ -f "$$lib" ] || continue; \
-			libname=$$(basename "$$lib"); \
-			cp "$$lib" $(APP_FRAMEWORKS)/; \
-			chmod 755 $(APP_FRAMEWORKS)/$$libname; \
-		done; \
-		echo "Fixing ImageMagick library paths..."; \
-		for lib in $(APP_FRAMEWORKS)/libMagick*.dylib; do \
-			[ -f "$$lib" ] || continue; \
-			libname=$$(basename "$$lib"); \
-			install_name_tool -id "@executable_path/../Frameworks/$$libname" "$$lib" 2>/dev/null || true; \
-			for dep in $$(otool -L "$$lib" | grep "/Applications/ViolaWWW.app" | awk '{print $$1}'); do \
-				depname=$$(basename "$$dep"); \
-				install_name_tool -change "$$dep" "@executable_path/../Frameworks/$$depname" "$$lib" 2>/dev/null || true; \
-			done; \
-		done; \
-		for dep in $$(otool -L $(APP_MACOS)/magick | grep "/Applications/ViolaWWW.app" | awk '{print $$1}'); do \
-			depname=$$(basename "$$dep"); \
-			install_name_tool -change "$$dep" "@executable_path/../Frameworks/$$depname" $(APP_MACOS)/magick 2>/dev/null || true; \
-		done; \
-		mkdir -p $(APP_RESOURCES)/ImageMagick; \
-		cp -r build/imagemagick/etc $(APP_RESOURCES)/ImageMagick/; \
-		cp -r build/imagemagick/share $(APP_RESOURCES)/ImageMagick/ 2>/dev/null || true; \
-		cp -r build/imagemagick/lib/ImageMagick-*/config-* $(APP_RESOURCES)/ImageMagick/ 2>/dev/null || true; \
-	else \
-		echo "Note: Custom ImageMagick not found. To bundle it:"; \
-		echo "      ./scripts/build-imagemagick.sh"; \
-		echo "      (Or use system ImageMagick via: brew install imagemagick)"; \
+	@# Build ImageMagick from source if not already built
+	@if [ ! -d build/imagemagick/bin ] || [ ! -x build/imagemagick/bin/magick ]; then \
+		echo "Building ImageMagick from source (static coders)..."; \
+		chmod +x scripts/build-imagemagick.sh; \
+		./scripts/build-imagemagick.sh || exit 1; \
 	fi
+	@# Bundle custom-built ImageMagick (static build: all coders in libMagickCore)
+	@echo "Bundling ImageMagick..."
+	@cp build/imagemagick/bin/magick $(APP_MACOS)/magick
+	@echo "Copying ImageMagick libraries to Frameworks..."
+	@for lib in build/imagemagick/lib/*.dylib; do \
+		[ -f "$$lib" ] || continue; \
+		libname=$$(basename "$$lib"); \
+		cp "$$lib" $(APP_FRAMEWORKS)/; \
+		chmod 755 $(APP_FRAMEWORKS)/$$libname; \
+	done
+	@echo "Fixing ImageMagick library paths..."
+	@for lib in $(APP_FRAMEWORKS)/libMagick*.dylib; do \
+		[ -f "$$lib" ] || continue; \
+		libname=$$(basename "$$lib"); \
+		install_name_tool -id "@executable_path/../Frameworks/$$libname" "$$lib" 2>/dev/null || true; \
+		for dep in $$(otool -L "$$lib" | grep "/Applications/ViolaWWW.app" | awk '{print $$1}'); do \
+			depname=$$(basename "$$dep"); \
+			install_name_tool -change "$$dep" "@executable_path/../Frameworks/$$depname" "$$lib" 2>/dev/null || true; \
+		done; \
+	done
+	@for dep in $$(otool -L $(APP_MACOS)/magick | grep "/Applications/ViolaWWW.app" | awk '{print $$1}'); do \
+		depname=$$(basename "$$dep"); \
+		install_name_tool -change "$$dep" "@executable_path/../Frameworks/$$depname" $(APP_MACOS)/magick 2>/dev/null || true; \
+	done
+	@mkdir -p $(APP_RESOURCES)/ImageMagick
+	@cp -r build/imagemagick/etc $(APP_RESOURCES)/ImageMagick/
+	@cp -r build/imagemagick/share $(APP_RESOURCES)/ImageMagick/ 2>/dev/null || true
+	@cp -r build/imagemagick/lib/ImageMagick-*/config-* $(APP_RESOURCES)/ImageMagick/ 2>/dev/null || true
 	@echo "Copying resources..."
 	@cp -r res $(APP_RESOURCES)/
 	@cp LICENSE.md $(APP_RESOURCES)/ 2>/dev/null || true
@@ -890,13 +888,6 @@ bundle-dylibs:
 .PHONY: dmg
 dmg: app
 	@echo "=== Creating $(APP_NAME).dmg ==="
-	@chmod +x scripts/create-dmg.sh
-	@scripts/create-dmg.sh
-
-# Custom DMG with XQuartz and retro styling
-.PHONY: dmg-custom
-dmg-custom: app
-	@echo "=== Creating custom DMG with XQuartz ==="
 	@chmod +x scripts/create-dmg.sh
 	@scripts/create-dmg.sh
 
