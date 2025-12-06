@@ -87,9 +87,6 @@ fi
 
 echo "Background created."
 
-# Create Applications symlink
-ln -sf /Applications "$BUILD_DIR/Applications"
-
 # Remove old DMG
 rm -f "$PROJECT_DIR/ViolaWWW.dmg"
 
@@ -102,9 +99,9 @@ create-dmg \
     --window-pos 200 100 \
     --window-size 640 580 \
     --icon-size 64 \
-    --icon "ViolaWWW.app" 130 190 \
-    --icon "$XQUARTZ_PKG" 320 190 \
-    --icon "Applications" 510 190 \
+    --icon "$XQUARTZ_PKG" 130 190 \
+    --icon "ViolaWWW.app" 320 190 \
+    --app-drop-link 510 190 \
     --hide-extension "ViolaWWW.app" \
     --no-internet-enable \
     "$PROJECT_DIR/ViolaWWW.dmg" \
