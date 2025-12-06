@@ -199,12 +199,25 @@ This version brings ViolaWWW into the modern web era while preserving its unique
 - **OpenMotif**: Motif toolkit (`brew install openmotif`)
 - **Byacc**: Berkeley Yacc parser generator (`brew install byacc`)
 
-#### Optional Dependencies
+#### Optional Dependencies (Build Time)
+
+These are linked at build time and bundled into the app:
 
 - **OpenSSL 3.x**: For HTTPS support (`brew install openssl@3`)
 - **ICU4C**: For UTF-8 transliteration (`brew install icu4c`)
-- **ImageMagick**: For PostScript image support (`brew install imagemagick`) - required if you need to display PostScript/PS figures
-- **OpenSP**: For HMML document support (`brew install open-sp`) - provides `onsgmls` SGML parser for legacy HMML format
+
+#### Optional Dependencies (Runtime)
+
+These external programs are called by ViolaWWW for specific features:
+
+| Program | Installation | Purpose | Bundled in .app |
+|---------|--------------|---------|-----------------|
+| **Ghostscript** | `brew install ghostscript` | PostScript display and conversion | ✅ Yes |
+| **ImageMagick** | `brew install imagemagick` or `./scripts/build-imagemagick.sh` | PostScript-to-GIF conversion | ✅ Yes (if built) |
+| **OpenSP** | `brew install open-sp` | HMML document parsing (`onsgmls`) | ✅ Yes |
+| **telnet** | `brew install telnet` | `telnet://` URL support | ✅ Yes |
+
+**Note**: When building `ViolaWWW.app`, these programs are automatically bundled if available. The app bundle is self-contained and doesn't require Homebrew at runtime (only XQuartz is needed).
 
 **Note**: Without OpenMotif, only the pure X11 version (`viola`) will be built. The Motif version (`vw`) requires OpenMotif.
 
@@ -216,9 +229,10 @@ git clone https://github.com/bolknote/violawww.git
 cd violawww
 
 # Install dependencies (macOS)
-brew install --cask xquartz    # X11 window system
+brew install --cask xquartz    # X11 window system (required)
 brew install openmotif byacc   # Required for building
-brew install openssl@3 icu4c imagemagick open-sp  # HTTPS, UTF-8 transliteration, PostScript, HMML support
+brew install openssl@3 icu4c   # HTTPS, UTF-8 transliteration
+brew install ghostscript open-sp telnet  # PostScript, HMML, telnet:// URLs
 
 # Compile (parallel build)
 make clean
