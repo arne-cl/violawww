@@ -97,6 +97,7 @@ echo "Creating DMG..."
 create-dmg \
     --volname "ViolaWWW" \
     --volicon "$PROJECT_DIR/resources/ViolaWWW.icns" \
+    --format ULMO \
     --background "$BACKGROUND_PNG" \
     --window-pos 200 100 \
     --window-size 640 580 \
