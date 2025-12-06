@@ -21,6 +21,7 @@ ViolaWWW is an extensible World Wide Web hypermedia browser, originally created 
 - HTTPS/TLS support via OpenSSL
 - HTTP redirect handling (301, 302, 303, 307, 308)
 - Internet Archive (Wayback Machine) integration
+- Proto-VRML graphics tags implementation (GRAPHICS, ROT, SCALE, etc.)
 - Multi-encoding support with transliteration (Windows-1251, KOI8-R, UTF-8 → Latin/ASCII)
 - Socket timeouts and improved error handling
 - Modern build system with parallel compilation
