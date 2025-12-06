@@ -97,6 +97,11 @@ if [ -f "$APP_MACOS/gs" ]; then
     collect_deps "$APP_MACOS/gs"
 fi
 
+if [ -f "$APP_MACOS/telnet" ]; then
+    echo "Processing telnet..."
+    collect_deps "$APP_MACOS/telnet"
+fi
+
 # Process custom-built ImageMagick if present
 if [ -f "$APP_MACOS/magick" ]; then
     echo "Processing magick (ImageMagick)..."
@@ -215,6 +220,14 @@ if [ -f "$APP_MACOS/gs" ]; then
     done < "$ALL_PATHS_FILE"
 fi
 
+if [ -f "$APP_MACOS/telnet" ]; then
+    echo "Fixing paths in telnet..."
+    while read dep; do
+        libname=$(basename "$dep")
+        install_name_tool -change "$dep" "@executable_path/../Frameworks/$libname" "$APP_MACOS/telnet" 2>/dev/null || true
+    done < "$ALL_PATHS_FILE"
+fi
+
 # Fix paths in magick if present
 if [ -f "$APP_MACOS/magick" ]; then
     echo "Fixing paths in magick..."
@@ -289,6 +302,7 @@ codesign --force --sign - "$APP_MACOS/vw.bin" 2>/dev/null || true
 [ -f "$APP_MACOS/onsgmls" ] && codesign --force --sign - "$APP_MACOS/onsgmls" 2>/dev/null || true
 [ -f "$APP_MACOS/gs" ] && codesign --force --sign - "$APP_MACOS/gs" 2>/dev/null || true
 [ -f "$APP_MACOS/magick" ] && codesign --force --sign - "$APP_MACOS/magick" 2>/dev/null || true
+[ -f "$APP_MACOS/telnet" ] && codesign --force --sign - "$APP_MACOS/telnet" 2>/dev/null || true
 [ -f "$VPLOT_PATH" ] && codesign --force --sign - "$VPLOT_PATH" 2>/dev/null || true
 for lib in "$APP_FRAMEWORKS"/*.dylib; do
     [ -f "$lib" ] && codesign --force --sign - "$lib" 2>/dev/null || true

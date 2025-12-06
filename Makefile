@@ -745,6 +745,17 @@ app: $(VW) $(LAUNCHER)
 	else \
 		echo "Note: Ghostscript not found, PostScript support will require installation"; \
 	fi
+	@# Bundle telnet if available (for telnet:// URLs)
+	@TELNET_PATH=$$(brew --prefix telnet 2>/dev/null)/bin/telnet; \
+	if [ -x "$$TELNET_PATH" ]; then \
+		echo "Bundling telnet..."; \
+		cp "$$TELNET_PATH" $(APP_MACOS)/telnet; \
+	elif [ -x /usr/local/bin/telnet ]; then \
+		echo "Bundling telnet..."; \
+		cp /usr/local/bin/telnet $(APP_MACOS)/telnet; \
+	else \
+		echo "Note: telnet not found, telnet:// URLs will require: brew install telnet"; \
+	fi
 	@# Bundle custom-built ImageMagick if available (built with scripts/build-imagemagick.sh)
 	@# Static build: all coders are compiled into libMagickCore, no module loading needed
 	@if [ -d build/imagemagick/bin ] && [ -x build/imagemagick/bin/magick ]; then \
@@ -842,6 +853,7 @@ app: $(VW) $(LAUNCHER)
 	@strip -x $(APP_MACOS)/onsgmls 2>/dev/null || true
 	@strip -x $(APP_MACOS)/gs 2>/dev/null || true
 	@strip -x $(APP_MACOS)/magick 2>/dev/null || true
+	@strip -x $(APP_MACOS)/telnet 2>/dev/null || true
 	@for lib in $(APP_FRAMEWORKS)/*.dylib; do \
 		strip -x "$$lib" 2>/dev/null || true; \
 	done
