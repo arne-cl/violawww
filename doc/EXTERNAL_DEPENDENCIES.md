@@ -25,9 +25,11 @@ ViolaWWW invokes external programs via `system()`, `popen()`, and `execv()` call
 
 | Program | Purpose | Invoked From | Search Path |
 |---------|---------|--------------|-------------|
-| `telnet` | Handle `telnet://` URLs | `WWWTelnetHandler_script.v` | `PATH` |
-| `rlogin` | Handle `telnet://user@host` URLs (legacy) | `WWWTelnetHandler_script.v` | `PATH` |
+| `telnet` | Handle `telnet://host` URLs | `WWWTelnetHandler_script.v` | `PATH` |
+| `rlogin` | Handle `telnet://user@host` URLs (optional, legacy) | `WWWTelnetHandler_script.v` | `PATH` |
 | `xterm` | Terminal emulator for telnet/rlogin sessions | `WWWTelnetHandler_script.v` | `PATH` (typically `/opt/X11/bin`) |
+
+**Note**: `rlogin` is optional. It's only used for `telnet://user@host` URLs (with username). Without it, such URLs will fail but regular `telnet://host` URLs will work. Install via `brew install inetutils`.
 
 ### Mail and Printing
 
@@ -167,7 +169,10 @@ When running from `ViolaWWW.app`, the launcher:
 | Ghostscript | `brew install ghostscript` | PostScript support |
 | ImageMagick | `brew install imagemagick` | PS-to-GIF conversion |
 | OpenSP | `brew install open-sp` | HMML document support |
-| telnet | `brew install telnet` | telnet:// URL support |
+| telnet | `brew install telnet` | `telnet://host` URL support |
+| inetutils | `brew install inetutils` | `telnet://user@host` URLs (provides `rlogin`) |
+
+**Note**: `telnet` and `inetutils` conflict (both provide telnet binary). Use `brew install --force inetutils` to install alongside telnet, or choose one. The `rlogin` program from inetutils is optional — only needed for telnet URLs with username.
 
 ---
 

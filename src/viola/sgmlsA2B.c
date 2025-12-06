@@ -43,7 +43,7 @@ static char onsgmls_path[4096] = "";
  * First checks the same directory as this executable (for app bundles),
  * then searches standard paths.
  */
-static const char* find_onsgmls(void) {
+static const char* дfind_onsgmls(void) {
     char exe_path[4096];
     char exe_dir[4096];
     char candidate[4096];

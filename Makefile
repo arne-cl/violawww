@@ -756,6 +756,14 @@ app: $(VW) $(LAUNCHER)
 	else \
 		echo "Note: telnet not found, telnet:// URLs will require: brew install telnet"; \
 	fi
+	@# Bundle rlogin if available (for telnet://user@host URLs, optional)
+	@RLOGIN_PATH=$$(brew --prefix inetutils 2>/dev/null)/bin/grlogin; \
+	if [ -x "$$RLOGIN_PATH" ]; then \
+		echo "Bundling rlogin..."; \
+		cp "$$RLOGIN_PATH" $(APP_MACOS)/rlogin; \
+	else \
+		echo "Note: rlogin not found (optional), install via: brew install inetutils"; \
+	fi
 	@# Bundle custom-built ImageMagick if available (built with scripts/build-imagemagick.sh)
 	@# Static build: all coders are compiled into libMagickCore, no module loading needed
 	@if [ -d build/imagemagick/bin ] && [ -x build/imagemagick/bin/magick ]; then \
@@ -854,6 +862,7 @@ app: $(VW) $(LAUNCHER)
 	@strip -x $(APP_MACOS)/gs 2>/dev/null || true
 	@strip -x $(APP_MACOS)/magick 2>/dev/null || true
 	@strip -x $(APP_MACOS)/telnet 2>/dev/null || true
+	@strip -x $(APP_MACOS)/rlogin 2>/dev/null || true
 	@for lib in $(APP_FRAMEWORKS)/*.dylib; do \
 		strip -x "$$lib" 2>/dev/null || true; \
 	done
