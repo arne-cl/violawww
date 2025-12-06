@@ -28,6 +28,7 @@
 #include "packet.h"
 #include "cexec.h"
 #include "ident.h"
+#include "ast.h"
 #include "slotaccess.h"
 
 /*
