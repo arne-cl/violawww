@@ -835,21 +835,7 @@ app: $(VW) $(LAUNCHER)
 	@echo "Bundling dynamic libraries..."
 	@$(MAKE) --no-print-directory bundle-dylibs
 	@echo ""
-	@echo "=== $(APP_NAME).app built successfully! ==="
-	@du -sh $(APP_BUNDLE)
-	@echo ""
-	@echo "Note: XQuartz is required to run this application."
-	@echo "      Install from: https://www.xquartz.org/"
-
-.PHONY: bundle-dylibs
-bundle-dylibs:
-	@chmod +x $(BUNDLE_SCRIPT)
-	@$(BUNDLE_SCRIPT) "$(APP_MACOS)" "$(APP_FRAMEWORKS)" "$(APP_RESOURCES)"
-
-# Create a DMG for distribution
-.PHONY: dmg
-dmg: app
-	@echo "=== Stripping debug symbols ==="
+	@echo "Stripping debug symbols..."
 	@strip -x $(APP_MACOS)/vw 2>/dev/null || true
 	@strip -x $(APP_MACOS)/vw.bin 2>/dev/null || true
 	@strip -x $(APP_MACOS)/sgmlsA2B 2>/dev/null || true
@@ -862,16 +848,29 @@ dmg: app
 	@if [ -f $(APP_RESOURCES)/vplot_dir/vplot ]; then \
 		strip -x $(APP_RESOURCES)/vplot_dir/vplot 2>/dev/null || true; \
 	fi
-	@echo "Stripped. New sizes:"
+	@# Re-sign after stripping
+	@codesign --force --sign - $(APP_MACOS)/* 2>/dev/null || true
+	@for lib in $(APP_FRAMEWORKS)/*.dylib; do \
+		codesign --force --sign - "$$lib" 2>/dev/null || true; \
+	done
+	@echo ""
+	@echo "=== $(APP_NAME).app built successfully! ==="
 	@du -sh $(APP_BUNDLE)
 	@echo ""
-	@echo "=== Creating $(APP_NAME).dmg (lzfse compression) ==="
-	@rm -f $(APP_NAME).dmg
-	@hdiutil create -volname "$(APP_NAME)" -srcfolder $(APP_BUNDLE) \
-		-ov -format ULFO $(APP_NAME).dmg
-	@echo ""
-	@echo "=== $(APP_NAME).dmg created! ==="
-	@ls -lh $(APP_NAME).dmg
+	@echo "Note: XQuartz is required to run this application."
+	@echo "      Install from: https://www.xquartz.org/"
+
+.PHONY: bundle-dylibs
+bundle-dylibs:
+	@chmod +x $(BUNDLE_SCRIPT)
+	@$(BUNDLE_SCRIPT) "$(APP_MACOS)" "$(APP_FRAMEWORKS)" "$(APP_RESOURCES)"
+
+# Create a DMG for distribution (uses scripts/create-dmg.sh)
+.PHONY: dmg
+dmg: app
+	@echo "=== Creating $(APP_NAME).dmg ==="
+	@chmod +x scripts/create-dmg.sh
+	@scripts/create-dmg.sh
 
 # Custom DMG with XQuartz and retro styling
 .PHONY: dmg-custom
