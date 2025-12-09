@@ -73,6 +73,23 @@ PUBLIC const char* HTGetNewsHost NOARGS { return HTNewsHost; }
 
 PUBLIC void HTSetNewsHost ARGS1(const char*, value) { StrAllocCopy(HTNewsHost, value); }
 
+/*	Check if string starts with a known URL protocol
+**	Returns length of protocol prefix (including ://) or 0 if not a URL
+*/
+PRIVATE int is_url_protocol ARGS1(const char*, s) {
+    static const char* protocols[] = {
+        "http://", "https://", "ftp://", "gopher://", "file://",
+        "telnet://", "rlogin://", "tn3270://", "wais://", NULL
+    };
+    int i;
+    for (i = 0; protocols[i]; i++) {
+        int len = strlen(protocols[i]);
+        if (strncasecmp(s, protocols[i], len) == 0)
+            return len;
+    }
+    return 0;
+}
+
 /*	Initialisation for this module
 **	------------------------------
 **
@@ -565,15 +582,31 @@ PRIVATE void read_article NOARGS {
                 }
             } else {
 
-                /*	Normal lines are scanned for buried references to other articles.
-                **	Unfortunately, it will pick up mail addresses as well!
+                /*	Normal lines are scanned for buried references to other articles
+                **  and URLs with known protocols.
                 */
                 char* l = line;
                 char* p2;
                 while ((p2 = strchr(l, '<'))) {
                     char* q = strchr(p2, '>');
                     char* at = strchr(p2, '@');
-                    if (q && at && at < q) {
+                    int proto_len = is_url_protocol(p2 + 1);
+                    
+                    if (q && proto_len > 0) {
+                        /* URL with known protocol: <http://...>, <https://...>, etc. */
+                        char c = q[1];
+                        q[1] = 0; /* chop up */
+                        *p2 = 0;
+                        PUTS(l);  /* text before < */
+                        *q = 0;   /* terminate URL */
+                        start_anchor(p2 + 1);  /* URL as href */
+                        PUTS(p2 + 1);  /* URL as link text */
+                        (*targetClass.end_element)(target, HTML_A);
+                        *q = '>'; /* restore */
+                        q[1] = c; /* restore */
+                        l = q + 1;
+                    } else if (q && at && at < q) {
+                        /* Message-ID: <something@host> */
                         char c = q[1];
                         q[1] = 0; /* chop up */
                         *p2 = 0;
@@ -587,7 +620,7 @@ PRIVATE void read_article NOARGS {
                         q[1] = c; /* again */
                         l = q + 1;
                     } else
-                        break; /* line has unmatched <> */
+                        break; /* line has unmatched <> or unknown content */
                 }
                 PUTS(l); /* Last bit of the line */
                 if (!flowed) PUTS("\n");
