@@ -416,6 +416,9 @@ PRIVATE void read_article NOARGS {
     char* p = line;
     BOOL done = NO;
 
+    /* Start BODY element for proper layout */
+    (*targetClass.start_element)(target, HTML_BODY, 0, 0, &HTML_dtd.tags[HTML_BODY]);
+
     /*	Read in the HEADer of the article:
     **
     **	The header fields are either ignored, or formatted and put into the
@@ -456,8 +459,6 @@ PRIVATE void read_article NOARGS {
                                                  &HTML_dtd.tags[HTML_H1] /*PYW*/);
                     PUTS(subj);
                     (*targetClass.end_element)(target, HTML_H1);
-                    (*targetClass.start_element)(target, HTML_ADDRESS, 0, 0,
-                                                 &HTML_dtd.tags[HTML_ADDRESS] /*PYW*/);
                 } else if (match(line, "DATE:") || match(line, "FROM:") ||
                            match(line, "ORGANIZATION:")) {
                     HTCharset_decode_mime(line);
@@ -481,9 +482,11 @@ PRIVATE void read_article NOARGS {
                 (*targetClass.start_element)(target, HTML_DT, 0, 0,
                                              &HTML_dtd.tags[HTML_DT] /*PYW*/);
                 PUTS("Newsgroups:");
+                (*targetClass.end_element)(target, HTML_DT);
                 (*targetClass.start_element)(target, HTML_DD, 0, 0,
                                              &HTML_dtd.tags[HTML_DD] /*PYW*/);
                 write_anchors(newsgroups);
+                (*targetClass.end_element)(target, HTML_DD);
                 free(newsgroups);
             }
 
@@ -491,9 +494,11 @@ PRIVATE void read_article NOARGS {
                 (*targetClass.start_element)(target, HTML_DT, 0, 0,
                                              &HTML_dtd.tags[HTML_DT] /*PYW*/);
                 PUTS("References:");
+                (*targetClass.end_element)(target, HTML_DT);
                 (*targetClass.start_element)(target, HTML_DD, 0, 0,
                                              &HTML_dtd.tags[HTML_DD] /*PYW*/);
                 write_anchors(references);
+                (*targetClass.end_element)(target, HTML_DD);
                 free(references);
             }
             (*targetClass.end_element)(target, HTML_DLC);
@@ -502,6 +507,8 @@ PRIVATE void read_article NOARGS {
     }
 
     /*	Read in the BODY of the Article:
+     *  Implements format=flowed (RFC 3676): lines ending with space
+     *  are "soft" line breaks and should be joined with the next line.
      */
     (*targetClass.start_element)(target, HTML_PRE, 0, 0, &HTML_dtd.tags[HTML_PRE] /*PYW*/);
 
@@ -514,15 +521,47 @@ PRIVATE void read_article NOARGS {
         }
         *p++ = ch;
         if ((ch == LF) || (p == &line[LINE_LENGTH])) {
-            *p++ = 0; /* Terminate the string */
+            int len;
+            BOOL flowed = NO;  /* format=flowed: soft line break? */
+            
+            *--p = 0; /* Overwrite LF with null terminator */
+            len = p - line;
+            
+            /* Strip trailing CR (NNTP uses CRLF) */
+            if (len > 0 && line[len-1] == CR) {
+                line[--len] = 0;
+            }
+            
+            /* format=flowed (RFC 3676): line ending with space is a soft break
+             * Exception: don't flow quote-only lines ("> " or "> > " etc)
+             * The trailing space is a marker, not content - remove it.
+             */
+            if (len > 0 && line[len-1] == ' ') {
+                /* Check if line is only quote markers and spaces */
+                BOOL quote_only = YES;
+                int i;
+                for (i = 0; i < len; i++) {
+                    if (line[i] != '>' && line[i] != ' ') {
+                        quote_only = NO;
+                        break;
+                    }
+                }
+                if (!quote_only) {
+                    flowed = YES;  /* Don't add newline after this line */
+                    line[len-1] = '\0';  /* Remove trailing space (it's just a marker) */
+                    len--;
+                }
+            }
+            
             if (TRACE)
-                fprintf(stderr, "B %s", line);
+                fprintf(stderr, "B %s%s", line, flowed ? "" : "\n");
             if (line[0] == '.') {
-                if (line[1] < ' ') { /* End of article? */
+                if (len <= 1 || line[1] < ' ') { /* End of article? */
                     done = YES;
                     break;
                 } else {            /* Line starts with dot */
                     PUTS(&line[1]); /* Ignore first dot */
+                    if (!flowed) PUTS("\n");
                 }
             } else {
 
@@ -530,20 +569,20 @@ PRIVATE void read_article NOARGS {
                 **	Unfortunately, it will pick up mail addresses as well!
                 */
                 char* l = line;
-                char* p;
-                while ((p = strchr(l, '<'))) {
-                    char* q = strchr(p, '>');
-                    char* at = strchr(p, '@');
+                char* p2;
+                while ((p2 = strchr(l, '<'))) {
+                    char* q = strchr(p2, '>');
+                    char* at = strchr(p2, '@');
                     if (q && at && at < q) {
                         char c = q[1];
                         q[1] = 0; /* chop up */
-                        *p = 0;
+                        *p2 = 0;
                         PUTS(l);
-                        *p = '<'; /* again */
+                        *p2 = '<'; /* again */
                         *q = 0;
-                        start_anchor(p + 1);
+                        start_anchor(p2 + 1);
                         *q = '>'; /* again */
-                        PUTS(p);
+                        PUTS(p2);
                         (*targetClass.end_element)(target, HTML_A);
                         q[1] = c; /* again */
                         l = q + 1;
@@ -551,12 +590,14 @@ PRIVATE void read_article NOARGS {
                         break; /* line has unmatched <> */
                 }
                 PUTS(l); /* Last bit of the line */
+                if (!flowed) PUTS("\n");
             } /* if not dot */
             p = line; /* Restart at beginning */
         } /* if end of line */
     } /* Loop over characters */
 
     (*targetClass.end_element)(target, HTML_PRE);
+    (*targetClass.end_element)(target, HTML_BODY);
 }
 
 /*	Read in a List of Newsgroups
