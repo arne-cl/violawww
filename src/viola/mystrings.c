@@ -57,7 +57,7 @@ void SkipBlanks(char* linep, int* i)
  * PreCondition: i <= strlen(linep);
  * PostCondition: *wordp contains an argument string from *linep, truncated if necessary.
  */
-int NextWord(const char* linep, int i, char* wordp, int maxlen)
+int NextWord(const char* restrict linep, int i, char* restrict wordp, int maxlen)
 {
     if (!linep || i < 0)
         return i;
@@ -115,7 +115,7 @@ int SkipNextWord(const char* linep, int i)
  * copys the next phrase, up to the cutOffWord, onto destStr.
  * if no cutOffWord is found, the phrase string is copied anyway.
  */
-int GetNextPhrase(char* str, int i, char* destStr, char* cutOffWord)
+int GetNextPhrase(char* restrict str, int i, char* restrict destStr, char* restrict cutOffWord)
 {
     char c;
     int x, y, ci = i, cuti = 0, parenLevel = 0, quoteToggle = 0;
@@ -831,7 +831,7 @@ int getItemVals(int li, int hi, char* itemStr, long* itemValArray) {
     return ai;
 }
 
-char* extractWord(char* text, long li, long hi, char* retStr) {
+char* extractWord(char* restrict text, long li, long hi, char* restrict retStr) {
     int bi = 0, i = 0;
     long itemNum = 1;
     char c;

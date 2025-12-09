@@ -1,6 +1,6 @@
 /* file.h */
 
-char* vl_expandPath(char*, char*);
+char* vl_expandPath(char* restrict, char* restrict);
 char* getEnvironVars(char**, char*, char*);
 int setStackPath(void);
 int loadFile(char*, char**);

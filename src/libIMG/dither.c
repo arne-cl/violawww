@@ -32,8 +32,8 @@
 #define MinGrey 0
 
 static unsigned int tone_scale_adjust(unsigned int val);
-static void LeftToRight(int* curr, int* next, int width);
-static void RightToLeft(int* curr, int* next, int width);
+static void LeftToRight(int* restrict curr, int* restrict next, int width);
+static void RightToLeft(int* restrict curr, int* restrict next, int width);
 
 /*
  * simple floyd-steinberg dither with serpentine raster processing
@@ -327,7 +327,7 @@ static unsigned int tone_scale_adjust(unsigned int val) {
 /*
  * dither a line from left to right
  */
-static void LeftToRight(int* curr, int* next, int width)
+static void LeftToRight(int* restrict curr, int* restrict next, int width)
 {
     int idx;
     int error;
@@ -347,7 +347,7 @@ static void LeftToRight(int* curr, int* next, int width)
 /*
  * dither a line from right to left
  */
-static void RightToLeft(int* curr, int* next, int width)
+static void RightToLeft(int* restrict curr, int* restrict next, int width)
 {
     int idx;
     int error;

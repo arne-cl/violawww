@@ -26,7 +26,7 @@
 
 int io_stat;
 
-char* vl_expandPath(char* path, char* buffer)
+char* vl_expandPath(char* restrict path, char* restrict buffer)
 {
     if (!path)
         return NULL;

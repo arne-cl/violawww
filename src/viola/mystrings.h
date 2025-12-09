@@ -59,7 +59,7 @@ void SkipBlanks(char* linep, int* i);
  * PreCondition: i <= strlen(linep);
  * PostCondition: *wordp contains an argument string from *linep, truncated if necessary.
  */
-int NextWord(const char* linep, int i, char* wordp, int maxlen);
+int NextWord(const char* restrict linep, int i, char* restrict wordp, int maxlen);
 
 /*
  ** Skips the next word linep in *wordp. Current postion in line is
@@ -75,7 +75,7 @@ int SkipNextWord(const char* linep, int i);
 /*
  * copys the next phrase, before cutOffWord, onto destStr.
  */
-int GetNextPhrase(char* str, int i, char* destStr, char* cutOffWord);
+int GetNextPhrase(char* restrict str, int i, char* restrict destStr, char* restrict cutOffWord);
 
 char* NextLines(char** textpp, int* lines, int* size);
 
@@ -161,6 +161,6 @@ char* enQuote(char* str);
 char* enBracket(char* str);
 char* deBracket(char* str);
 char* listItem(char* list, int li, int hi);
-char* extractWord(char* text, long li, long hi, char* retStr);
+char* extractWord(char* restrict text, long li, long hi, char* restrict retStr);
 
 #endif /* _MYSTRINGS_H_ */
