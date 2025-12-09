@@ -16,7 +16,7 @@
 **
 **	This table must be matched exactly with ALL the translation tables
 */
-static CONST char* entities[] = {
+static const char* entities[] = {
     "AElig",    /* capital AE diphthong (ligature) */
     "Aacute",   /* capital A, acute accent */
     "Acirc",    /* capital A, circumflex accent */
@@ -528,7 +528,7 @@ static HTTag tags[] = {
     {0}};
 #define HTML_TAGS 129
 
-PUBLIC CONST SGML_dtd HTML_dtd = {tags, HTML_ELEMENTS, entities, sizeof(entities) / sizeof(entities[0])};
+PUBLIC const SGML_dtd HTML_dtd = {tags, HTML_ELEMENTS, entities, sizeof(entities) / sizeof(entities[0])};
 
 /*	Utility Routine: useful for people building HTML objects */
 
@@ -544,9 +544,9 @@ struct _HTStructured {
     /* ... */
 };
 
-PUBLIC void HTStartAnchor ARGS3(HTStructured*, obj, CONST char*, name, CONST char*, href) {
+PUBLIC void HTStartAnchor ARGS3(HTStructured*, obj, const char*, name, const char*, href) {
     BOOL present[HTML_A_ATTRIBUTES];
-    CONST char* value[HTML_A_ATTRIBUTES];
+    const char* value[HTML_A_ATTRIBUTES];
 
     {
         int i;
@@ -567,7 +567,7 @@ PUBLIC void HTStartAnchor ARGS3(HTStructured*, obj, CONST char*, name, CONST cha
 
 PUBLIC void HTNextID ARGS2(HTStructured*, obj, int, next_one) {
     BOOL present[HTML_NEXTID_ATTRIBUTES];
-    CONST char* value[HTML_NEXTID_ATTRIBUTES];
+    const char* value[HTML_NEXTID_ATTRIBUTES];
     char string[10];
 
     sprintf(string, "z%i", next_one);

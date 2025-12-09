@@ -111,7 +111,7 @@ typedef struct {
 **      document. The parent anchor must already exist.
 */
 
-extern HTChildAnchor* HTAnchor_findChild PARAMS((HTParentAnchor * parent, CONST char* tag));
+extern HTChildAnchor* HTAnchor_findChild PARAMS((HTParentAnchor * parent, const char* tag));
 
 /*      Create or find a child anchor with a possible link
 **      --------------------------------------------------
@@ -121,8 +121,8 @@ extern HTChildAnchor* HTAnchor_findChild PARAMS((HTParentAnchor * parent, CONST 
 **      (Code originally in ParseHTML.h)
 */
 extern HTChildAnchor* HTAnchor_findChildAndLink PARAMS((HTParentAnchor * parent, /* May not be 0 */
-                                                        CONST char* tag,  /* May be "" or 0 */
-                                                        CONST char* href, /* May be "" or 0 */
+                                                        const char* tag,  /* May be "" or 0 */
+                                                        const char* href, /* May be "" or 0 */
                                                         HTLinkType* ltype /* May be 0 */
                                                         ));
 
@@ -135,7 +135,7 @@ extern HTChildAnchor* HTAnchor_findChildAndLink PARAMS((HTParentAnchor * parent,
 **      like with fonts.
 */
 
-extern HTAnchor* HTAnchor_findAddress PARAMS((CONST char* address));
+extern HTAnchor* HTAnchor_findAddress PARAMS((const char* address));
 
 /*      Delete an anchor and possibly related things (auto garbage collection)
 **      --------------------------------------------
@@ -188,11 +188,11 @@ extern BOOL HTAnchor_hasChildren PARAMS((HTParentAnchor * me));
 
 /*      Title handling
  */
-extern CONST char* HTAnchor_title PARAMS((HTParentAnchor * me));
+extern const char* HTAnchor_title PARAMS((HTParentAnchor * me));
 
-extern void HTAnchor_setTitle PARAMS((HTParentAnchor * me, CONST char* title));
+extern void HTAnchor_setTitle PARAMS((HTParentAnchor * me, const char* title));
 
-extern void HTAnchor_appendTitle PARAMS((HTParentAnchor * me, CONST char* title));
+extern void HTAnchor_appendTitle PARAMS((HTParentAnchor * me, const char* title));
 
 /*      Link this Anchor to another given one
 **      -------------------------------------
@@ -231,7 +231,7 @@ extern void HTAnchor_setPhysical PARAMS((HTParentAnchor * me, char* protocol));
 **      ------------------
 */
 extern char* HTAnchor_charset PARAMS((HTParentAnchor * me));
-extern void HTAnchor_setCharset PARAMS((HTParentAnchor * me, CONST char* charset));
+extern void HTAnchor_setCharset PARAMS((HTParentAnchor * me, const char* charset));
 
 #endif /* HTANCHOR_H */
 

@@ -53,6 +53,6 @@ typedef enum _FOSIElement {
 #define FOSI_INDENT_RIGHTIND 2
 #define FOSI_INDENT_ATTRIBUTES 3
 
-extern CONST SGML_dtd FOSI_dtd;
+extern const SGML_dtd FOSI_dtd;
 
 #endif /* FOSIDTD_H */

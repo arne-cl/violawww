@@ -24,7 +24,7 @@
 **	returns		Wayback URL if available (must be freed by caller)
 **			NULL if not found or error
 */
-PUBLIC char* HTWaybackCheck PARAMS((CONST char* url));
+PUBLIC char* HTWaybackCheck PARAMS((const char* url));
 
 #endif /* HTWAYBACK_H */
 

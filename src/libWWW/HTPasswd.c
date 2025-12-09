@@ -71,12 +71,12 @@ PRIVATE void next_rec ARGS1(FILE*, fp) {
 **	about the security inside the machine.
 **
 */
-PUBLIC char* HTAA_encryptPasswd ARGS1(CONST char*, password) {
+PUBLIC char* HTAA_encryptPasswd ARGS1(const char*, password) {
     char salt[3];
     char chunk[9];
     char* result;
     char* tmp;
-    CONST char* cur = password;
+    const char* cur = password;
     int len = strlen(password);
     extern time_t theTime;
     int random = (int)theTime; /* This is random enough */
@@ -123,7 +123,7 @@ PUBLIC char* HTAA_encryptPasswd ARGS1(CONST char*, password) {
 **	This is to allow interoperation of servers and clients
 **	who have a hard-coded limit of 8 to password.
 */
-PUBLIC BOOL HTAA_passwdMatch ARGS2(CONST char*, password, CONST char*, encrypted) {
+PUBLIC BOOL HTAA_passwdMatch ARGS2(const char*, password, const char*, encrypted) {
     char* result;
     int len;
     int status;
@@ -142,8 +142,8 @@ PUBLIC BOOL HTAA_passwdMatch ARGS2(CONST char*, password, CONST char*, encrypted
     while (len > 0) {
         char salt[3];
         char chunk[9];
-        CONST char* cur1 = password;
-        CONST char* cur2 = encrypted;
+        const char* cur1 = password;
+        const char* cur2 = encrypted;
         char* tmp;
 
         salt[0] = *cur2;
@@ -230,7 +230,7 @@ PUBLIC int HTAAFile_readPasswdRec ARGS3(FILE*, fp, char*, out_username, char*, o
 **	returns		YES, if the username-password pair was correct.
 **			NO, otherwise; also, if open fails.
 */
-PUBLIC BOOL HTAA_checkPassword ARGS3(CONST char*, username, CONST char*, password, CONST char*,
+PUBLIC BOOL HTAA_checkPassword ARGS3(const char*, username, const char*, password, const char*,
                                      filename) {
     FILE* fp = NULL;
     char user[MAX_USERNAME_LEN + 1];

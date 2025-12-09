@@ -53,7 +53,7 @@ typedef struct _stack_element {
 } stack_element;
 
 struct _HTStructured {
-    CONST HTStructuredClass* isa;
+    const HTStructuredClass* isa;
     HTParentAnchor* node_anchor;
     HText* text;
 
@@ -75,7 +75,7 @@ struct _HTStructured {
 };
 
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
     /* .... */
 };
 
@@ -369,14 +369,14 @@ PRIVATE void FOSI_put_character ARGS2(HTStructured*, this, char, c) {
 **	This is written separately from put_character becuase the loop can
 **	in some cases be postponed to a lower level for speed.
 */
-PRIVATE void FOSI_put_string ARGS2(HTStructured*, this, CONST char*, s) {
+PRIVATE void FOSI_put_string ARGS2(HTStructured*, this, const char*, s) {
     char* cp;
     fprintf(stderr, "### FOSI  STRING {/%s}\n", s);
 
     switch (this->sp[0].tag_number) {
     default: /* Free format text */
     {
-        CONST char* p = s;
+        const char* p = s;
         if (this->style_change) {
             for (; *p && ((*p == '\n') || (*p == ' ')); p++)
                 ; /* Ignore leaders */
@@ -411,9 +411,9 @@ PRIVATE void FOSI_progress ARGS2(HTStructured*, this, int, l) {}
 /*	Buffer write
 **
 */
-PRIVATE void FOSI_write ARGS3(HTStructured*, this, CONST char*, s, int, l) {
-    CONST char* p;
-    CONST char* e = s + l;
+PRIVATE void FOSI_write ARGS3(HTStructured*, this, const char*, s, int, l) {
+    const char* p;
+    const char* e = s + l;
 
     for (p = s; s < e; p++)
         FOSI_put_character(this, *p);
@@ -423,8 +423,8 @@ PRIVATE void FOSI_write ARGS3(HTStructured*, this, CONST char*, s, int, l) {
 /*	Start Element
 **	-------------
 */
-PRIVATE void FOSI_start_element ARGS5(HTStructured*, this, int, element_number, CONST BOOL*,
-                                      present, CONST char**, value, HTTag*, tagInfo) {
+PRIVATE void FOSI_start_element ARGS5(HTStructured*, this, int, element_number, const BOOL*,
+                                      present, const char**, value, HTTag*, tagInfo) {
     /* Safe to ignore only if the FOSI data is never significant
      */
     /*
@@ -528,7 +528,7 @@ PRIVATE void FOSI_end_document ARGS1(HTStructured*, this)
 /*	Structured Object Class
 **	-----------------------
 */
-PUBLIC CONST HTStructuredClass FOSIPresentation =                   /* As opposed to print etc */
+PUBLIC const HTStructuredClass FOSIPresentation =                   /* As opposed to print etc */
     {"text/FOSI",        FOSI_free,        FOSI_end_document, NULL, /* abort */
      FOSI_put_character, FOSI_put_string,  FOSI_progress,     FOSI_write,
      FOSI_start_element, FOSI_end_element, FOSI_put_entity};

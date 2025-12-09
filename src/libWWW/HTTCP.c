@@ -131,7 +131,7 @@ PUBLIC unsigned int HTCardinal ARGS3(int*, pstatus, char**, pp, unsigned int, ma
 **		it is to be kept.
 */
 
-PUBLIC CONST char* HTInetString ARGS1(SockA*, sin) {
+PUBLIC const char* HTInetString ARGS1(SockA*, sin) {
     static char string[16];
     sprintf(string, "%d.%d.%d.%d", (int)*((unsigned char*)(&sin->sin_addr) + 0),
             (int)*((unsigned char*)(&sin->sin_addr) + 1),
@@ -153,7 +153,7 @@ PUBLIC CONST char* HTInetString ARGS1(SockA*, sin) {
 **	*sin	is filled in. If no port is specified in str, that
 **		field is left unchanged in *sin.
 */
-PUBLIC int HTParseInet ARGS2(SockA*, sin, CONST char*, str) {
+PUBLIC int HTParseInet ARGS2(SockA*, sin, const char*, str) {
     char* port;
     char host[256];
     struct hostent* phost; /* Pointer to host - See netdb.h */

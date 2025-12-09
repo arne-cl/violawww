@@ -15,8 +15,8 @@
 
 GLOBALREF HTProtocol HTNews;
 
-extern void HTSetNewsHost PARAMS((CONST char* value));
-extern CONST char* HTGetNewsHost NOPARAMS;
+extern void HTSetNewsHost PARAMS((const char* value));
+extern const char* HTGetNewsHost NOPARAMS;
 extern char* HTNewsHost;
 
 #endif /* HTNEWS_H */

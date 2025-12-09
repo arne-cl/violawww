@@ -78,38 +78,95 @@ int flag_cliprompt = 1;
 
 struct StrInfo init_obj_script; /* initialized in class.c */
 
-SlotInfo cl_generic_NCSlots[] = {0};
-SlotInfo cl_generic_NPSlots[] = {{STR_name, PTRS | SLOT_RW, (long)""},
-                                 {STR_parent, PTRS | SLOT_RW, (long)""},
-                                 {STR__parent, OBJP, 0},
-                                 {STR_children, PTRS | SLOT_RW, (long)""},
-                                 {STR__children, OBJL, 0},
-                                 {
-                                     STR_security,
-                                     LONG,
-                                     0,
-                                 },
-                                 {STR_script, STRI | SLOT_RW,
-                                  /*	(long)&init_obj_script,*/
-                                  (long)"usual();"},
-                                 {
-                                     STR__script,
-                                     PCOD,
-                                     0,
-                                 },
-                                 {STR__varList, ATTR, 0},
-                                 {STR__argAttr, ATTR, 0},
-                                 {STR__classScriptVV, PTRV, 0},
-                                 {STR__scriptVV, PTRV, 0},
-                                 {STR__tempScriptVV, PTRV, 0},
-                                 {STR_active, LONG | SLOT_RW, (long)0},
-                                 {0}};
+SlotInfo cl_generic_NCSlots[] = {{0}};
+SlotInfo cl_generic_NPSlots[] = {
+    [0] = {
+        .id = STR_name,
+        .flags = PTRS | SLOT_RW,
+        .val = (long)""
+    },
+    [1] = {
+        .id = STR_parent,
+        .flags = PTRS | SLOT_RW,
+        .val = (long)""
+    },
+    [2] = {
+        .id = STR__parent,
+        .flags = OBJP,
+        .val = 0
+    },
+    [3] = {
+        .id = STR_children,
+        .flags = PTRS | SLOT_RW,
+        .val = (long)""
+    },
+    [4] = {
+        .id = STR__children,
+        .flags = OBJL,
+        .val = 0
+    },
+    [5] = {
+        .id = STR_security,
+        .flags = LONG,
+        .val = 0,
+    },
+    [6] = {
+        .id = STR_script,
+        .flags = STRI | SLOT_RW,
+        /*	(long)&init_obj_script,*/
+        .val = (long)"usual();"
+    },
+    [7] = {
+        .id = STR__script,
+        .flags = PCOD,
+        .val = 0,
+    },
+    [8] = {
+        .id = STR__varList,
+        .flags = ATTR,
+        .val = 0
+    },
+    [9] = {
+        .id = STR__argAttr,
+        .flags = ATTR,
+        .val = 0
+    },
+    [10] = {
+        .id = STR__classScriptVV,
+        .flags = PTRV,
+        .val = 0
+    },
+    [11] = {
+        .id = STR__scriptVV,
+        .flags = PTRV,
+        .val = 0
+    },
+    [12] = {
+        .id = STR__tempScriptVV,
+        .flags = PTRV,
+        .val = 0
+    },
+    [13] = {
+        .id = STR_active,
+        .flags = LONG | SLOT_RW,
+        .val = (long)0
+    },
+    [14] = {0}
+};
 SlotInfo cl_generic_CSlots[] = {/* COMMON SLOTS */
-                                {STR_class, PTRS | SLOT_RW, (long)"generic"},
-                                {0}};
+                                [0] = {
+                                    .id = STR_class,
+                                    .flags = PTRS | SLOT_RW,
+                                    .val = (long)"generic"
+                                },
+                                [1] = {0}};
 SlotInfo cl_generic_PSlots[] = {/* PRIVATE SLOTS */
-                                {STR__classInfo, CLSI, (long)&class_generic},
-                                {0}};
+                                [0] = {
+                                    .id = STR__classInfo,
+                                    .flags = CLSI,
+                                    .val = (long)&class_generic
+                                },
+                                [1] = {0}};
 
 SlotInfo* slots_generic[] = {(SlotInfo*)cl_generic_NCSlots, (SlotInfo*)cl_generic_NPSlots,
                              (SlotInfo*)cl_generic_CSlots, (SlotInfo*)cl_generic_PSlots};
@@ -456,7 +513,6 @@ long meth_generic_GB_copy(VObj* self, Packet* result, int argc, Packet argv[]) {
  * Result: the global buffer (no malloc occurs)
  */
 long meth_generic_GB_data(VObj* self, Packet* result, int argc, Packet argv[]) {
-    char* str;
     long bufferID = PkInfo2Int(&argv[0]);
 
     result->type = PKT_STR;
@@ -484,9 +540,6 @@ long meth_generic_GB_data(VObj* self, Packet* result, int argc, Packet argv[]) {
  * Result:  the character at the buffer's index
  */
 long meth_generic_GB_char(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-    long idx;
-
     result->type = PKT_CHR;
     result->canFree = 0;
     if (argc != 1) {
@@ -494,14 +547,13 @@ long meth_generic_GB_char(VObj* self, Packet* result, int argc, Packet argv[]) {
         result->info.c = '\0';
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         fprintf(stderr, "unknown Global Buffer. id=%ld\n", bufferID);
         result->info.c = '\0';
         return 0;
     }
-    idx = PkInfo2Int(&argv[1]);
     if (GBuff[bufferID]) {
         result->info.c = GBuff[bufferID][GBuffIdx[bufferID]];
         return 1;
@@ -529,7 +581,7 @@ long meth_generic_GB_create(VObj* self, Packet* result, int argc, Packet argv[])
  * Result: char at index, '\0' on error
  */
 long meth_generic_GB_decChar(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID, n;
+    long n;
 
     result->type = PKT_CHR;
     result->canFree = 0;
@@ -538,7 +590,7 @@ long meth_generic_GB_decChar(VObj* self, Packet* result, int argc, Packet argv[]
     } else {
         n = 1;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.c = '\0';
@@ -557,8 +609,6 @@ long meth_generic_GB_decChar(VObj* self, Packet* result, int argc, Packet argv[]
  * Result: char at index, '\0' on error
  */
 long meth_generic_GB_decChar1(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-
     result->type = PKT_CHR;
     result->canFree = 0;
     if (argc != 1) {
@@ -566,7 +616,7 @@ long meth_generic_GB_decChar1(VObj* self, Packet* result, int argc, Packet argv[
         result->info.c = '\0';
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.c = '\0';
@@ -586,10 +636,7 @@ long meth_generic_GB_decChar1(VObj* self, Packet* result, int argc, Packet argv[
  * Result: index, -1 on error
  */
 long meth_generic_GB_decLine(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
     long n;
-    int idx;
-    char* cp;
 
     result->type = PKT_INT;
     result->canFree = 0;
@@ -598,15 +645,15 @@ long meth_generic_GB_decLine(VObj* self, Packet* result, int argc, Packet argv[]
     } else {
         n = 1;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.i = -1;
         result->canFree = 0;
         return 0;
     }
-    idx = GBuffIdx[bufferID];
-    cp = GBuff[bufferID] + idx;
+    int idx = GBuffIdx[bufferID];
+    char* cp = GBuff[bufferID] + idx;
 
     for (; idx >= 0; cp--, idx--)
         if (*cp == '\n') {
@@ -640,8 +687,6 @@ long meth_generic_GB_decLine(VObj* self, Packet* result, int argc, Packet argv[]
  * Result: 0 on success, -1 on error
  */
 long meth_generic_GB_free(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-
     result->type = PKT_INT;
     result->canFree = 0;
     if (argc != 1) {
@@ -650,7 +695,7 @@ long meth_generic_GB_free(VObj* self, Packet* result, int argc, Packet argv[]) {
         result->canFree = 0;
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.i = -1;
@@ -671,8 +716,6 @@ long meth_generic_GB_free(VObj* self, Packet* result, int argc, Packet argv[]) {
  * Result:  string pointer at index position
  */
 long meth_generic_GB_herePtr(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-
     result->type = PKT_STR;
     if (argc != 1) {
         /* incorrect number of arguments */
@@ -680,7 +723,7 @@ long meth_generic_GB_herePtr(VObj* self, Packet* result, int argc, Packet argv[]
         result->canFree = 0;
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.s = "";
@@ -700,7 +743,7 @@ long meth_generic_GB_herePtr(VObj* self, Packet* result, int argc, Packet argv[]
  * Result: char at index, '\0' on error
  */
 long meth_generic_GB_incChar(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID, n;
+    long n;
 
     result->type = PKT_CHR;
     result->canFree = 0;
@@ -709,7 +752,7 @@ long meth_generic_GB_incChar(VObj* self, Packet* result, int argc, Packet argv[]
     } else {
         n = 1;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.c = '\0';
@@ -728,8 +771,6 @@ long meth_generic_GB_incChar(VObj* self, Packet* result, int argc, Packet argv[]
  * Result: char at index, '\0' on error
  */
 long meth_generic_GB_incChar1(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-
     result->type = PKT_CHR;
     result->canFree = 0;
     if (argc != 1) {
@@ -737,7 +778,7 @@ long meth_generic_GB_incChar1(VObj* self, Packet* result, int argc, Packet argv[
         result->info.c = '\0';
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.c = '\0';
@@ -756,10 +797,7 @@ long meth_generic_GB_incChar1(VObj* self, Packet* result, int argc, Packet argv[
  * Result:  current index. -1 on error.
  */
 long meth_generic_GB_incLine(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
     long n;
-    int idx;
-    char* cp;
 
     result->type = PKT_INT;
     result->canFree = 0;
@@ -768,15 +806,15 @@ long meth_generic_GB_incLine(VObj* self, Packet* result, int argc, Packet argv[]
     } else {
         n = 1;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.i = -1;
         result->canFree = 0;
         return 0;
     }
-    idx = GBuffIdx[bufferID];
-    cp = GBuff[bufferID] + idx;
+    int idx = GBuffIdx[bufferID];
+    char* cp = GBuff[bufferID] + idx;
 
     for (; *cp; cp++, idx++) {
         if (*cp == '\n') {
@@ -802,10 +840,6 @@ long meth_generic_GB_incLine(VObj* self, Packet* result, int argc, Packet argv[]
  *         "" on error
  */
 long meth_generic_GB_line(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-    char *cp, *ccp;
-    int len, idx;
-
     result->type = PKT_STR;
     if (argc != 1) {
         /* incorrect number of arguments */
@@ -814,7 +848,7 @@ long meth_generic_GB_line(VObj* self, Packet* result, int argc, Packet argv[]) {
         return 0;
     }
 
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
 
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
@@ -823,8 +857,8 @@ long meth_generic_GB_line(VObj* self, Packet* result, int argc, Packet argv[]) {
         return 0;
     }
 
-    idx = GBuffIdx[bufferID];
-    cp = GBuff[bufferID] + idx;
+    int idx = GBuffIdx[bufferID];
+    char* cp = GBuff[bufferID] + idx;
 
     /*	for (; *cp; cp++, idx++) {
                     if (*cp == '\n') {
@@ -833,7 +867,7 @@ long meth_generic_GB_line(VObj* self, Packet* result, int argc, Packet argv[]) {
                     }
             }
     */
-    ccp = cp;
+    char* ccp = cp;
     while (*cp) {
         if (*cp++ == '\n') {
             break;
@@ -841,7 +875,7 @@ long meth_generic_GB_line(VObj* self, Packet* result, int argc, Packet argv[]) {
     }
     idx += cp - ccp;
 
-    len = idx - GBuffIdx[bufferID];
+    int len = idx - GBuffIdx[bufferID];
     result->info.s = (char*)malloc(sizeof(char) * len + 1);
     result->canFree = PK_CANFREE_STR;
     strncpy(result->info.s, GBuff[bufferID] + GBuffIdx[bufferID], len);
@@ -857,8 +891,6 @@ long meth_generic_GB_line(VObj* self, Packet* result, int argc, Packet argv[]) {
  * Return: index (0) on success, -1 on failure
  */
 long meth_generic_GB_moveToStart(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-
     result->type = PKT_INT;
     result->canFree = 0;
     if (argc != 1) {
@@ -867,7 +899,7 @@ long meth_generic_GB_moveToStart(VObj* self, Packet* result, int argc, Packet ar
         result->canFree = 0;
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.i = -1;
@@ -887,8 +919,6 @@ long meth_generic_GB_moveToStart(VObj* self, Packet* result, int argc, Packet ar
  * Return: index on success, -1 on failure
  */
 long meth_generic_GB_moveToChar(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-
     result->type = PKT_INT;
     result->canFree = 0;
     if (argc != 2) {
@@ -897,7 +927,7 @@ long meth_generic_GB_moveToChar(VObj* self, Packet* result, int argc, Packet arg
         result->canFree = 0;
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.i = -1;
@@ -916,10 +946,6 @@ long meth_generic_GB_moveToChar(VObj* self, Packet* result, int argc, Packet arg
  * Return: index if successful, -1 if error occured
  */
 long meth_generic_GB_moveToLine(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-    long n;
-    char* cp;
-
     result->type = PKT_INT;
     result->canFree = 0;
     if (argc != 2) {
@@ -927,7 +953,7 @@ long meth_generic_GB_moveToLine(VObj* self, Packet* result, int argc, Packet arg
         result->info.i = -1;
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
     if (bufferID >= numOfGBuffs) {
         /* unknown buffer */
         result->info.i = -1;
@@ -937,10 +963,10 @@ long meth_generic_GB_moveToLine(VObj* self, Packet* result, int argc, Packet arg
     result->info.i = GBuffIdx[bufferID];
 
     GBuffIdx[bufferID] = 0;
-    n = PkInfo2Int(&argv[1]);
+    long n = PkInfo2Int(&argv[1]);
 
     if (n > 0) {
-        for (cp = GBuff[bufferID]; *cp; cp++) {
+        for (char* cp = GBuff[bufferID]; *cp; cp++) {
             if (*cp == '\n' || !(*cp)) {
                 GBuffIdx[bufferID]++;
                 if (!(*cp))
@@ -966,25 +992,20 @@ long meth_generic_GB_nthChar(VObj* self, Packet* result, int argc, Packet argv[]
     result->type = PKT_CHR;
     result->canFree = 0;
     if (argc == 2) {
-        long n;
-
-        n = PkInfo2Int(&argv[1]);
+        long n = PkInfo2Int(&argv[1]);
         result->info.c = GBuff[bufferID][n];
         return 1;
     } else if (argc == 3) {
-        int i;
-        long n1, n2;
-        char *cp, *str;
-
-        n1 = PkInfo2Int(&argv[1]);
-        n2 = PkInfo2Int(&argv[2]);
-        str = GBuff[bufferID];
-        cp = (char*)malloc(sizeof(char) * (n2 - n1 + 2));
+        long n1 = PkInfo2Int(&argv[1]);
+        long n2 = PkInfo2Int(&argv[2]);
+        char* str = GBuff[bufferID];
+        char* cp = (char*)malloc(sizeof(char) * (n2 - n1 + 2));
         if (!cp) {
             result->info.s = "";
             result->canFree = 0;
             return 0;
         }
+        int i;
         for (i = 0; n1 <= n2; n1++) {
             if (!str[n1])
                 break;
@@ -1013,10 +1034,6 @@ long meth_generic_GB_nthChar(VObj* self, Packet* result, int argc, Packet argv[]
  */
 long meth_generic_GB_nthLine(VObj* self, Packet* result, int argc, Packet argv[]) {
     long bufferID = PkInfo2Int(&argv[0]);
-    long li, hi;
-    int lines;
-    long size;
-    char *cp, *str;
 
     result->type = PKT_STR;
     if (bufferID >= numOfGBuffs) {
@@ -1025,8 +1042,9 @@ long meth_generic_GB_nthLine(VObj* self, Packet* result, int argc, Packet argv[]
         result->canFree = 0;
         return 0;
     }
-    str = GBuff[bufferID];
+    char* str = GBuff[bufferID];
 
+    long li, hi;
     if (argc == 2) {
         li = hi = PkInfo2Int(&argv[1]);
     } else if (argc == 3) {
@@ -1038,7 +1056,8 @@ long meth_generic_GB_nthLine(VObj* self, Packet* result, int argc, Packet argv[]
         result->canFree = 0;
         return 0;
     }
-    cp = getLines(li, hi, str, &size);
+    long size;
+    char* cp = getLines(li, hi, str, &size);
     if (cp) {
         result->info.s = cp;
         result->canFree = PK_CANFREE_STR;
@@ -1057,8 +1076,6 @@ long meth_generic_GB_nthLine(VObj* self, Packet* result, int argc, Packet argv[]
  * Result: GBufffID. -1 on error
  */
 long meth_generic_GB_set(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-
     result->type = PKT_INT;
     result->canFree = 0;
     if (argc != 2) {
@@ -1066,7 +1083,7 @@ long meth_generic_GB_set(VObj* self, Packet* result, int argc, Packet argv[]) {
         result->info.i = -1;
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
 
     if (bufferID > NUM_OF_GBUFFS) {
         fprintf(stderr, "Error: Trying to set GBuff[%d]. There's only %d Global Buffers.\n",
@@ -1089,8 +1106,6 @@ long meth_generic_GB_set(VObj* self, Packet* result, int argc, Packet argv[]) {
  * Result: GBufffID. -1 on error
  */
 long meth_generic_GB_setCopy(VObj* self, Packet* result, int argc, Packet argv[]) {
-    long bufferID;
-
     result->type = PKT_INT;
     result->canFree = 0;
     if (argc != 2) {
@@ -1098,7 +1113,7 @@ long meth_generic_GB_setCopy(VObj* self, Packet* result, int argc, Packet argv[]
         result->info.i = -1;
         return 0;
     }
-    bufferID = PkInfo2Int(&argv[0]);
+    long bufferID = PkInfo2Int(&argv[0]);
 
     if (bufferID > NUM_OF_GBUFFS) {
         fprintf(stderr, "Error: Trying to set GBuff[%d]. There's only %d Global Buffers.\n",
@@ -1145,13 +1160,8 @@ long meth_generic_HTTPCurrentDocAddr(VObj* self, Packet* result, int argc, Packe
 long meth_generic_HTTPCurrentDocAddrParsed(VObj* self, Packet* result, int argc, Packet argv[]) {
     extern char* current_addr;    /* from html.c */
     extern char* default_default; /* from html.c */
-    Attr* attrp;
-    Packet* packet0 = makePacket(); /* access */
-    Packet* packet1 = makePacket(); /* host */
-    Packet* packet2 = makePacket(); /* path (not including file name) */
-    Packet* packet3 = makePacket(); /* file */
-    Packet* packet4 = makePacket(); /* anchor */
-    char *addr, *relative, *path, *anchor;
+    
+    char *addr, *relative;
 
     if (argc >= 1)
         addr = PkInfo2Str(&argv[0]);
@@ -1168,6 +1178,13 @@ long meth_generic_HTTPCurrentDocAddrParsed(VObj* self, Packet* result, int argc,
         clearPacket(result);
         return 0;
     }
+
+    Packet* packet0 = makePacket(); /* access */
+    Packet* packet1 = makePacket(); /* host */
+    Packet* packet2 = makePacket(); /* path (not including file name) */
+    Packet* packet3 = makePacket(); /* file */
+    Packet* packet4 = makePacket(); /* anchor */
+
     packet0->canFree = packet1->canFree = packet2->canFree = packet3->canFree = packet4->canFree =
         PK_CANFREE_STR;
 
@@ -1179,7 +1196,7 @@ long meth_generic_HTTPCurrentDocAddrParsed(VObj* self, Packet* result, int argc,
     packet1->info.s = saveString(parsed_host);
     free(parsed_access);  /* Free the result from HTParse */
     free(parsed_host);    /* Free the result from HTParse */
-    path = HTParse(addr, relative, PARSE_PATH | PARSE_PUNCTUATION);
+    char* path = HTParse(addr, relative, PARSE_PATH | PARSE_PUNCTUATION);
 
     for (size_t i = strlen(path); i >= 0; i--) {
         if (path[i] == '/') {
@@ -1194,9 +1211,10 @@ long meth_generic_HTTPCurrentDocAddrParsed(VObj* self, Packet* result, int argc,
     packet3->info.s = saveString(path);
 lameLoopEsc:
 
-    anchor = HTParse(addr, relative, PARSE_ANCHOR);
+    char* anchor = HTParse(addr, relative, PARSE_ANCHOR);
     packet4->info.s = (anchor ? saveString(anchor) : saveString(""));
 
+    Attr* attrp;
     result->type = PKT_ATR;
     result->info.a = attrp = makeAttr(0, (intptr_t)packet0);
     result->canFree = 0;
@@ -1254,12 +1272,6 @@ long meth_generic_HTTPEncodeURL(VObj* self, Packet* result, int argc, Packet arg
  *
  */
 long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
-    char *simpleAddress, *anchorSearch;
-    FILE* fp;
-    char *tfn, tempFileName[200], *ext, *src, *p;
-    size_t len;
-    int span = 0;
-
     /* now... is this a leak? this method can be called by
      * imgNodeRefInc.. only for images, so ... probably quite safe.
      */
@@ -1267,7 +1279,7 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
         if (notSecure(self))
             return 0;
 
-    src = PkInfo2Str(&argv[0]);
+    char* src = PkInfo2Str(&argv[0]);
 
     /* Safety check: validate src */
     if (!src || (unsigned long)src < 0x1000) {
@@ -1276,7 +1288,7 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
         return 0;
     }
 
-    len = strlen(src);
+    size_t len = strlen(src);
 
     /* Safety check: ensure tempFileNamePrefix is valid
      * Check for:
@@ -1292,8 +1304,10 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
     }
 
     /* Find extension - scan backwards from end */
-    ext = NULL; /* Initialize to NULL */
-    for (p = src + len; p >= src; p--) {
+    char* ext = NULL; /* Initialize to NULL */
+    char *tfn, tempFileName[200];
+
+    for (char* p = src + len; p >= src; p--) {
         if (*p == '.') {
             ext = p; /* Found extension */
             break;
@@ -1324,8 +1338,9 @@ long meth_generic_HTTPGet(VObj* self, Packet* result, int argc, Packet argv[]) {
     sprintf(tempFileName, "%s%ld%s", tempFileNamePrefix, tempFileNameIDCounter++, ext);
     tfn = tempFileName;
 gogo:
-    fp = fopen(tfn, "w");
+    FILE* fp = fopen(tfn, "w");
     if (fp) {
+        char *simpleAddress, *anchorSearch;
         if (html_fetchDocument(self, src, &simpleAddress, &anchorSearch, fp)) {
             fclose(fp);
             result->canFree = PK_CANFREE_STR;
@@ -1343,8 +1358,6 @@ gogo:
 
 long int helper_buildingHTML(Packet* result, VObj* obj, char* url, long width, int method,
                              char* dataToPost) {
-    VObj* newObj;
-    char *simpleAddress, *anchorSearch;
     /*	struct timeval time1, time2;*/
     clearPacket(result);
 
@@ -1353,7 +1366,8 @@ long int helper_buildingHTML(Packet* result, VObj* obj, char* url, long width, i
     if (notSecure(obj))
         return 0;
 
-    newObj =
+    char *simpleAddress, *anchorSearch;
+    VObj* newObj =
         html2_parseHTMLDocument(obj, url, &simpleAddress, &anchorSearch, width, method, dataToPost);
     /*
             gettimeofday(&time2, (struct timezone*)NULL);
@@ -1424,11 +1438,10 @@ long meth_generic_HTTPHotListDelete(VObj* self, Packet* result, int argc, Packet
  * arg[1]	n	nth item in the hotlist
  */
 long meth_generic_HTTPHotListGet(VObj* self, Packet* result, int argc, Packet argv[]) {
-    HotListItem* hip;
-
     if (notSecure(self))
         return 0;
 
+    HotListItem* hip;
     switch (PkInfo2Int(&argv[0])) {
     case 0:
         hip = getNthHotListItem(PkInfo2Int(&argv[1]));
@@ -2524,7 +2537,13 @@ long meth_generic_cursorShape(VObj* self, Packet* result, int argc, Packet argv[
 long meth_generic_date(VObj* self, Packet* result, int argc, Packet argv[]) {
     time_t theTime;
     time(&theTime);
-    result->info.s = SaveString(ctime(&theTime));
+    char* timeStr = ctime(&theTime);
+    /* remove newline from ctime result if present */
+    size_t len = strlen(timeStr);
+    if (len > 0 && timeStr[len - 1] == '\n') {
+        timeStr[len - 1] = '\0';
+    }
+    result->info.s = SaveString(timeStr);
     result->type = PKT_STR;
     result->canFree = PK_CANFREE_STR;
     return 1;
@@ -4562,12 +4581,11 @@ long meth_generic_sleep(VObj* self, Packet* result, int argc, Packet argv[]) {
  * Return: 1 if successful, 0 if error occured
  */
 long meth_generic_sprintf(VObj* self, Packet* result, int argc, Packet argv[]) {
-    int i;
     /*XXX NOT IMPLEMENTED*/
 
     /*
             clearPacket(result);
-            for (i = 0; i < argc; i++) {
+            for (int i = 0; i < argc; i++) {
                     switch (argv[i].type) {
                     case PKT_OBJ:
                             printf("%s", GET_name(argv[i].info.o));

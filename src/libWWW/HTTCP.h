@@ -81,7 +81,7 @@ extern unsigned int HTCardinal PARAMS((int* pstatus, char** pp, unsigned int max
 **               field is left unchanged in *sin.
 */
 #ifdef __STDC__
-extern int HTParseInet(struct sockaddr_in* sin, CONST char* str);
+extern int HTParseInet(struct sockaddr_in* sin, const char* str);
 /*!! had to change this to get it to compile. CTB */
 #else
 extern int HTParseInet();
@@ -92,7 +92,7 @@ extern int HTParseInet();
 **
 */
 
-extern CONST char* HTHostName NOPARAMS;
+extern const char* HTHostName NOPARAMS;
 
 #endif /* HTTCP_H */
 /*

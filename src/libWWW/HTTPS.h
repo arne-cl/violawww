@@ -26,7 +26,7 @@
 **			<0		Error
 */
 extern int HTLoadHTTPS ARGS4(
-    CONST char*,		arg,
+    const char*,		arg,
     HTParentAnchor*,	anAnchor,
     HTFormat,			format_out,
     HTStream*,			sink

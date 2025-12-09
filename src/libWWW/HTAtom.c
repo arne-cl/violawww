@@ -24,9 +24,9 @@
 PRIVATE HTAtom* hash_table[HASH_SIZE];
 PRIVATE BOOL initialised = NO;
 
-PUBLIC HTAtom* HTAtom_for ARGS1(CONST char*, string) {
+PUBLIC HTAtom* HTAtom_for ARGS1(const char*, string) {
     int hash;
-    CONST char* p;
+    const char* p;
     HTAtom* a;
 
     /*		First time around, clear hash table
@@ -69,7 +69,7 @@ PUBLIC HTAtom* HTAtom_for ARGS1(CONST char*, string) {
     return a;
 }
 
-PRIVATE BOOL mime_match ARGS2(CONST char*, name, CONST char*, templ) {
+PRIVATE BOOL mime_match ARGS2(const char*, name, const char*, templ) {
     if (name && templ) {
         static char* n1 = NULL;
         static char* t1 = NULL;
@@ -92,7 +92,7 @@ PRIVATE BOOL mime_match ARGS2(CONST char*, name, CONST char*, templ) {
     return NO;
 }
 
-PUBLIC HTList* HTAtom_templateMatches ARGS1(CONST char*, templ) {
+PUBLIC HTList* HTAtom_templateMatches ARGS1(const char*, templ) {
     HTList* matches = HTList_new();
 
     if (initialised && templ) {

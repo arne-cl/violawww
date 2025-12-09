@@ -24,7 +24,7 @@ extern char* user_prompt_default(char* message, char* deflt);
 extern char* user_prompt_password(char* message);
 extern void user_prompt_username_and_password(char* message, char** username, char** password);
 
-PUBLIC void HTAlert ARGS1(CONST char*, Msg) {
+PUBLIC void HTAlert ARGS1(const char*, Msg) {
 #ifdef NeXTStep
     NXRunAlertPanel(NULL, "%s", NULL, NULL, NULL, Msg);
 #else
@@ -33,13 +33,13 @@ PUBLIC void HTAlert ARGS1(CONST char*, Msg) {
 #endif
 }
 
-PUBLIC void HTProgress ARGS1(CONST char*, Msg) {
+PUBLIC void HTProgress ARGS1(const char*, Msg) {
     user_message(Msg);
     /*  fprintf(stderr, "   %s ...\n", Msg);
      */
 }
 
-PUBLIC BOOL HTConfirm ARGS1(CONST char*, Msg) {
+PUBLIC BOOL HTConfirm ARGS1(const char*, Msg) {
     if (user_message_confirm(Msg))
         return YES;
     else
@@ -74,7 +74,7 @@ PUBLIC BOOL HTConfirm ARGS1(CONST char*, Msg) {
 
 /*	Prompt for answer and get text back
  */
-PUBLIC char* HTPrompt ARGS2(CONST char*, Msg, CONST char*, deflt) {
+PUBLIC char* HTPrompt ARGS2(const char*, Msg, const char*, deflt) {
     return user_prompt_default(Msg, deflt);
 
 #ifdef TTYMODE
@@ -94,7 +94,7 @@ PUBLIC char* HTPrompt ARGS2(CONST char*, Msg, CONST char*, deflt) {
 
 /*	Prompt for password without echoing the reply
  */
-PUBLIC char* HTPromptPassword ARGS1(CONST char*, Msg) {
+PUBLIC char* HTPromptPassword ARGS1(const char*, Msg) {
     return user_prompt_password(Msg);
 
 #ifdef TTYMODE
@@ -125,7 +125,7 @@ PUBLIC char* HTPromptPassword ARGS1(CONST char*, Msg) {
 **	are NOT freed.
 **
 */
-PUBLIC void HTPromptUsernameAndPassword ARGS3(CONST char*, Msg, char**, username, char**,
+PUBLIC void HTPromptUsernameAndPassword ARGS3(const char*, Msg, char**, username, char**,
                                               password) {
     user_prompt_username_and_password(Msg, username, password);
 

@@ -207,7 +207,7 @@ PRIVATE char* status_name ARGS1(HTAAFailReasonType, reason) {
 **	to avoid unnecessary overhead of opening the
 **	file twice).
 */
-PRIVATE HTAAFailReasonType check_authorization ARGS4(CONST char*, pathname, HTAAMethod, method,
+PRIVATE HTAAFailReasonType check_authorization ARGS4(const char*, pathname, HTAAMethod, method,
                                                      HTAAScheme, scheme, char*, scheme_specifics) {
     HTAAFailReasonType reason;
     GroupDef* allowed_groups;
@@ -384,7 +384,7 @@ PRIVATE HTAAFailReasonType check_authorization ARGS4(CONST char*, pathname, HTAA
 **	file twice).
 **
 */
-PUBLIC int HTAA_checkAuthorization ARGS4(CONST char*, url, CONST char*, method_name, CONST char*,
+PUBLIC int HTAA_checkAuthorization ARGS4(const char*, url, const char*, method_name, const char*,
                                          scheme_name, char*, scheme_specifics) {
     static char* pathname = NULL;
     char* local_copy = NULL;

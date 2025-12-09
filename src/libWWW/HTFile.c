@@ -50,7 +50,7 @@ typedef struct _HTSuffix {
 #define END(e) (*target->isa->end_element)(target, e)
 #define FREE_TARGET (*target->isa->free)(target)
 struct _HTStructured {
-    CONST HTStructuredClass* isa;
+    const HTStructuredClass* isa;
     /* ... */
 };
 
@@ -84,8 +84,8 @@ PRIVATE HTSuffix unknown_suffix = {"*.*", NULL, NULL, 1.0};
 **	If filename suffix is already defined its previous
 **	definition is overridden.
 */
-PUBLIC void HTSetSuffix ARGS4(CONST char*, suffix, CONST char*, representation, CONST char*,
-                              encoding, float, value) {
+PUBLIC void HTSetSuffix(const char* suffix, const char* representation, const char* encoding,
+                      float value) {
 
     HTSuffix* suff;
 
@@ -134,7 +134,7 @@ PUBLIC void HTSetSuffix ARGS4(CONST char*, suffix, CONST char*, representation, 
 */
 
 #ifdef GOT_READ_DIR
-PRIVATE void do_readme ARGS2(HTStructured*, target, CONST char*, localname) {
+PRIVATE void do_readme(HTStructured* target, const char* localname) {
     FILE* fp;
     char* readme_file_name = malloc(strlen(localname) + 1 + strlen(HT_DIR_README_FILE) + 1);
     strcpy(readme_file_name, localname);
@@ -185,7 +185,7 @@ PRIVATE void do_readme ARGS2(HTStructured*, target, CONST char*, localname) {
 ** On exit,
 **	returns	a malloc'ed string which must be freed by the caller.
 */
-PUBLIC char* HTCacheFileName ARGS1(CONST char*, name) {
+PUBLIC char* HTCacheFileName(const char* name) {
     char* access = HTParse(name, "", PARSE_ACCESS);
     char* host = HTParse(name, "", PARSE_HOST);
     char* path = HTParse(name, "", PARSE_PATH + PARSE_PUNCTUATION);
@@ -206,7 +206,7 @@ PUBLIC char* HTCacheFileName ARGS1(CONST char*, name) {
 **	----------------------------------------
 */
 #ifdef NOT_IMPLEMENTED
-PRIVATE int HTCreatePath ARGS1(CONST char*, path) { return -1; }
+PRIVATE int HTCreatePath(const char* path) { return -1; }
 #endif
 
 /*	Convert filenames between local and WWW formats
@@ -219,7 +219,7 @@ PRIVATE int HTCreatePath ARGS1(CONST char*, path) { return -1; }
 ** On exit,
 **	returns	a malloc'ed string which must be freed by the caller.
 */
-PUBLIC char* HTLocalName ARGS1(CONST char*, name) {
+PUBLIC char* HTLocalName(const char* name) {
     char* access = HTParse(name, "", PARSE_ACCESS);
     char* host = HTParse(name, "", PARSE_HOST);
     char* path = HTParse(name, "", PARSE_PATH + PARSE_PUNCTUATION);
@@ -247,7 +247,7 @@ PUBLIC char* HTLocalName ARGS1(CONST char*, name) {
         }
     } else { /* other access */
         char* result;
-        CONST char* home = (CONST char*)getenv("HOME");
+        const char* home = (const char*)getenv("HOME");
         if (!home)
             home = "/tmp";
         result = (char*)malloc(strlen(home) + strlen(access) + strlen(host) + strlen(path) + 6 + 1);
@@ -269,7 +269,7 @@ PUBLIC char* HTLocalName ARGS1(CONST char*, name) {
 **	the general case.
 */
 
-PUBLIC char* WWW_nameOfFile ARGS1(CONST char*, name) {
+PUBLIC char* WWW_nameOfFile(const char* name) {
     char* result;
 #ifdef NeXT
     if (0 == strncmp("/private/Net/", name, 13)) {
@@ -305,7 +305,7 @@ PUBLIC char* WWW_nameOfFile ARGS1(CONST char*, name) {
 **	returns	a pointer to a suitable suffix string if one has been
 **		found, else "".
 */
-PUBLIC CONST char* HTFileSuffix ARGS1(HTAtom*, rep) {
+PUBLIC const char* HTFileSuffix(HTAtom* rep) {
     HTSuffix* suff;
     int n;
     int i;
@@ -333,7 +333,7 @@ PUBLIC CONST char* HTFileSuffix ARGS1(HTAtom*, rep) {
 **	It will handle for example  x.txt, x.txt,Z, x.Z
 */
 
-PUBLIC HTFormat HTFileFormat ARGS2(CONST char*, filename, HTAtom**, pencoding)
+PUBLIC HTFormat HTFileFormat(const char* filename, HTAtom** pencoding)
 
 {
     HTSuffix* suff;
@@ -386,7 +386,7 @@ PUBLIC HTFormat HTFileFormat ARGS2(CONST char*, filename, HTAtom**, pencoding)
 **
 */
 
-PUBLIC float HTFileValue ARGS1(CONST char*, filename)
+PUBLIC float HTFileValue(const char* filename)
 
 {
     HTSuffix* suff;
@@ -430,7 +430,7 @@ PUBLIC float HTFileValue ARGS1(CONST char*, filename)
 #define NO_GROUPS
 #endif
 
-PUBLIC BOOL HTEditable ARGS1(CONST char*, filename) {
+PUBLIC BOOL HTEditable(const char* filename) {
 #ifdef NO_GROUPS
     return NO; /* Safe answer till we find the correct algorithm */
 #else
@@ -482,9 +482,9 @@ PUBLIC BOOL HTEditable ARGS1(CONST char*, filename) {
 **	The stream must be used for writing back the file.
 **	@@@ no backup done
 */
-PUBLIC HTStream* HTFileSaveStream ARGS1(HTParentAnchor*, anchor) {
+PUBLIC HTStream* HTFileSaveStream(HTParentAnchor* anchor) {
 
-    CONST char* addr = HTAnchor_address((HTAnchor*)anchor);
+    const char* addr = HTAnchor_address((HTAnchor*)anchor);
     char* localname = HTLocalName(addr);
 
     FILE* fp = fopen(localname, "w");
@@ -497,7 +497,7 @@ PUBLIC HTStream* HTFileSaveStream ARGS1(HTParentAnchor*, anchor) {
 /*      Output one directory entry
 **
 */
-PUBLIC void HTDirEntry ARGS3(HTStructured*, target, CONST char*, tail, CONST char*, entry) {
+PUBLIC void HTDirEntry(HTStructured* target, const char* tail, const char* entry) {
     char* relative;
     char* escaped = HTEscape(entry, URL_XPALPHAS);
 
@@ -518,7 +518,7 @@ PUBLIC void HTDirEntry ARGS3(HTStructured*, target, CONST char*, tail, CONST cha
 **    This gives the TITLE and H1 header, and also a link
 **    to the parent directory if appropriate.
 */
-PUBLIC void HTDirTitles ARGS2(HTStructured*, target, HTAnchor*, anchor)
+PUBLIC void HTDirTitles(HTStructured* target, HTAnchor* anchor)
 
 {
     char* logical = HTAnchor_address(anchor);
@@ -587,8 +587,8 @@ PUBLIC void HTDirTitles ARGS2(HTStructured*, target, HTAnchor*, anchor)
 **			HTLOADED	OK
 **
 */
-PUBLIC int HTLoadFile ARGS4(CONST char*, addr, HTParentAnchor*, anchor, HTFormat, format_out,
-                            HTStream*, sink) {
+PUBLIC int HTLoadFile(const char* addr, HTParentAnchor* anchor, HTFormat format_out,
+                            HTStream* sink) {
     char* filename;
     HTFormat format;
     char* nodename = 0;

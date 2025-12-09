@@ -38,7 +38,7 @@
 **		(which is automatically freed next time
 **		this fuction is called).
 */
-PUBLIC char* HTAA_getAclFilename ARGS1(CONST char*, pathname) {
+PUBLIC char* HTAA_getAclFilename ARGS1(const char*, pathname) {
     static char* local_copy = NULL;
     static char* acl_path = NULL;
     char* directory = NULL;
@@ -75,7 +75,7 @@ PUBLIC char* HTAA_getAclFilename ARGS1(CONST char*, pathname) {
 **	returns		the FILE* to open ACL.
 **			NULL, if ACL not found.
 */
-PUBLIC FILE* HTAA_openAcl ARGS1(CONST char*, pathname) {
+PUBLIC FILE* HTAA_openAcl ARGS1(const char*, pathname) {
     return fopen(HTAA_getAclFilename(pathname), "r");
 }
 
@@ -137,10 +137,10 @@ PUBLIC void HTAA_closeAcl ARGS1(FILE*, acl_file) {
 **	HTAA_readGroupFile()) and after that access authorization
 **	can be checked with function HTAA_userAndInetGroup().
 */
-PUBLIC GroupDef* HTAA_getAclEntry ARGS3(FILE*, acl_file, CONST char*, pathname, HTAAMethod,
+PUBLIC GroupDef* HTAA_getAclEntry ARGS3(FILE*, acl_file, const char*, pathname, HTAAMethod,
                                         method) {
     static GroupDef* group_def = NULL;
-    CONST char* filename;
+    const char* filename;
     int len;
     char* buf;
 

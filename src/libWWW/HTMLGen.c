@@ -35,13 +35,13 @@
 */
 
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
     HTStream* target;
     HTStreamClass targetClass; /* COPY for speed */
 };
 
 struct _HTStructured {
-    CONST HTStructuredClass* isa;
+    const HTStructuredClass* isa;
     HTStream* target;
     HTStreamClass targetClass; /* COPY for speed */
 
@@ -135,16 +135,16 @@ PRIVATE void HTMLGen_put_character ARGS2(HTStructured*, me, char, c) {
 /*	String handling
 **	---------------
 */
-PRIVATE void HTMLGen_put_string ARGS2(HTStructured*, me, CONST char*, s) {
-    CONST char* p;
+PRIVATE void HTMLGen_put_string ARGS2(HTStructured*, me, const char*, s) {
+    const char* p;
     for (p = s; *p; p++)
         HTMLGen_put_character(me, *p);
 }
 
 PRIVATE void HTMLGen_progress ARGS2(HTStructured*, me, int, l) {}
 
-PRIVATE void HTMLGen_write ARGS3(HTStructured*, me, CONST char*, s, int, l) {
-    CONST char* p;
+PRIVATE void HTMLGen_write ARGS3(HTStructured*, me, const char*, s, int, l) {
+    const char* p;
     for (p = s; p < s + l; p++)
         HTMLGen_put_character(me, *p);
 }
@@ -155,8 +155,8 @@ PRIVATE void HTMLGen_write ARGS3(HTStructured*, me, CONST char*, s, int, l) {
 **	Within the opening tag, there may be spaces
 **	and the line may be broken at these spaces.
 */
-PRIVATE void HTMLGen_start_element ARGS5(HTStructured*, me, int, element_number, CONST BOOL*,
-                                         present, CONST char**, value, HTTag*, tag_unused) {
+PRIVATE void HTMLGen_start_element ARGS5(HTStructured*, me, int, element_number, const BOOL*,
+                                         present, const char**, value, HTTag*, tag_unused) {
     int i;
 
     BOOL was_preformatted = me->preformatted;
@@ -251,7 +251,7 @@ PRIVATE void PlainToHTML_abort ARGS2(HTStructured*, me, HTError, e) { PlainToHTM
 /*	Structured Object Class
 **	-----------------------
 */
-PRIVATE CONST HTStructuredClass HTMLGeneration =       /* As opposed to print etc */
+PRIVATE const HTStructuredClass HTMLGeneration =       /* As opposed to print etc */
     {"text/html",         HTMLGen_free,          NULL, /* end */
      HTMLGen_abort,       HTMLGen_put_character, HTMLGen_put_string,
      HTMLGen_progress,    HTMLGen_write,         HTMLGen_start_element,
@@ -285,7 +285,7 @@ PUBLIC HTStructured* HTMLGenerator ARGS1(HTStream*, output) {
 **	It is officially a structured strem but only the stream bits exist.
 **	This is just the easiest way of typecasting all the routines.
 */
-PRIVATE CONST HTStructuredClass PlainToHTMLConversion = {
+PRIVATE const HTStructuredClass PlainToHTMLConversion = {
     "plaintexttoHTML",
     HTMLGen_free,
     NULL, /* end */

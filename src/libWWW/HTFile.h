@@ -44,7 +44,7 @@ extern int HTDirReadme;        /* Include readme files in listing? */
 Convert filenames between local and WWW formats
 
  */
-extern char* HTLocalName PARAMS((CONST char* name));
+extern char* HTLocalName PARAMS((const char* name));
 
 /*
 
@@ -58,7 +58,7 @@ extern char* WWW_nameOfFile PARAMS((const char* name));
 Generate the name of a cache file
 
  */
-extern char* HTCacheFileName PARAMS((CONST char* name));
+extern char* HTCacheFileName PARAMS((const char* name));
 
 /*
 
@@ -79,8 +79,8 @@ Output a directory entry
 
  */
 extern void HTDirEntry PARAMS((HTStructured * target, /* in which to put the linked text */
-                               CONST char* tail,      /* last part of directory name */
-                               CONST char* entry));   /* name of this entry */
+                               const char* tail,      /* last part of directory name */
+                               const char* entry));   /* name of this entry */
 
 /*
 
@@ -104,8 +104,8 @@ HTSetSuffix: Define the representation for a file suffix
 **
 */
 
-extern void HTSetSuffix PARAMS((CONST char* suffix, CONST char* representation,
-                                CONST char* encoding, float quality));
+extern void HTSetSuffix PARAMS((const char* suffix, const char* representation,
+                                const char* encoding, float quality));
 
 /*
 
@@ -118,7 +118,7 @@ HTFileFormat: Get Representation and Encoding from file name
   *pEncoding              The encoding (binary, 7bit, etc). See HTSetSuffix .
 
  */
-extern HTFormat HTFileFormat PARAMS((CONST char* filename, HTAtom** pEncoding));
+extern HTFormat HTFileFormat PARAMS((const char* filename, HTAtom** pEncoding));
 
 /*
 
@@ -126,7 +126,7 @@ Determine file value from file name
 
  */
 
-extern float HTFileValue PARAMS((CONST char* filename));
+extern float HTFileValue PARAMS((const char* filename));
 
 /*
 
@@ -146,7 +146,7 @@ Determine write access to a file
 
  */
 
-extern BOOL HTEditable PARAMS((CONST char* filename));
+extern BOOL HTEditable PARAMS((const char* filename));
 
 /*
 
@@ -162,7 +162,7 @@ Determine a suitable suffix, given the representation
                          else NULL.
 
  */
-extern CONST char* HTFileSuffix PARAMS((HTAtom * rep));
+extern const char* HTFileSuffix PARAMS((HTAtom * rep));
 
 /*
 

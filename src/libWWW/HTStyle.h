@@ -133,7 +133,7 @@ typedef struct _HTStyle {
 /*      Style functions:
  */
 extern HTStyle* HTStyleNew NOPARAMS;
-extern HTStyle* HTStyleNewNamed PARAMS((CONST char* name));
+extern HTStyle* HTStyleNewNamed PARAMS((const char* name));
 extern HTStyle* HTStyleFree PARAMS((HTStyle * self));
 #ifdef SUPRESS
 extern HTStyle* HTStyleRead PARAMS((HTStyle * self, HTStream* stream));
@@ -151,7 +151,7 @@ typedef struct _HTStyleSheet {
  */
 extern HTStyleSheet* HTStyleSheetNew NOPARAMS;
 extern HTStyleSheet* HTStyleSheetFree PARAMS((HTStyleSheet * self));
-extern HTStyle* HTStyleNamed PARAMS((HTStyleSheet * self, CONST char* name));
+extern HTStyle* HTStyleNamed PARAMS((HTStyleSheet * self, const char* name));
 extern HTStyle* HTStyleForParagraph PARAMS((HTStyleSheet * self, HTParagraphStyle* paraStyle));
 extern HTStyle* HTStyleMatching PARAMS((HTStyleSheet * self, HTStyle* style));
 /* extern HTStyle * HTStyleForRun PARAMS((HTStyleSheet *self, NXRun * run)); */

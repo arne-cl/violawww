@@ -134,11 +134,11 @@ PRIVATE HTAAUser* decompose_auth_string ARGS2(char*, authstring, HTAAScheme, sch
     return user;
 }
 
-PRIVATE BOOL HTAA_checkTimeStamp ARGS1(CONST char*, timestamp) {
+PRIVATE BOOL HTAA_checkTimeStamp ARGS1(const char*, timestamp) {
     return NO; /* This is just a stub */
 }
 
-PRIVATE BOOL HTAA_checkInetAddress ARGS1(CONST char*, inet_addr) {
+PRIVATE BOOL HTAA_checkInetAddress ARGS1(const char*, inet_addr) {
     return NO; /* This is just a stub */
 }
 

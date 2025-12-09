@@ -9,7 +9,7 @@
 #include "HTAnchor.h"
 #include "HTUtils.h"
 
-extern CONST HTStructuredClass FOSIPresentation;
+extern const HTStructuredClass FOSIPresentation;
 
 /*	HTConverter to present FOSI
  */
@@ -45,6 +45,6 @@ extern void FOSIUseCharacterSet PARAMS((FOSICharacterSet i));
 **	a retrun code like HT_LOADED if object exists else < 0
 */
 
-PUBLIC int HTLoadError PARAMS((HTStream * sink, int number, CONST char* message));
+PUBLIC int HTLoadError PARAMS((HTStream * sink, int number, const char* message));
 
 #endif

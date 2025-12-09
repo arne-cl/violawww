@@ -44,7 +44,7 @@ extern void HTKeepAlive_cleanup NOPARAMS;
 
 /* Get a connection from the pool (returns NULL if none available) */
 extern HTConnection* HTKeepAlive_getConnection PARAMS((
-    CONST char* hostname,
+    const char* hostname,
     int port,
     BOOL is_ssl
 ));

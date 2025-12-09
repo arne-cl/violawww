@@ -126,7 +126,7 @@ Authentication Schemes
 ** ON EXIT:
 **      returns         the enumerated constant for that scheme.
 */
-PUBLIC HTAAScheme HTAAScheme_enum PARAMS((CONST char* name));
+PUBLIC HTAAScheme HTAAScheme_enum PARAMS((const char* name));
 
 /* PUBLIC                                               HTAAScheme_name()
 **                      GET THE NAME OF A GIVEN SCHEME
@@ -155,7 +155,7 @@ Methods
 **      returns         HTAAMethod enumerated value corresponding
 **                      to the given name.
 */
-PUBLIC HTAAMethod HTAAMethod_enum PARAMS((CONST char* name));
+PUBLIC HTAAMethod HTAAMethod_enum PARAMS((const char* name));
 
 /* PUBLIC                                               HTAAMethod_name()
 **                      GET THE NAME OF A GIVEN METHOD
@@ -208,7 +208,7 @@ Match Template Against Filename
 **      returns         YES, if filename matches the template.
 **                      NO, otherwise.
 */
-PUBLIC BOOL HTAA_templateMatch PARAMS((CONST char* template, CONST char* filename));
+PUBLIC BOOL HTAA_templateMatch PARAMS((const char* template, const char* filename));
 
 /* PUBLIC                                               HTAA_templateCaseMatch()
 **              STRING COMPARISON FUNCTION FOR FILE NAMES
@@ -232,7 +232,7 @@ PUBLIC BOOL HTAA_templateMatch PARAMS((CONST char* template, CONST char* filenam
 **      returns         YES, if filename matches the template.
 **                      NO, otherwise.
 */
-PUBLIC BOOL HTAA_templateCaseMatch PARAMS((CONST char* template, CONST char* filename));
+PUBLIC BOOL HTAA_templateCaseMatch PARAMS((const char* template, const char* filename));
 
 /* PUBLIC                                       HTAA_makeProtectionTemplate()
 **              CREATE A PROTECTION TEMPLATE FOR THE FILES
@@ -253,7 +253,7 @@ PUBLIC BOOL HTAA_templateCaseMatch PARAMS((CONST char* template, CONST char* fil
 **                              being a comment marker here,
 **                              there really isn't any space.
 */
-PUBLIC char* HTAA_makeProtectionTemplate PARAMS((CONST char* docname));
+PUBLIC char* HTAA_makeProtectionTemplate PARAMS((const char* docname));
 /*
 
 MIME Argument List Parser

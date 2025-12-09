@@ -54,7 +54,7 @@ PRIVATE HTChildAnchor* HTChildAnchor_new NOARGS {
 **		NO if they differ in more than  their case.
 */
 
-PRIVATE BOOL equivalent ARGS2(CONST char*, s, CONST char*, t) {
+PRIVATE BOOL equivalent ARGS2(const char*, s, const char*, t) {
     if (s && t) { /* Make sure they point to something */
         for (; *s && *t; s++, t++) {
             if (TOUPPER(*s) != TOUPPER(*t))
@@ -72,7 +72,7 @@ PRIVATE BOOL equivalent ARGS2(CONST char*, s, CONST char*, t) {
 **	document. The parent anchor must already exist.
 */
 
-PUBLIC HTChildAnchor* HTAnchor_findChild ARGS2(HTParentAnchor*, parent, CONST char*, tag) {
+PUBLIC HTChildAnchor* HTAnchor_findChild ARGS2(HTParentAnchor*, parent, const char*, tag) {
     HTChildAnchor* child;
     HTList* kids;
 
@@ -99,7 +99,7 @@ PUBLIC HTChildAnchor* HTAnchor_findChild ARGS2(HTParentAnchor*, parent, CONST ch
     child = HTChildAnchor_new();
     if (TRACE)
         fprintf(stderr, "new Anchor %p named `%s' is child of %p\n", (void*)child,
-                tag ? tag : (CONST char*)"", (void*)parent);
+                tag ? tag : (const char*)"", (void*)parent);
     HTList_addObject(parent->children, child);
     child->parent = parent;
     StrAllocCopy(child->tag, tag);
@@ -114,8 +114,8 @@ PUBLIC HTChildAnchor* HTAnchor_findChild ARGS2(HTParentAnchor*, parent, CONST ch
 **	(Code originally in ParseHTML.h)
 */
 PUBLIC HTChildAnchor* HTAnchor_findChildAndLink ARGS4(HTParentAnchor*, parent, /* May not be 0 */
-                                                      CONST char*, tag,        /* May be "" or 0 */
-                                                      CONST char*, href,       /* May be "" or 0 */
+                                                      const char*, tag,        /* May be "" or 0 */
+                                                      const char*, href,       /* May be "" or 0 */
                                                       HTLinkType*, ltype       /* May be 0 */
 ) {
     HTChildAnchor* child = HTAnchor_findChild(parent, tag);
@@ -139,7 +139,7 @@ PUBLIC HTChildAnchor* HTAnchor_findChildAndLink ARGS4(HTParentAnchor*, parent, /
 **	like with fonts.
 */
 
-HTAnchor* HTAnchor_findAddress ARGS1(CONST char*, address) {
+HTAnchor* HTAnchor_findAddress ARGS1(const char*, address) {
     char* tag = HTParse(address, "", PARSE_ANCHOR); /* Anchor tag specified ? */
 
     /* If the address represents a sub-anchor, we recursively load its parent,
@@ -157,7 +157,7 @@ HTAnchor* HTAnchor_findAddress ARGS1(CONST char*, address) {
     else { /* If the address has no anchor tag,
               check whether we have this node */
         int hash;
-        CONST char* p;
+        const char* p;
         HTList* adults;
         HTList* grownups;
         HTParentAnchor* foundAnchor;
@@ -332,13 +332,13 @@ BOOL HTAnchor_hasChildren ARGS1(HTParentAnchor*, me) {
 
 /*	Title handling
  */
-CONST char* HTAnchor_title ARGS1(HTParentAnchor*, me) { return me ? me->title : 0; }
+const char* HTAnchor_title ARGS1(HTParentAnchor*, me) { return me ? me->title : 0; }
 
-void HTAnchor_setTitle ARGS2(HTParentAnchor*, me, CONST char*, title) {
+void HTAnchor_setTitle ARGS2(HTParentAnchor*, me, const char*, title) {
     StrAllocCopy(me->title, title);
 }
 
-void HTAnchor_appendTitle ARGS2(HTParentAnchor*, me, CONST char*, title) {
+void HTAnchor_appendTitle ARGS2(HTParentAnchor*, me, const char*, title) {
     StrAllocCat(me->title, title);
 }
 
@@ -447,6 +447,6 @@ PUBLIC void HTAnchor_setPhysical ARGS2(HTParentAnchor*, me, char*, physical) {
 
 PUBLIC char* HTAnchor_charset ARGS1(HTParentAnchor*, me) { return me->charset; }
 
-PUBLIC void HTAnchor_setCharset ARGS2(HTParentAnchor*, me, CONST char*, charset) {
+PUBLIC void HTAnchor_setCharset ARGS2(HTParentAnchor*, me, const char*, charset) {
     StrAllocCopy(me->charset, charset);
 }

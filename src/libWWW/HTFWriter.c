@@ -23,7 +23,7 @@ extern int http_progress_notify(int n);
 */
 
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
 
     FILE* fp;
     char* end_command;
@@ -40,9 +40,9 @@ struct _HTStream {
 **	they just absorb data.
 */
 PRIVATE void HTBlackHole_put_character ARGS2(HTStream*, me, char, c) {}
-PRIVATE void HTBlackHole_put_string ARGS2(HTStream*, me, CONST char*, s) {}
+PRIVATE void HTBlackHole_put_string ARGS2(HTStream*, me, const char*, s) {}
 PRIVATE void HTBlackHole_progress ARGS2(HTStream*, me, int, l) {}
-PRIVATE void HTBlackHole_write ARGS3(HTStream*, me, CONST char*, s, int, l) {}
+PRIVATE void HTBlackHole_write ARGS3(HTStream*, me, const char*, s, int, l) {}
 PRIVATE void HTBlackHole_free ARGS1(HTStream*, me) {}
 PRIVATE void HTBlackHole_end ARGS1(HTStream*, me) {}
 PRIVATE void HTBlackHole_abort ARGS2(HTStream*, me, HTError, e) {}
@@ -50,7 +50,7 @@ PRIVATE void HTBlackHole_abort ARGS2(HTStream*, me, HTError, e) {}
 /*	Black Hole stream
 **	-----------------
 */
-PRIVATE CONST HTStreamClass HTBlackHoleClass = {
+PRIVATE const HTStreamClass HTBlackHoleClass = {
     "BlackHole",          HTBlackHole_free,          HTBlackHole_end, /*PYW*/
     HTBlackHole_abort,    HTBlackHole_put_character, HTBlackHole_put_string,
     HTBlackHole_progress, HTBlackHole_write,
@@ -80,7 +80,7 @@ PRIVATE void HTFWriter_put_character ARGS2(HTStream*, me, char, c) { putc(c, me-
 **
 **	Strings must be smaller than this buffer size.
 */
-PRIVATE void HTFWriter_put_string ARGS2(HTStream*, me, CONST char*, s) { fputs(s, me->fp); }
+PRIVATE void HTFWriter_put_string ARGS2(HTStream*, me, const char*, s) { fputs(s, me->fp); }
 
 /*	Buffer write.  Buffers can (and should!) be big.
 **	------------
@@ -94,7 +94,7 @@ PRIVATE void HTFWriter_progress ARGS2(HTStream*, me, int, l) {
 /*	Buffer write.  Buffers can (and should!) be big.
 **	------------
 */
-PRIVATE void HTFWriter_write ARGS3(HTStream*, me, CONST char*, s, int, l) {
+PRIVATE void HTFWriter_write ARGS3(HTStream*, me, const char*, s, int, l) {
     fwrite(s, 1, l, me->fp);
 }
 
@@ -143,7 +143,7 @@ PRIVATE void HTFWriter_abort ARGS2(HTStream*, me, HTError, e) {
 /*	Structured Object Class
 **	-----------------------
 */
-PRIVATE CONST HTStreamClass HTFWriter = /* As opposed to print etc */
+PRIVATE const HTStreamClass HTFWriter = /* As opposed to print etc */
     {"FileWriter",       HTFWriter_free,          HTFWriter_end,
      HTFWriter_abort,    HTFWriter_put_character, HTFWriter_put_string,
      HTFWriter_progress, HTFWriter_write};
@@ -198,7 +198,7 @@ PUBLIC HTStream* HTSaveAndExecute ARGS3(HTPresentation*, pres, HTParentAnchor*,
 #ifdef REMOVE_COMMAND
 {
     char* fnam;
-    CONST char* suffix;
+    const char* suffix;
 
     HTStream* me;
 
@@ -272,7 +272,7 @@ PUBLIC HTStream* HTSaveLocally ARGS3(HTPresentation*, pres, HTParentAnchor*, anc
 {
     char* fnam;
     char* answer;
-    CONST char* suffix;
+    const char* suffix;
 
     HTStream* me;
 

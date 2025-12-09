@@ -128,7 +128,7 @@ Read Group File (and do caching)
 
  */
 
-PUBLIC GroupDefList* HTAA_readGroupFile PARAMS((CONST char* filename));
+PUBLIC GroupDefList* HTAA_readGroupFile PARAMS((const char* filename));
 /*
 
 Delete Group Definition

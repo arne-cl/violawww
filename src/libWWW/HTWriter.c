@@ -16,7 +16,7 @@
 */
 
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
 
     int soc;
     char* write_pointer;
@@ -75,7 +75,7 @@ PRIVATE void HTWriter_put_character ARGS2(HTStream*, me, char, c) {
 **
 **	Strings must be smaller than this buffer size.
 */
-PRIVATE void HTWriter_put_string ARGS2(HTStream*, me, CONST char*, s) {
+PRIVATE void HTWriter_put_string ARGS2(HTStream*, me, const char*, s) {
     int l = strlen(s);
     if (me->write_pointer + l > &me->buffer[BUFFER_SIZE])
         flush(me);
@@ -88,10 +88,10 @@ PRIVATE void HTWriter_progress ARGS2(HTStream*, me, int, l) {}
 /*	Buffer write.  Buffers can (and should!) be big.
 **	------------
 */
-PRIVATE void HTWriter_write ARGS3(HTStream*, me, CONST char*, s, int, l) {
+PRIVATE void HTWriter_write ARGS3(HTStream*, me, const char*, s, int, l) {
 
-    CONST char* read_pointer = s;
-    CONST char* write_pointer = s + l;
+    const char* read_pointer = s;
+    const char* write_pointer = s + l;
 
     flush(me); /* First get rid of our buffer */
 
@@ -125,7 +125,7 @@ PRIVATE void HTWriter_abort ARGS2(HTStream*, me, HTError, e) { HTWriter_free(me)
 /*	Structured Object Class
 **	-----------------------
 */
-PRIVATE CONST HTStreamClass HTWriter =                        /* As opposed to print etc */
+PRIVATE const HTStreamClass HTWriter =                        /* As opposed to print etc */
     {"SocketWriter",    HTWriter_free,          HTWriter_end, /*PYW*/
      HTWriter_abort,    HTWriter_put_character, HTWriter_put_string,
      HTWriter_progress, HTWriter_write};

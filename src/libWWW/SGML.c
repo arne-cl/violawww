@@ -52,9 +52,9 @@ struct _HTElement {
 */
 struct _HTStream {
 
-    CONST HTStreamClass* isa; /* inherited from HTStream */
+    const HTStreamClass* isa; /* inherited from HTStream */
 
-    CONST SGML_dtd* dtd;
+    const SGML_dtd* dtd;
     HTStructuredClass* actions; /* target class  */
     HTStructured* target;       /* target object */
     HTParentAnchor* anchor;     /* anchor for charset info */
@@ -94,7 +94,7 @@ struct _HTStream {
 /*	Handle Attribute
 **	----------------
 */
-/* PUBLIC CONST char * SGML_default = "";   ?? */
+/* PUBLIC const char * SGML_default = "";   ?? */
 
 #ifdef __STDC__
 PRIVATE void handle_attribute_name(HTStream* context, const char* s)
@@ -165,8 +165,8 @@ char term;
 #endif
 {
 
-    CONST char** entities = context->dtd->entity_names;
-    CONST char* s = context->string->data;
+    const char** entities = context->dtd->entity_names;
+    const char* s = context->string->data;
 
     int high, low, i, diff;
     for (low = 0, high = context->dtd->number_of_entities; high > low;
@@ -183,7 +183,7 @@ char term;
         fprintf(stderr, "SGML: Unknown entity %s\n", s);
     PUTC('&');
     {
-        CONST char* p;
+        const char* p;
         for (p = s; *p; p++) {
             PUTC(*p);
         }
@@ -276,7 +276,7 @@ PRIVATE void start_element(context) HTStream* context;
         fprintf(stderr, "SGML: Start <%s>\n", new_tag->name);
     (*context->actions->start_element)(context->target, (int)(new_tag - context->dtd->tags),
                                        context->present,
-                                       (CONST char**)context->value, /* coerce type for think c */
+                                       (const char**)context->value, /* coerce type for think c */
                                        new_tag /*PYW*/);
     if (new_tag->contents != SGML_EMPTY) { /* i.e. tag not empty */
         HTElement* N = (HTElement*)malloc(sizeof(HTElement));
@@ -300,7 +300,7 @@ PRIVATE void start_element(context) HTStream* context;
 **		NULL		tag not found
 **		else		address of tag structure in dtd
 */
-PUBLIC HTTag* SGMLFindTag ARGS2(CONST SGML_dtd*, dtd, CONST char*, string) {
+PUBLIC HTTag* SGMLFindTag ARGS2(const SGML_dtd*, dtd, const char*, string) {
     int high, low, i, diff;
     for (low = 0, high = dtd->number_of_tags; high > low;
          diff < 0 ? (low = i + 1) : (high = i)) { /* Binary serach */
@@ -444,7 +444,7 @@ PRIVATE void closeImpliedTags ARGS2(HTStream*, context, HTTag*, tag) {
 PUBLIC void SGML_character ARGS2(HTStream*, context, char, c)
 
 {
-    CONST SGML_dtd* dtd = context->dtd;
+    const SGML_dtd* dtd = context->dtd;
     HTChunk* string = context->string;
 
 #ifdef IMPLY_VERBOSE
@@ -858,8 +858,8 @@ PUBLIC void SGML_character ARGS2(HTStream*, context, char, c)
 
 } /* SGML_character */
 
-PUBLIC void SGML_string ARGS2(HTStream*, context, CONST char*, str) {
-    CONST char* p;
+PUBLIC void SGML_string ARGS2(HTStream*, context, const char*, str) {
+    const char* p;
     for (p = str; *p; p++)
         SGML_character(context, *p);
 }
@@ -870,9 +870,9 @@ PUBLIC void SGML_progress ARGS2(HTStream*, context, int, l) {
 #endif
 }
 
-PUBLIC void SGML_write ARGS3(HTStream*, context, CONST char*, str, int, l) {
-    CONST char* p;
-    CONST char* e = str + l;
+PUBLIC void SGML_write ARGS3(HTStream*, context, const char*, str, int, l) {
+    const char* p;
+    const char* e = str + l;
     char outbuf[65536];
     int converted_len;
     char* charset;
@@ -891,12 +891,12 @@ PUBLIC void SGML_write ARGS3(HTStream*, context, CONST char*, str, int, l) {
 
             converted_len = HTCharset_convert_to_ascii(charset, inptr, slice, outbuf, sizeof(outbuf));
             if (converted_len > 0) {
-                CONST char* ce = outbuf + converted_len;
+                const char* ce = outbuf + converted_len;
                 for (p = outbuf; p < ce; p++)
                     SGML_character(context, *p);
             } else {
                 /* Fallback: pass through raw slice */
-                CONST char* pe = inptr + slice;
+                const char* pe = inptr + slice;
                 for (p = inptr; p < pe; p++)
                     SGML_character(context, *p);
             }
@@ -918,7 +918,7 @@ PUBLIC void SGML_write ARGS3(HTStream*, context, CONST char*, str, int, l) {
 /*	Structured Object Class
 **	-----------------------
 */
-PUBLIC CONST HTStreamClass SGMLParser = {"SGMLParser",   SGML_free,   SGML_end,      SGML_abort,
+PUBLIC const HTStreamClass SGMLParser = {"SGMLParser",   SGML_free,   SGML_end,      SGML_abort,
                                          SGML_character, SGML_string, SGML_progress, SGML_write};
 
 /*	Create SGML Engine
@@ -930,7 +930,7 @@ PUBLIC CONST HTStreamClass SGMLParser = {"SGMLParser",   SGML_free,   SGML_end, 
 **
 */
 
-PUBLIC HTStream* SGML_new ARGS3(CONST SGML_dtd*, dtd, HTStructured*, target, HTParentAnchor*, anchor) {
+PUBLIC HTStream* SGML_new ARGS3(const SGML_dtd*, dtd, HTStructured*, target, HTParentAnchor*, anchor) {
     int i;
     HTStream* context = (HTStream*)malloc(sizeof(*context));
     if (!context)

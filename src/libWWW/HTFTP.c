@@ -109,7 +109,7 @@ typedef struct _connection {
 #define END(e) (*targetClass.end_element)(target, e)
 #define FREE_TARGET (*targetClass.free)(target)
 struct _HTStructured {
-    CONST HTStructuredClass* isa;
+    const HTStructuredClass* isa;
     /* ... */
 };
 
@@ -313,7 +313,7 @@ PRIVATE int response(char* cmd)
 **	It ensures that all connections are logged in if they exist.
 **	It ensures they have the port number transferred.
 */
-PRIVATE int get_connection ARGS1(CONST char*, arg) {
+PRIVATE int get_connection ARGS1(const char*, arg) {
     struct sockaddr_in soc_address; /* Binary network address */
     struct sockaddr_in* sin = &soc_address;
 
@@ -455,7 +455,7 @@ PRIVATE int get_connection ARGS1(CONST char*, arg) {
                     sprintf(command, "PASS %s%c%c", password, CR, LF);
                 } else {
                     char* user = getenv("USER");
-                    CONST char* host = HTHostName();
+                    const char* host = HTHostName();
                     if (!user)
                         user = "WWWuser";
                     /* If not fully qualified, suppress it as ftp.uu.net
@@ -670,7 +670,7 @@ PRIVATE int get_listen_socket()
 **	returns		HT_LOADED if OK
 **			<0 if error.
 */
-PRIVATE int read_directory ARGS4(HTParentAnchor*, parent, CONST char*, address, HTFormat,
+PRIVATE int read_directory ARGS4(HTParentAnchor*, parent, const char*, address, HTFormat,
                                  format_out, HTStream*, sink) {
     HTStructured* target = HTML_new(parent, format_out, sink);
     HTStructuredClass targetClass;
@@ -761,7 +761,7 @@ PRIVATE int read_directory ARGS4(HTParentAnchor*, parent, CONST char*, address, 
 **	returns		Socket number for file if good.
 **			<0 if bad.
 */
-PUBLIC int HTFTPLoad ARGS4(CONST char*, name, HTParentAnchor*, anchor, HTFormat, format_out,
+PUBLIC int HTFTPLoad ARGS4(const char*, name, HTParentAnchor*, anchor, HTFormat, format_out,
                            HTStream*, sink) {
     BOOL isDirectory = NO;
     int status;

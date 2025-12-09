@@ -39,7 +39,7 @@ PUBLIC void HTAssocList_delete ARGS1(HTAssocList*, alist) {
     }
 }
 
-PUBLIC void HTAssocList_add ARGS3(HTAssocList*, alist, CONST char*, name, CONST char*, value) {
+PUBLIC void HTAssocList_add ARGS3(HTAssocList*, alist, const char*, name, const char*, value) {
     HTAssoc* assoc;
 
     if (alist) {
@@ -57,7 +57,7 @@ PUBLIC void HTAssocList_add ARGS3(HTAssocList*, alist, CONST char*, name, CONST 
         fprintf(stderr, "HTAssoc_add: ERROR: assoc list NULL!!\n");
 }
 
-PUBLIC char* HTAssocList_lookup ARGS2(HTAssocList*, alist, CONST char*, name) {
+PUBLIC char* HTAssocList_lookup ARGS2(HTAssocList*, alist, const char*, name) {
     HTAssocList* cur = alist;
     HTAssoc* assoc;
 

@@ -16,16 +16,16 @@ PUBLIC int WWW_TraceFlag = 1; /* Global trace flag for ALL W3 code - ENABLED FOR
 #define VC "unknown"
 #endif
 
-PUBLIC CONST char* HTLibraryVersion = VC; /* String for help screen etc */
+PUBLIC const char* HTLibraryVersion = VC; /* String for help screen etc */
 
 #ifndef VM /* VM has these already it seems */
 
 /*	Strings of any length
 **	---------------------
 */
-PUBLIC int strcasecomp ARGS2(CONST char*, a, CONST char*, b) {
-    CONST char* p = a;
-    CONST char* q = b;
+PUBLIC int strcasecomp ARGS2(const char*, a, const char*, b) {
+    const char* p = a;
+    const char* q = b;
     for (p = a, q = b; *p && *q; p++, q++) {
         int diff = TOLOWER(*p) - TOLOWER(*q);
         if (diff)
@@ -41,9 +41,9 @@ PUBLIC int strcasecomp ARGS2(CONST char*, a, CONST char*, b) {
 /*	With count limit
 **	----------------
 */
-PUBLIC int strncasecomp ARGS3(CONST char*, a, CONST char*, b, int, n) {
-    CONST char* p = a;
-    CONST char* q = b;
+PUBLIC int strncasecomp ARGS3(const char*, a, const char*, b, int, n) {
+    const char* p = a;
+    const char* q = b;
 
     for (p = a, q = b;; p++, q++) {
         int diff;
@@ -61,7 +61,7 @@ PUBLIC int strncasecomp ARGS3(CONST char*, a, CONST char*, b, int, n) {
 
 /*	Allocate a new copy of a string, and returns it
  */
-PUBLIC char* HTSACopy ARGS2(char**, dest, CONST char*, src) {
+PUBLIC char* HTSACopy ARGS2(char**, dest, const char*, src) {
     if (*dest)
         free(*dest);
     if (!src)
@@ -77,7 +77,7 @@ PUBLIC char* HTSACopy ARGS2(char**, dest, CONST char*, src) {
 
 /*	String Allocate and Concatenate
  */
-PUBLIC char* HTSACat ARGS2(char**, dest, CONST char*, src) {
+PUBLIC char* HTSACat ARGS2(char**, dest, const char*, src) {
     if (src && *src) {
         if (*dest) {
             int length = strlen(*dest);

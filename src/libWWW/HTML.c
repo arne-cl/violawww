@@ -72,7 +72,7 @@ typedef struct _stack_element {
 } stack_element;
 
 struct _HTStructured {
-    CONST HTStructuredClass* isa;
+    const HTStructuredClass* isa;
     HTParentAnchor* node_anchor;
     HText* text;
 
@@ -94,7 +94,7 @@ struct _HTStructured {
 };
 
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
     /* .... */
 };
 
@@ -413,7 +413,7 @@ PRIVATE void HTML_put_character ARGS2(HTStructured*, me, char, c) {
 **	This is written separately from put_character becuase the loop can
 **	in some cases be promoted to a higher function call level for speed.
 */
-PRIVATE void HTML_put_string ARGS2(HTStructured*, me, CONST char*, s) {
+PRIVATE void HTML_put_string ARGS2(HTStructured*, me, const char*, s) {
 #ifdef VIOLA
 
     char* cp;
@@ -451,7 +451,7 @@ PRIVATE void HTML_put_string ARGS2(HTStructured*, me, CONST char*, s) {
 
     default: /* Free format text */
     {
-        CONST char* p = s;
+        const char* p = s;
         if (me->style_change) {
             for (; *p && ((*p == '\n') || (*p == ' ')); p++)
                 ; /* Ignore leaders */
@@ -485,16 +485,16 @@ PRIVATE void HTML_progress ARGS2(HTStructured*, me, int, l) {}
 /*	Buffer write
 **	------------
 */
-PRIVATE void HTML_write ARGS3(HTStructured*, me, CONST char*, s, int, l) {
-    CONST char* p;
-    CONST char* e = s + l;
+PRIVATE void HTML_write ARGS3(HTStructured*, me, const char*, s, int, l) {
+    const char* p;
+    const char* e = s + l;
     for (p = s; s < e; p++)
         HTML_put_character(me, *p);
 }
 
-PRIVATE char* extract_charset_from_content ARGS1(CONST char*, content) {
-    CONST char* scan;
-    CONST char* start;
+PRIVATE char* extract_charset_from_content ARGS1(const char*, content) {
+    const char* scan;
+    const char* start;
     char quote = 0;
     size_t len;
     char* charset;
@@ -504,7 +504,7 @@ PRIVATE char* extract_charset_from_content ARGS1(CONST char*, content) {
 
     for (scan = content; *scan; scan++) {
         if (strncasecmp(scan, "charset", 7) == 0) {
-            CONST char* cursor = scan + 7;
+            const char* cursor = scan + 7;
             while (*cursor && WHITE(*cursor))
                 cursor++;
             if (*cursor != '=')
@@ -540,7 +540,7 @@ PRIVATE char* extract_charset_from_content ARGS1(CONST char*, content) {
     return NULL;
 }
 
-PRIVATE void handle_meta_charset ARGS3(HTStructured*, me, CONST BOOL*, present, CONST char**, value) {
+PRIVATE void handle_meta_charset ARGS3(HTStructured*, me, const BOOL*, present, const char**, value) {
     char* charset;
     char* existing;
 
@@ -572,8 +572,8 @@ PRIVATE void handle_meta_charset ARGS3(HTStructured*, me, CONST BOOL*, present, 
 /*	Start Element
 **	-------------
 */
-PRIVATE void HTML_start_element ARGS5(HTStructured*, me, int, element_number, CONST BOOL*, present,
-                                      CONST char**, value, HTTag*, tagInfo) /* PYW */
+PRIVATE void HTML_start_element ARGS5(HTStructured*, me, int, element_number, const BOOL*, present,
+                                      const char**, value, HTTag*, tagInfo) /* PYW */
 {
     const char* tag_name = NULL;
     if (tagInfo && tagInfo->name)
@@ -954,7 +954,7 @@ PRIVATE void get_styles NOARGS {
 /*	Structured Object Class
 **	-----------------------
 */
-PUBLIC CONST HTStructuredClass HTMLPresentation =        /* As opposed to print etc */
+PUBLIC const HTStructuredClass HTMLPresentation =        /* As opposed to print etc */
     {"text/html", HTML_free,          HTML_end_document, /*PYW*/
      HTML_abort,  HTML_put_character, HTML_put_string,   HTML_progress,
      HTML_write,  HTML_start_element, HTML_end_element,  HTML_put_entity};
@@ -1070,7 +1070,7 @@ PUBLIC HTStream* HTMLPresent ARGS3(HTPresentation*, pres, HTParentAnchor*, ancho
 **	returns	a negative number to indicate lack of success in the load.
 */
 
-PUBLIC int HTLoadError ARGS3(HTStream*, sink, int, number, CONST char*, message) {
+PUBLIC int HTLoadError ARGS3(HTStream*, sink, int, number, const char*, message) {
     /*  HTAlert(message);	PYW*/ /* @@@@@@@@@@@@@@@@@@@ */
     return -number;
 }

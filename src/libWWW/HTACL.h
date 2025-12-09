@@ -32,7 +32,7 @@ Opening Access Control List File
 **      returns         the FILE* to open ACL.
 **                      NULL, if ACL not found.
 */
-PUBLIC FILE* HTAA_openAcl PARAMS((CONST char* pathname));
+PUBLIC FILE* HTAA_openAcl PARAMS((const char* pathname));
 
 /* PUBLIC                                               HTAA_closeAcl()
 **                      CLOSE ACL FILE
@@ -94,7 +94,7 @@ Getting ACL Entry
 **      HTAA_readGroupFile()) and after that access authorization
 **      can be checked with function HTAA_userAndInetGroup().
 */
-PUBLIC GroupDef* HTAA_getAclEntry PARAMS((FILE * acl_file, CONST char* pathname,
+PUBLIC GroupDef* HTAA_getAclEntry PARAMS((FILE * acl_file, const char* pathname,
                                           HTAAMethod method));
 /*
 

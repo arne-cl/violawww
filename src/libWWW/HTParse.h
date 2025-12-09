@@ -115,7 +115,7 @@ HTEscape:  Encode unacceptable characters in string
    represented in the form %xy where X and Y are two hex digits.
 
  */
-extern char* HTEscape PARAMS((CONST char* str, unsigned char mask));
+extern char* HTEscape PARAMS((const char* str, unsigned char mask));
 
 /*
 

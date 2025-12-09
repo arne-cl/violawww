@@ -117,7 +117,7 @@ HTSetConfiguration:  Load one line of configuration information
    the  rule file, for example INI files for X resources.
 
  */
-extern int HTSetConfiguration PARAMS((CONST char* config));
+extern int HTSetConfiguration PARAMS((const char* config));
 
 /*
 

@@ -118,7 +118,7 @@ extern void HText_appendCharacter PARAMS((HText * text, char ch));
 
  */
 
-extern void HText_appendText PARAMS((HText * text, CONST char* str));
+extern void HText_appendText PARAMS((HText * text, const char* str));
 
 /*
 
@@ -162,7 +162,7 @@ extern void HText_endAnchor PARAMS((HText * text));
 
  */
 extern void HText_appendImage PARAMS((HText * text, HTChildAnchor* anc,
-                                      CONST char* alternative_text, int alignment, BOOL isMap));
+                                      const char* alternative_text, int alignment, BOOL isMap));
 
 /*
 
@@ -219,7 +219,7 @@ extern HTStyle* HText_selectionStyle PARAMS((HText * me, HTStyleSheet* sheet));
 
 /*      Paste in styled text
  */
-extern void HText_replaceSel PARAMS((HText * me, CONST char* aString, HTStyle* aStyle));
+extern void HText_replaceSel PARAMS((HText * me, const char* aString, HTStyle* aStyle));
 
 /*      Apply this style to the selection and all similarly formatted text
 **      (style recovery only)

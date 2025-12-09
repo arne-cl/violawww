@@ -77,8 +77,8 @@ PUBLIC void HTChunkTerminate ARGS1(HTChunk*, ch) { HTChunkPutc(ch, (char)0); }
 /*	Append a string
 **	---------------
 */
-PUBLIC void HTChunkPuts ARGS2(HTChunk*, ch, CONST char*, s) {
-    CONST char* p;
+PUBLIC void HTChunkPuts ARGS2(HTChunk*, ch, const char*, s) {
+    const char* p;
     for (p = s; *p; p++)
         HTChunkPutc(ch, *p);
 }

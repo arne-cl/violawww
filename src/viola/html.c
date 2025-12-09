@@ -1015,7 +1015,7 @@ PUBLIC void HText_endAnchor ARGS1(HText*, text) {
 #endif
 }
 
-PUBLIC void HText_appendText ARGS2(HText*, text, CONST char*, str) {
+PUBLIC void HText_appendText ARGS2(HText*, text, const char*, str) {
     char* p;
     for (p = str; *p; p++)
         HText_appendCharacter(text, *p);
@@ -1128,7 +1128,7 @@ PUBLIC HTStyle* HText_selectionStyle ARGS2(HText*, me, HTStyleSheet*, sheet) {
 
 /*	Paste in styled text
  */
-PUBLIC void HText_replaceSel ARGS3(HText*, me, CONST char*, aString, HTStyle*, aStyle) {
+PUBLIC void HText_replaceSel ARGS3(HText*, me, const char*, aString, HTStyle*, aStyle) {
     printf("HText_replaceSel.\n");
 }
 

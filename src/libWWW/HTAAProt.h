@@ -69,8 +69,8 @@ Callbacks for rule system
 **      returns         nothing.
 **                      Sets the module-wide variable default_prot.
 */
-PUBLIC void HTAA_setDefaultProtection PARAMS((CONST char* cur_docname, CONST char* prot_filename,
-                                              CONST char* eff_ids));
+PUBLIC void HTAA_setDefaultProtection PARAMS((const char* cur_docname, const char* prot_filename,
+                                              const char* eff_ids));
 
 /* PUBLIC                                       HTAA_setCurrentProtection()
 **              SET THE CURRENT PROTECTION MODE
@@ -91,8 +91,8 @@ PUBLIC void HTAA_setDefaultProtection PARAMS((CONST char* cur_docname, CONST cha
 **      returns         nothing.
 **                      Sets the module-wide variable current_prot.
 */
-PUBLIC void HTAA_setCurrentProtection PARAMS((CONST char* cur_docname, CONST char* prot_filename,
-                                              CONST char* eff_ids));
+PUBLIC void HTAA_setCurrentProtection PARAMS((const char* cur_docname, const char* prot_filename,
+                                              const char* eff_ids));
 
 /* SERVER INTERNAL                                      HTAA_clearProtections()
 **              CLEAR DOCUMENT PROTECTION MODE

@@ -39,11 +39,11 @@ typedef struct _HTStreamClass {
 
     void(*put_character) PARAMS((HTStream * me, char ch));
 
-    void(*put_string) PARAMS((HTStream * me, CONST char* str));
+    void(*put_string) PARAMS((HTStream * me, const char* str));
 
     void(*progress) PARAMS((HTStream * me, int n));
 
-    void(*put_block) PARAMS((HTStream * me, CONST char* str, int len));
+    void(*put_block) PARAMS((HTStream * me, const char* str, int len));
 
 } HTStreamClass;
 

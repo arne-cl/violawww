@@ -108,7 +108,7 @@ PRIVATE void safe_show_message(const char* message) {
 **
 **  Uses the Wayback Availability API to check if a snapshot exists
 */
-PUBLIC char* HTWaybackCheck PARAMS((CONST char* url)) {
+PUBLIC char* HTWaybackCheck PARAMS((const char* url)) {
     int s = -1;
     SockA soc_address;
     SockA* sin = &soc_address;
@@ -144,7 +144,7 @@ PUBLIC char* HTWaybackCheck PARAMS((CONST char* url)) {
 
     /* Minimal URL encoding - only encode what's truly problematic */
     {
-        CONST char* src = url;
+        const char* src = url;
         char* dst = url_encoded;
         while (*src) {
             if (*src == ' ') {

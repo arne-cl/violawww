@@ -55,14 +55,14 @@ extern BOOL interactive;
 
 #ifdef ORIGINAL
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
     /* ... */
 };
 #endif
 
 /* this version used by the NetToText stream */
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
     BOOL had_cr;
     HTStream* sink;
 };
@@ -77,7 +77,7 @@ PUBLIC HTPresentation* default_presentation = 0;
 /*	Define a presentation system command for a content-type
 **	-------------------------------------------------------
 */
-PUBLIC void HTSetPresentation ARGS5(CONST char*, representation, CONST char*, command, float,
+PUBLIC void HTSetPresentation ARGS5(const char*, representation, const char*, command, float,
                                     quality, float, secs, float, secs_per_byte) {
 
     HTPresentation* pres = (HTPresentation*)malloc(sizeof(HTPresentation));
@@ -109,7 +109,7 @@ PUBLIC void HTSetPresentation ARGS5(CONST char*, representation, CONST char*, co
 /*	Define a built-in function for a content-type
 **	---------------------------------------------
 */
-PUBLIC void HTSetConversion ARGS6(CONST char*, representation_in, CONST char*, representation_out,
+PUBLIC void HTSetConversion ARGS6(const char*, representation_in, const char*, representation_out,
                                   HTConverter*, converter, float, quality, float, secs, float,
                                   secs_per_byte) {
 
@@ -616,8 +616,8 @@ PRIVATE void NetToText_put_character ARGS2(HTStream*, me, char, net_char) {
         me->sink->isa->put_character(me->sink, c); /* normal */
 }
 
-PRIVATE void NetToText_put_string ARGS2(HTStream*, me, CONST char*, s) {
-    CONST char* p;
+PRIVATE void NetToText_put_string ARGS2(HTStream*, me, const char*, s) {
+    const char* p;
     for (p = s; *p; p++)
         NetToText_put_character(me, *p);
 }
@@ -628,8 +628,8 @@ PRIVATE void NetToText_progress ARGS2(HTStream*, me, int, l) {
 #endif
 }
 
-PRIVATE void NetToText_put_block ARGS3(HTStream*, me, CONST char*, s, int, l) {
-    CONST char* p;
+PRIVATE void NetToText_put_block ARGS3(HTStream*, me, const char*, s, int, l) {
+    const char* p;
     for (p = s; p < (s + l); p++)
         NetToText_put_character(me, *p);
 }

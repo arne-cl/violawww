@@ -149,7 +149,7 @@ PRIVATE char* find_header(char* headers, const char* header_name) {
 **	returns	>=0	If no error, a good socket number
 **		<0	Error.
 */
-PUBLIC int HTLoadHTTPS ARGS4(CONST char*, arg,
+PUBLIC int HTLoadHTTPS ARGS4(const char*, arg,
                              HTParentAnchor*, anAnchor, 
                              HTFormat, format_out, 
                              HTStream*, sink) {
@@ -165,7 +165,7 @@ PUBLIC int HTLoadHTTPS ARGS4(CONST char*, arg,
     HTFormat format_in;      /* Format arriving in the message */
     char* auth = NULL;       /* Authorization information */
 
-    CONST char* gate = 0; /* disable gateway feature */
+    const char* gate = 0; /* disable gateway feature */
     SockA soc_address;    /* Binary network address */
     SockA* sin = &soc_address;
     BOOL had_header = NO;

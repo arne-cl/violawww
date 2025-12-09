@@ -26,14 +26,14 @@ extern HTStyleSheet* styleSheet;
 */
 
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
 
     HText* text;
     HTParentAnchor* anchor; /* To access charset information */
 };
 
 /* Forward declaration */
-PRIVATE void HTPlain_write ARGS3(HTStream*, me, CONST char*, s, int, l);
+PRIVATE void HTPlain_write ARGS3(HTStream*, me, const char*, s, int, l);
 
 /*	Write the buffer out to the socket
 **	----------------------------------
@@ -56,16 +56,16 @@ PRIVATE void HTPlain_put_character ARGS2(HTStream*, me, char, c) {
 **	---------------
 **
 */
-PRIVATE void HTPlain_put_string ARGS2(HTStream*, me, CONST char*, s) {
+PRIVATE void HTPlain_put_string ARGS2(HTStream*, me, const char*, s) {
     /* Use HTPlain_write for conversion */
     HTPlain_write(me, s, strlen(s));
 }
 
 PRIVATE void HTPlain_progress ARGS2(HTStream*, me, int, l) {}
 
-PRIVATE void HTPlain_write ARGS3(HTStream*, me, CONST char*, s, int, l) {
-    CONST char* p;
-    CONST char* e = s + l;
+PRIVATE void HTPlain_write ARGS3(HTStream*, me, const char*, s, int, l) {
+    const char* p;
+    const char* e = s + l;
     char outbuf[65536]; /* 8x buffer for encoding expansion + transliteration */
     int converted_len;
     int i;
@@ -130,7 +130,7 @@ PRIVATE void HTPlain_abort ARGS2(HTStream*, me, HTError, e) { HTPlain_free(me); 
 /*		Structured Object Class
 **		-----------------------
 */
-PUBLIC CONST HTStreamClass HTPlain = {
+PUBLIC const HTStreamClass HTPlain = {
     "SocketWriter",        HTPlain_free,       HTPlain_end,      HTPlain_abort,
     HTPlain_put_character, HTPlain_put_string, HTPlain_progress, HTPlain_write,
 };

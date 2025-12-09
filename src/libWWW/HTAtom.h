@@ -35,8 +35,8 @@ struct _HTAtom {
     char* name;
 }; /* struct _HTAtom */
 
-PUBLIC HTAtom* HTAtom_for PARAMS((CONST char* string));
-PUBLIC HTList* HTAtom_templateMatches PARAMS((CONST char* templ));
+PUBLIC HTAtom* HTAtom_for PARAMS((const char* string));
+PUBLIC HTList* HTAtom_templateMatches PARAMS((const char* templ));
 
 #define HTAtom_name(a) ((a)->name)
 

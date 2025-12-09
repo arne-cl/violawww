@@ -168,7 +168,7 @@ PRIVATE int remote_session ARGS2(char*, access, char*, host) {
 **			(See WWW.h)
 **
 */
-PRIVATE int HTLoadTelnet ARGS4(CONST char*, addr, HTParentAnchor*, anchor, HTFormat, format_out,
+PRIVATE int HTLoadTelnet ARGS4(const char*, addr, HTParentAnchor*, anchor, HTFormat, format_out,
                                HTStream*, sink /* Ignored */
 ) {
     char* access;

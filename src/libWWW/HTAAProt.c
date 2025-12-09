@@ -46,8 +46,8 @@ PRIVATE HTAAProt* current_prot = NULL; /* Current protection mode	*/
 /* PRIVATE							isNumber()
 **		DOES A CHARACTER STRING REPRESENT A NUMBER
 */
-PRIVATE BOOL isNumber ARGS1(CONST char*, s) {
-    CONST char* cur = s;
+PRIVATE BOOL isNumber ARGS1(const char*, s) {
+    const char* cur = s;
 
     if (!s || !*s)
         return NO;
@@ -162,7 +162,7 @@ PUBLIC int HTAA_getGid NOARGS {
 ** ON EXIT:
 **	returns		nothing.
 */
-PRIVATE void HTAA_setIds ARGS2(HTAAProt*, prot, CONST char*, ids) {
+PRIVATE void HTAA_setIds ARGS2(HTAAProt*, prot, const char*, ids) {
     if (ids) {
         char* local_copy = NULL;
         char* point;
@@ -309,8 +309,8 @@ PRIVATE void HTAA_parseProtFile ARGS2(HTAAProt*, prot, FILE*, fp) {
 **			in cache), only sets uid_name and gid
 **			fields, and returns that.
 */
-PRIVATE HTAAProt* HTAAProt_new ARGS3(CONST char*, cur_docname, CONST char*, prot_filename,
-                                     CONST char*, ids) {
+PRIVATE HTAAProt* HTAAProt_new ARGS3(const char*, cur_docname, const char*, prot_filename,
+                                     const char*, ids) {
     HTList* cur = prot_cache;
     HTAAProtCache* cache_item = NULL;
     HTAAProt* prot;
@@ -383,8 +383,8 @@ PRIVATE HTAAProt* HTAAProt_new ARGS3(CONST char*, cur_docname, CONST char*, prot
 **	returns		nothing.
 **			Sets the module-wide variable default_prot.
 */
-PUBLIC void HTAA_setDefaultProtection ARGS3(CONST char*, cur_docname, CONST char*, prot_filename,
-                                            CONST char*, ids) {
+PUBLIC void HTAA_setDefaultProtection ARGS3(const char*, cur_docname, const char*, prot_filename,
+                                            const char*, ids) {
     default_prot = NULL; /* Not free()'d because this is in cache */
 
     if (prot_filename) {
@@ -415,8 +415,8 @@ PUBLIC void HTAA_setDefaultProtection ARGS3(CONST char*, cur_docname, CONST char
 **	returns		nothing.
 **			Sets the module-wide variable current_prot.
 */
-PUBLIC void HTAA_setCurrentProtection ARGS3(CONST char*, cur_docname, CONST char*, prot_filename,
-                                            CONST char*, ids) {
+PUBLIC void HTAA_setCurrentProtection ARGS3(const char*, cur_docname, const char*, prot_filename,
+                                            const char*, ids) {
     current_prot = NULL; /* Not free()'d because this is in cache */
 
     if (prot_filename) {

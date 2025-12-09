@@ -16,7 +16,7 @@
 #define HTMLPresent HTMLPres
 #endif
 
-extern CONST HTStructuredClass HTMLPresentation;
+extern const HTStructuredClass HTMLPresentation;
 
 /*
 
@@ -56,7 +56,7 @@ Record error message as a hypertext object
 **      a retrun code like HT_LOADED if object exists else 60; 0
 */
 
-PUBLIC int HTLoadError PARAMS((HTStream * sink, int number, CONST char* message));
+PUBLIC int HTLoadError PARAMS((HTStream * sink, int number, const char* message));
 
 #endif
 

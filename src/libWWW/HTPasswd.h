@@ -43,8 +43,8 @@ User Authentication
 **      returns         YES, if the username-password pair was correct.
 **                      NO, otherwise; also, if open fails.
 */
-PUBLIC BOOL HTAA_checkPassword PARAMS((CONST char* username, CONST char* password,
-                                       CONST char* filename));
+PUBLIC BOOL HTAA_checkPassword PARAMS((const char* username, const char* password,
+                                       const char* filename));
 /*
 
 Password File Maintenance Routines
@@ -70,7 +70,7 @@ Password File Maintenance Routines
 **      about the security inside the machine.
 **
 */
-PUBLIC char* HTAA_encryptPasswd PARAMS((CONST char* password));
+PUBLIC char* HTAA_encryptPasswd PARAMS((const char* password));
 
 /* PUBLIC                                               HTAA_passwdMatch()
 **              VERIFY THE CORRECTNESS OF A GIVEN PASSWORD
@@ -86,7 +86,7 @@ PUBLIC char* HTAA_encryptPasswd PARAMS((CONST char* password));
 **      returns         YES, if password matches the encrypted one.
 **                      NO, if not, or if either parameter is NULL.
 */
-PUBLIC BOOL HTAA_passwdMatch PARAMS((CONST char* password, CONST char* encrypted));
+PUBLIC BOOL HTAA_passwdMatch PARAMS((const char* password, const char* encrypted));
 
 /* PUBLIC                                               HTAAFile_readPasswdRec()
 **                      READ A RECORD FROM THE PASSWORD FILE

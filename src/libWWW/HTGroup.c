@@ -298,7 +298,7 @@ PRIVATE GroupDef* parse_group_decl ARGS1(FILE*, fp) {
 ** Group manipulation routines
 */
 
-PRIVATE GroupDef* find_group_def ARGS2(GroupDefList*, group_list, CONST char*, group_name) {
+PRIVATE GroupDef* find_group_def ARGS2(GroupDefList*, group_list, const char*, group_name) {
     if (group_list && group_name) {
         GroupDefList* cur = group_list;
         GroupDef* group_def;
@@ -421,10 +421,10 @@ PRIVATE void print_group_def_list ARGS1(GroupDefList*, group_list) {
 ** ON EXIT:
 **	returns	YES, if match.
 */
-PRIVATE BOOL part_match ARGS2(CONST char*, tcur, CONST char*, icur) {
+PRIVATE BOOL part_match ARGS2(const char*, tcur, const char*, icur) {
     char required[4];
     char actual[4];
-    CONST char* cur;
+    const char* cur;
     int cnt;
 
     if (!tcur || !icur)
@@ -461,9 +461,9 @@ PRIVATE BOOL part_match ARGS2(CONST char*, tcur, CONST char*, icur) {
 ** ON EXIT:
 **	returns		YES, if match;  NO, if not.
 */
-PRIVATE BOOL ip_number_match ARGS2(CONST char*, template, CONST char*, inet_addr) {
-    CONST char* tcur = template;
-    CONST char* icur = inet_addr;
+PRIVATE BOOL ip_number_match ARGS2(const char*, template, const char*, inet_addr) {
+    const char* tcur = template;
+    const char* icur = inet_addr;
     int cnt;
 
     for (cnt = 0; cnt < 4; cnt++) {
@@ -493,8 +493,8 @@ PRIVATE BOOL ip_number_match ARGS2(CONST char*, template, CONST char*, inet_addr
 **	returns	YES, if mask is a domain name mask.
 **		NO, if it is an inet number mask.
 */
-PRIVATE BOOL is_domain_mask ARGS1(CONST char*, mask) {
-    CONST char* cur = mask;
+PRIVATE BOOL is_domain_mask ARGS1(const char*, mask) {
+    const char* cur = mask;
 
     if (!mask)
         return NO;
@@ -527,7 +527,7 @@ PRIVATE BOOL is_domain_mask ARGS1(CONST char*, mask) {
 **			matches the mask.
 **			NO, if no match (no fire).
 */
-PRIVATE BOOL ip_mask_match ARGS3(CONST char*, mask, CONST char*, ip_number, CONST char*, ip_name) {
+PRIVATE BOOL ip_mask_match ARGS3(const char*, mask, const char*, ip_number, const char*, ip_name) {
     if (mask && (ip_number || ip_name)) {
         if (is_domain_mask(mask)) {
             if (HTAA_templateMatch(mask, ip_name))
@@ -569,7 +569,7 @@ typedef HTList GroupCacheList;
 
 PRIVATE GroupCacheList* group_cache_list = NULL;
 
-PUBLIC GroupDefList* HTAA_readGroupFile ARGS1(CONST char*, filename) {
+PUBLIC GroupDefList* HTAA_readGroupFile ARGS1(const char*, filename) {
     FILE* fp;
     GroupCache* group_cache;
 

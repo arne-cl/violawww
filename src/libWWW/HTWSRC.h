@@ -28,9 +28,9 @@ Escaping Strings
    the caller.
 
  */
-extern char* HTDeSlash PARAMS((CONST char* str));
+extern char* HTDeSlash PARAMS((const char* str));
 
-extern char* HTEnSlash PARAMS((CONST char* str));
+extern char* HTEnSlash PARAMS((const char* str));
 
 #endif
 

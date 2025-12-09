@@ -13,7 +13,7 @@
 
 /* Subclass:
  */
-/* extern CONST HTStructuredClass HTMLGeneration; */
+/* extern const HTStructuredClass HTMLGeneration; */
 
 /* Special Creation:
  */

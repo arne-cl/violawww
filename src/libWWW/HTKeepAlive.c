@@ -83,7 +83,7 @@ PUBLIC void HTKeepAlive_cleanup NOPARAMS {
 **	Returns NULL if no matching connection is available
 */
 PUBLIC HTConnection* HTKeepAlive_getConnection ARGS3(
-    CONST char*, hostname,
+    const char*, hostname,
     int, port,
     BOOL, is_ssl
 ) {

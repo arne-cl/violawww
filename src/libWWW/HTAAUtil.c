@@ -61,7 +61,7 @@
 ** ON EXIT:
 **	returns		the enumerated constant for that scheme.
 */
-PUBLIC HTAAScheme HTAAScheme_enum ARGS1(CONST char*, name) {
+PUBLIC HTAAScheme HTAAScheme_enum ARGS1(const char*, name) {
     static char* upcased = NULL;
     char* cur;
 
@@ -133,9 +133,9 @@ PUBLIC char* HTAAScheme_name ARGS1(HTAAScheme, scheme) {
 **	returns		HTAAMethod enumerated value corresponding
 **			to the given name.
 */
-PUBLIC HTAAMethod HTAAMethod_enum ARGS1(CONST char*, name) {
+PUBLIC HTAAMethod HTAAMethod_enum ARGS1(const char*, name) {
     char tmp[MAX_METHODNAME_LEN + 1];
-    CONST char* src = name;
+    const char* src = name;
     char* dest = tmp;
 
     if (!name)
@@ -228,9 +228,9 @@ PUBLIC BOOL HTAAMethod_inList ARGS2(HTAAMethod, method, HTList*, list) {
 **	returns		YES, if filename matches the template.
 **			NO, otherwise.
 */
-PUBLIC BOOL HTAA_templateMatch ARGS2(CONST char*, template, CONST char*, filename) {
-    CONST char* p = template;
-    CONST char* q = filename;
+PUBLIC BOOL HTAA_templateMatch ARGS2(const char*, template, const char*, filename) {
+    const char* p = template;
+    const char* q = filename;
     int m;
 
     for (; *p && *q && *p == *q; p++, q++) /* Find first mismatch */
@@ -276,9 +276,9 @@ PUBLIC BOOL HTAA_templateMatch ARGS2(CONST char*, template, CONST char*, filenam
 **	returns		YES, if filename matches the template.
 **			NO, otherwise.
 */
-PUBLIC BOOL HTAA_templateCaseMatch ARGS2(CONST char*, template, CONST char*, filename) {
-    CONST char* p = template;
-    CONST char* q = filename;
+PUBLIC BOOL HTAA_templateCaseMatch ARGS2(const char*, template, const char*, filename) {
+    const char* p = template;
+    const char* q = filename;
     int m;
 
     for (; *p && *q && toupper(*p) == toupper(*q); p++, q++) /* Find first mismatch */
@@ -321,7 +321,7 @@ PUBLIC BOOL HTAA_templateCaseMatch ARGS2(CONST char*, template, CONST char*, fil
 **				being a comment marker here,
 **				there really isn't any space.
 */
-PUBLIC char* HTAA_makeProtectionTemplate ARGS1(CONST char*, docname) {
+PUBLIC char* HTAA_makeProtectionTemplate ARGS1(const char*, docname) {
     char* template = NULL;
     char* slash = NULL;
 

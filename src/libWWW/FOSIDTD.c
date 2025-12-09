@@ -8,7 +8,7 @@
 #include "FOSIDTD.h"
 
 /* 	Entity Names*/
-static CONST char* entities[] = {0};
+static const char* entities[] = {0};
 #define FOSI_ENTITIES 0
 
 /*		Attribute Lists
@@ -46,4 +46,4 @@ static HTTag tags[] = {
 };
 #define FOSI_TAGS 6
 
-PUBLIC CONST SGML_dtd FOSI_dtd = {tags, FOSI_TAGS, NULL, sizeof(entities) / sizeof(char**)};
+PUBLIC const SGML_dtd FOSI_dtd = {tags, FOSI_TAGS, NULL, sizeof(entities) / sizeof(char**)};

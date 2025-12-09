@@ -176,7 +176,7 @@ HTSetPresentation: Register a system command to present a format
   maxsecs                 A limit on the time user will wait (0 for infinity)
 
  */
-extern void HTSetPresentation PARAMS((CONST char* representation, CONST char* command,
+extern void HTSetPresentation PARAMS((const char* representation, const char* command,
                                       float quality, float secs, float secs_per_byte));
 
 /*
@@ -193,7 +193,7 @@ HTSetConversion:   Register a converstion routine
 
  */
 
-extern void HTSetConversion PARAMS((CONST char* rep_in, CONST char* rep_out, HTConverter* converter,
+extern void HTSetConversion PARAMS((const char* rep_in, const char* rep_out, HTConverter* converter,
                                     float quality, float secs, float secs_per_byte));
 
 /*

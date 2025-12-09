@@ -23,7 +23,7 @@ Retrieve File from Server
   returns                 Socket number for file if good.<0 if bad.
 
  */
-extern int HTFTPLoad PARAMS((CONST char* name, HTParentAnchor* anchor, HTFormat format_out,
+extern int HTFTPLoad PARAMS((const char* name, HTParentAnchor* anchor, HTFormat format_out,
                              HTStream* sink));
 
 /*
@@ -31,7 +31,7 @@ extern int HTFTPLoad PARAMS((CONST char* name, HTParentAnchor* anchor, HTFormat 
 Return Host Name
 
  */
-extern CONST char* HTHostName NOPARAMS;
+extern const char* HTHostName NOPARAMS;
 
 #endif
 

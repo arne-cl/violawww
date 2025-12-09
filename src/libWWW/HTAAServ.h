@@ -78,8 +78,8 @@ Check Access Authorization
 **      file twice).
 **
 */
-PUBLIC int HTAA_checkAuthorization PARAMS((CONST char* url, CONST char* method_name,
-                                           CONST char* scheme_name, char* scheme_specifics));
+PUBLIC int HTAA_checkAuthorization PARAMS((const char* url, const char* method_name,
+                                           const char* scheme_name, char* scheme_specifics));
 /*
 
 Compose Status Line Message

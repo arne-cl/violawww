@@ -101,12 +101,12 @@ PRIVATE char line[2048]; /* For building strings to display */
 #define FREE_TARGET (*target->isa->free)(target)
 
 struct _HTStructured {
-    CONST HTStructuredClass* isa;
+    const HTStructuredClass* isa;
     /* ... */
 };
 
 struct _HTStream {
-    CONST HTStreamClass* isa;
+    const HTStreamClass* isa;
     /* ... */
 };
 
@@ -502,7 +502,7 @@ void display_search_response ARGS4(HTStructured*, target, SearchResponseAPDU*, r
 **
 **	This renders any object or search as required
 */
-PUBLIC int HTLoadWAIS ARGS4(CONST char*, arg, HTParentAnchor*, anAnchor, HTFormat, format_out,
+PUBLIC int HTLoadWAIS ARGS4(const char*, arg, HTParentAnchor*, anAnchor, HTFormat, format_out,
                             HTStream*, sink)
 
 #define MAX_KEYWORDS_LENGTH 1000
@@ -512,7 +512,7 @@ PUBLIC int HTLoadWAIS ARGS4(CONST char*, arg, HTParentAnchor*, anAnchor, HTForma
 #define MAXDOCS 40
 
 {
-    static CONST char* error_header =
+    static const char* error_header =
         "<h1>Access error</h1>\nThe following error occured in accesing a WAIS server:<P>\n";
     char* key;                     /* pointer to keywords in URL */
     char* request_message = NULL;  /* arbitrary message limit */

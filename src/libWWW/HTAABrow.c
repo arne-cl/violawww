@@ -117,7 +117,7 @@ PRIVATE char* HTAAForwardAuth = NULL;    /* Authorization: line to forward    */
 
 /*** HTAAForwardAuth for enabling gateway-httpds to forward Authorization ***/
 
-PUBLIC void HTAAForwardAuth_set ARGS2(CONST char*, scheme_name, CONST char*, scheme_specifics) {
+PUBLIC void HTAAForwardAuth_set ARGS2(const char*, scheme_name, const char*, scheme_specifics) {
     int len = 20 + (scheme_name ? strlen(scheme_name) : 0) +
               (scheme_specifics ? strlen(scheme_specifics) : 0);
 
@@ -154,7 +154,7 @@ PUBLIC void HTAAForwardAuth_reset NOARGS { FREE(HTAAForwardAuth); }
 **			the function HTAAServer_delete(), which also
 **			frees the node itself.
 */
-PRIVATE HTAAServer* HTAAServer_new ARGS2(CONST char*, hostname, int, portnumber) {
+PRIVATE HTAAServer* HTAAServer_new ARGS2(const char*, hostname, int, portnumber) {
     HTAAServer* server;
 
     if (!(server = (HTAAServer*)malloc(sizeof(HTAAServer))))
@@ -226,7 +226,7 @@ PRIVATE void HTAAServer_delete ARGS1(HTAAServer*, killme) {
 **			representing the looked-up server.
 **			NULL, if not found.
 */
-PRIVATE HTAAServer* HTAAServer_lookup ARGS2(CONST char*, hostname, int, portnumber) {
+PRIVATE HTAAServer* HTAAServer_lookup ARGS2(const char*, hostname, int, portnumber) {
     if (hostname) {
         HTList* cur = server_table;
         HTAAServer* server;
@@ -265,7 +265,7 @@ PRIVATE HTAAServer* HTAAServer_lookup ARGS2(CONST char*, hostname, int, portnumb
 **			document tree.
 **
 */
-PRIVATE HTAASetup* HTAASetup_lookup ARGS3(CONST char*, hostname, int, portnumber, CONST char*,
+PRIVATE HTAASetup* HTAASetup_lookup ARGS3(const char*, hostname, int, portnumber, const char*,
                                           docname) {
     HTAAServer* server;
     HTAASetup* setup;
@@ -407,7 +407,7 @@ PRIVATE void HTAASetup_updateSpecifics ARGS2(HTAASetup*, setup, HTAssocList**, s
 ** ON EXIT:
 **	returns		the realm.  NULL, if not found.
 */
-PRIVATE HTAARealm* HTAARealm_lookup ARGS2(HTList*, realm_table, CONST char*, realmname) {
+PRIVATE HTAARealm* HTAARealm_lookup ARGS2(HTList*, realm_table, const char*, realmname) {
     if (realm_table && realmname) {
         HTList* cur = realm_table;
         HTAARealm* realm;
@@ -435,8 +435,8 @@ PRIVATE HTAARealm* HTAARealm_lookup ARGS2(HTList*, realm_table, CONST char*, rea
 ** ON EXIT:
 **	returns		the created realm.
 */
-PRIVATE HTAARealm* HTAARealm_new ARGS4(HTList*, realm_table, CONST char*, realmname, CONST char*,
-                                       username, CONST char*, password) {
+PRIVATE HTAARealm* HTAARealm_new ARGS4(HTList*, realm_table, const char*, realmname, const char*,
+                                       username, const char*, password) {
     HTAARealm* realm;
 
     realm = HTAARealm_lookup(realm_table, realmname);
@@ -632,7 +632,7 @@ PRIVATE HTAAScheme HTAA_selectScheme ARGS1(HTAASetup*, setup) {
 **
 **		As usual, this string is automatically freed.
 */
-PUBLIC char* HTAA_composeAuth ARGS3(CONST char*, hostname, CONST int, portnumber, CONST char*,
+PUBLIC char* HTAA_composeAuth ARGS3(const char*, hostname, const int, portnumber, const char*,
                                     docname) {
     static char* result = NULL;
     char* auth_string;

@@ -79,7 +79,7 @@ struct _tag {
 typedef struct {
     HTTag* tags; /* Must be in strcmp order by name */
     int number_of_tags;
-    CONST char** entity_names; /* Must be in strcmp order by name */
+    const char** entity_names; /* Must be in strcmp order by name */
     int number_of_entities;
 } SGML_dtd;
 
@@ -123,15 +123,15 @@ typedef struct _HTStructuredClass {
 
     void(*put_character) PARAMS((HTStructured * me, char ch));
 
-    void(*put_string) PARAMS((HTStructured * me, CONST char* str));
+    void(*put_string) PARAMS((HTStructured * me, const char* str));
 
     void(*progress) PARAMS((HTStructured * me, int n));
 
-    void(*write) PARAMS((HTStructured * me, CONST char* str, int len));
+    void(*write) PARAMS((HTStructured * me, const char* str, int len));
 
     void(*start_element)
-        PARAMS((HTStructured * me, int element_number, CONST BOOL* attribute_present,
-                CONST char** attribute_value, HTTag* tagInfo)); /*PYW*/
+        PARAMS((HTStructured * me, int element_number, const BOOL* attribute_present,
+                const char** attribute_value, HTTag* tagInfo)); /*PYW*/
 
     void(*end_element) PARAMS((HTStructured * me, int element_number));
 
@@ -146,7 +146,7 @@ Find a Tag by Name
    Returns a pointer to the tag within the DTD.
 
  */
-extern HTTag* SGMLFindTag PARAMS((CONST SGML_dtd * dtd, CONST char* string));
+extern HTTag* SGMLFindTag PARAMS((const SGML_dtd * dtd, const char* string));
 
 /*
 
@@ -162,9 +162,9 @@ Create an SGML parser
 **              The default tag starter has been processed.
 */
 
-extern HTStream* SGML_new PARAMS((CONST SGML_dtd * dtd, HTStructured* target, HTParentAnchor* anchor));
+extern HTStream* SGML_new PARAMS((const SGML_dtd * dtd, HTStructured* target, HTParentAnchor* anchor));
 
-extern CONST HTStreamClass SGMLParser;
+extern const HTStreamClass SGMLParser;
 
 #endif /* SGML_H */
 
