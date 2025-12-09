@@ -118,7 +118,7 @@ This version brings ViolaWWW into the modern web era while preserving its unique
 #### NNTP News Protocol Improvements
 - RFC 2047 MIME encoded-word decoding in article headers (Subject, From, etc.)
 - Transliteration of non-ASCII characters in newsgroup listings and articles
-- Example: `=?UTF-8?Q?J=C3=B6rg?=` → "Jorg" (with ö→o transliteration)
+- Example: `=?UTF-8?Q?J=C3=B6rg?=` → "Jörg" (Latin diacritics preserved in ISO-8859-1)
 - Supports both Quoted-Printable (`?Q?`) and Base64 (`?B?`) encodings
 - Fixed EOF handling for `-funsigned-char` compiler flag
 - Proper connection cleanup after each request (prevents hangs)
