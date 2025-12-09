@@ -1198,7 +1198,7 @@ long meth_generic_HTTPCurrentDocAddrParsed(VObj* self, Packet* result, int argc,
     free(parsed_host);    /* Free the result from HTParse */
     char* path = HTParse(addr, relative, PARSE_PATH | PARSE_PUNCTUATION);
 
-    for (size_t i = strlen(path); i >= 0; i--) {
+    for (size_t i = strlen(path); i-- > 0; ) {
         if (path[i] == '/') {
             strncpy(buff, path, i + 1);
             buff[i + 1] = '\0';
