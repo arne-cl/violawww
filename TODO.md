@@ -11,6 +11,10 @@
   - Skipping STYLE/SCRIPT elements doesn't seem to work everywhere; needs investigation and fixes.
 - [ ] Implement file opening sandbox
   - Implement a "sandbox" mechanism for safely opening files to prevent security issues.
+- [ ] Fix CHANGED tag (no yellow background)
+- [ ] Remove default hint message at bottom of vw
+- [ ] Fix URL bar in viola — address not displayed
+- [ ] Fix long link wrapping in news
 
 ### Styling
 - [ ] Make FOSI styles functional
