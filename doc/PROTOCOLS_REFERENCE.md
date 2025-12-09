@@ -250,6 +250,30 @@ The news server is determined by (in order of priority):
 3. Compile-time `DEFAULT_NEWS_HOST`
 4. Default: `news`
 
+### Troubleshooting
+
+**Error: "HTNews: Can't find news host 'news'. Please define your NNTP server"**
+
+This error occurs when ViolaWWW cannot connect to the default NNTP server (`news`). In the 1990s, most ISPs provided Usenet access and the hostname `news` typically resolved to the provider's local NNTP server. Today, public NNTP servers are rare.
+
+**Solution:** Set the `NNTPSERVER` environment variable before launching ViolaWWW:
+
+```bash
+# One-time use
+export NNTPSERVER=news.eternal-september.org
+./src/vw/vw news:comp.infosystems.www.browsers
+
+# Permanent configuration (add to ~/.bashrc or ~/.zshrc)
+export NNTPSERVER=news.eternal-september.org
+```
+
+### Public NNTP Servers
+
+| Server | Registration | Notes |
+|--------|--------------|-------|
+| `news.eternal-september.org` | Free account required | [eternal-september.org](https://www.eternal-september.org/) |
+| `news.aioe.org` | None | Limited access |
+
 ### Examples
 
 ```
