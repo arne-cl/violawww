@@ -4,6 +4,25 @@ This directory contains technical documentation for ViolaWWW.
 
 ---
 
+## Network Protocols
+
+### [PROTOCOLS_REFERENCE.md](PROTOCOLS_REFERENCE.md)
+Complete reference for all supported URL protocols.
+
+Topics covered:
+- **HTTP** — HyperText Transfer Protocol (original, 1992)
+- **HTTPS** — HTTP Secure with TLS/SSL (added in v4.0, 2025)
+- **FTP** — File Transfer Protocol
+- **File** — Local filesystem access
+- **Gopher** — Pre-WWW distributed document system
+- **News/NNTP** — Usenet newsgroup access
+- **Telnet** — Remote terminal sessions
+- **Rlogin** — Unix remote login
+- **TN3270** — IBM mainframe terminal emulation
+- **WAIS** — Wide Area Information Servers (conditional)
+
+---
+
 ## Browser Interface
 
 ### [CATALOG.md](CATALOG.md)
