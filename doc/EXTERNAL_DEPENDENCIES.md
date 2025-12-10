@@ -72,14 +72,24 @@ These standard Unix utilities are used by Viola scripts:
 |----------|---------|---------|---------|
 | `VIOLA_PATH` | Path to Viola resource files (`res/` directory) | None (required) | `viola.c` |
 | `PLOT_PATH` | Path to VPLOT resources (`vplot_dir/`) | None | `launcher.c` |
+| `VIOLA_SGMLSA2B` | Path to sgmlsA2B executable for HMML processing | None | `VWHandler_hmml_script.v` |
 | `WWW_HOME` | Home page URL loaded at startup | None | `vw.c` |
+| `WWW_LPR` | Custom print command | `/usr/bin/lpr` | `VWHandler_html_script6.v` |
 | `HOME` | User home directory for config files (`~/.viola_history`) | System default | `vw_stubs.c` |
+| `TMPDIR` | Temporary directory for file operations | `/tmp` | `wwwSecurity_script.v` |
 
 ### Display
 
 | Variable | Purpose | Default | Used By |
 |----------|---------|---------|---------|
 | `DISPLAY` | X11 display server connection | `:0` (XQuartz) | `launcher.c`, X11 libraries |
+
+### Network Protocols
+
+| Variable | Purpose | Default | Used By |
+|----------|---------|---------|---------|
+| `NNTPSERVER` | NNTP server hostname for `news:` URLs | None | `HTNews.c` |
+| `USER` | Username for anonymous FTP password | None | `HTFTP.c` |
 
 ### Ghostscript
 
@@ -88,6 +98,12 @@ These standard Unix utilities are used by Viola scripts:
 | `GS_LIB` | Ghostscript library/resource paths | None | Ghostscript (`gs`) |
 | `GS_FONTPATH` | Additional font search paths | None | Ghostscript (`gs`) |
 | `GHOSTVIEW` | Ghostscript viewer preference | None | Legacy |
+
+### VPLOT
+
+| Variable | Purpose | Default | Used By |
+|----------|---------|---------|---------|
+| `VPLOT_SCALE` | Scale factor for 3D rendering (e.g., `2.0`) | `1.0` | `vplot.c` |
 
 ### System
 
