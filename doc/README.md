@@ -23,16 +23,16 @@ Topics covered:
 
 ---
 
-## Browser Interface
+## Character Encoding & Transliteration
 
-### [CATALOG.md](CATALOG.md)
-Personal URL Catalog — a hierarchical bookmark organizer.
+### [CHARSET_TRANSLITERATION.md](CHARSET_TRANSLITERATION.md)
+Technical overview of the modern iconv+ICU transliteration pipeline.
 
 Topics covered:
-- Creating and organizing folders and links
-- Navigation and selection
-- Keyboard shortcuts
-- File format specification
+- Why transliteration is needed with Latin-1 rendering
+- Three-pass flow (iconv → ICU chain → iconv //TRANSLIT)
+- Call sites (HTTP plain text, HTML parsing, NNTP MIME headers/bodies)
+- Dependencies, fallbacks, and growth/edge-case considerations
 
 ---
 
@@ -122,42 +122,16 @@ Historical sources:
 
 ---
 
-## Multimedia
+## Browser Interface
 
-### [SOUND_REFERENCE.md](SOUND_REFERENCE.md)
-Audio playback capabilities in ViolaWWW.
-
-Topics covered:
-- Viola script functions: `bell()`, `bellVolume()`
-- Playing audio files in HTML (hyperlinks, `<INSERT>` tag)
-- Auto-play and looping with `AFTER` attribute
-- Supported audio formats (AU, AIFF, MP3, AAC, FLAC, etc.)
-- macOS implementation using `afplay`
-
-### [VPLOT_REFERENCE.md](VPLOT_REFERENCE.md)
-3D surface plotter and wireframe model viewer.
+### [CATALOG.md](CATALOG.md)
+Personal URL Catalog — a hierarchical bookmark organizer.
 
 Topics covered:
-- Complete command reference (window, domain, equation, file, camera)
-- Mathematical expression parser (sin, cos, exp, sqrt, abs)
-- OFF file format specification for 3D models
-- Viola TTY integration and slider controls
-- HiDPI/Retina display support
-
----
-
-## Security
-
-### [SECURITY_REFERENCE.md](SECURITY_REFERENCE.md)
-Complete analysis of ViolaWWW's security architecture and identified vulnerabilities.
-
-Topics covered:
-- Security levels and privilege checking (`notSecure()`)
-- Global security mode (`securityMode`)
-- Protected operations (`tweak()`, `loadFile()`, `exit()`, etc.)
-- Critical vulnerabilities (privilege escalation, object loading)
-- HTML tag security implications
-- Historical context and modern security comparison
+- Creating and organizing folders and links
+- Navigation and selection
+- Keyboard shortcuts
+- File format specification
 
 ---
 
@@ -207,7 +181,46 @@ Topics covered:
 
 ---
 
-## System Integration
+## Multimedia
+
+### [SOUND_REFERENCE.md](SOUND_REFERENCE.md)
+Audio playback capabilities in ViolaWWW.
+
+Topics covered:
+- Viola script functions: `bell()`, `bellVolume()`
+- Playing audio files in HTML (hyperlinks, `<INSERT>` tag)
+- Auto-play and looping with `AFTER` attribute
+- Supported audio formats (AU, AIFF, MP3, AAC, FLAC, etc.)
+- macOS implementation using `afplay`
+
+### [VPLOT_REFERENCE.md](VPLOT_REFERENCE.md)
+3D surface plotter and wireframe model viewer.
+
+Topics covered:
+- Complete command reference (window, domain, equation, file, camera)
+- Mathematical expression parser (sin, cos, exp, sqrt, abs)
+- OFF file format specification for 3D models
+- Viola TTY integration and slider controls
+- HiDPI/Retina display support
+
+---
+
+## Security
+
+### [SECURITY_REFERENCE.md](SECURITY_REFERENCE.md)
+Complete analysis of ViolaWWW's security architecture and identified vulnerabilities.
+
+Topics covered:
+- Security levels and privilege checking (`notSecure()`)
+- Global security mode (`securityMode`)
+- Protected operations (`tweak()`, `loadFile()`, `exit()`, etc.)
+- Critical vulnerabilities (privilege escalation, object loading)
+- HTML tag security implications
+- Historical context and modern security comparison
+
+---
+
+## Build & Integration
 
 ### [EXTERNAL_DEPENDENCIES.md](EXTERNAL_DEPENDENCIES.md)
 External programs and environment variables used by ViolaWWW.
@@ -232,19 +245,6 @@ Topics covered:
 
 ---
 
-## Character Encoding
-
-### [CHARSET_TRANSLITERATION.md](CHARSET_TRANSLITERATION.md)
-Technical overview of the modern iconv+ICU transliteration pipeline.
-
-Topics covered:
-- Why transliteration is needed with Latin-1 rendering
-- Three-pass flow (iconv → ICU chain → iconv //TRANSLIT)
-- Call sites (HTTP plain text, HTML parsing, NNTP MIME headers/bodies)
-- Dependencies, fallbacks, and growth/edge-case considerations
-
----
-
 ## Historical Context
 
 ViolaWWW (1991-1994) was one of the first graphical web browsers and pioneered many features that were later standardized:
@@ -262,6 +262,8 @@ ViolaWWW (1991-1994) was one of the first graphical web browsers and pioneered m
 | TTY (external processes) | Web Workers, WebAssembly |
 | VPLOT (3D visualization) | WebGL, Three.js |
 
+Modern enhancements (TLS, transliteration, Wayback, etc.) are documented in the main [README.md](../README.md) under “Modern Enhancements.”
+
 As Tim Berners-Lee noted in 1993: *"HMML is in fact already an extension of HTML for multimedia from O'Reilly."*
 
 ---
@@ -271,3 +273,4 @@ As Tim Berners-Lee noted in 1993: *"HMML is in fact already an extension of HTML
 - [Main README](../README.md) - Project overview and build instructions
 - [TODO](../TODO.md) - Known issues and future enhancements
 - [LICENSE](../LICENSE.md) - Licensing information
+- [CHARSET_TRANSLITERATION.md](CHARSET_TRANSLITERATION.md) - Encoding/transliteration pipeline
