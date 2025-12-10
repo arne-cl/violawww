@@ -13,7 +13,8 @@ ViolaWWW supports multiple network protocols for accessing different types of re
 | [FTP](#ftp) | `ftp://` | 21 | Original |
 | [File](#file) | `file://` | — | Original |
 | [Gopher](#gopher) | `gopher://` | 70 | Original |
-| [News/NNTP](#news) | `news:` | 119 | Original |
+| [News](#news) | `news:`, `news://` | 119 | Original (+URL host in v4.0) |
+| [NNTP](#nntp) | `nntp://` | 119 | **Added in v4.0 (2025)** |
 | [Telnet](#telnet) | `telnet://` | 23 | Original |
 | [Rlogin](#rlogin) | `rlogin://` | 513 | Original |
 | [TN3270](#tn3270) | `tn3270://` | 23 | Original |
@@ -224,14 +225,19 @@ gopher://gopher.example.com/0/welcome.txt
 
 ## News
 
-**NNTP (Network News Transfer Protocol)** — for reading Usenet newsgroups (RFC 977).
+**NNTP (Network News Transfer Protocol)** — for reading Usenet newsgroups (RFC 977, RFC 3977).
+
+The `news:` scheme supports both simple format (using configured default server) and full URL format with explicit host specification.
 
 ### URL Syntax
 
 ```
-news:newsgroup.name
-news:message-id
-news:*                    (list all groups)
+news:newsgroup                    (group on default server)
+news:message-id@domain            (article by Message-ID)
+news:*                            (list all groups on default server)
+news://host[:port]/newsgroup      (group on specific server)
+news://host[:port]/*              (list all groups on specific server)
+news://host[:port]/               (same as above)
 ```
 
 ### Features
@@ -239,16 +245,19 @@ news:*                    (list all groups)
 - Newsgroup listing and browsing
 - Article retrieval and threading
 - Message-ID based access
-- Configurable news server
+- **Explicit host specification** in URL (added in v4.0)
+- Configurable default news server
 
 ### News Server Configuration
 
-The news server is determined by (in order of priority):
+When using the simple `news:group` format (without host), the server is determined by:
 
 1. Environment variable `NNTPSERVER`
 2. File `/usr/local/lib/rn/server`
 3. Compile-time `DEFAULT_NEWS_HOST`
 4. Default: `news`
+
+When using `news://host/group` format, the host from the URL is used directly.
 
 ### Troubleshooting
 
@@ -256,8 +265,15 @@ The news server is determined by (in order of priority):
 
 This error occurs when ViolaWWW cannot connect to the default NNTP server (`news`). In the 1990s, most ISPs provided Usenet access and the hostname `news` typically resolved to the provider's local NNTP server. Today, public NNTP servers are rare.
 
-**Solution:** Set the `NNTPSERVER` environment variable before launching ViolaWWW:
+**Solutions:**
 
+1. **Use explicit host in URL** (recommended):
+```bash
+./src/vw/vw news://news.aioe.org/comp.sys.mac.misc
+./src/vw/vw "news://news.aioe.org/*"
+```
+
+2. **Set environment variable:**
 ```bash
 # One-time use
 export NNTPSERVER=news.eternal-september.org
@@ -273,6 +289,7 @@ export NNTPSERVER=news.eternal-september.org
 |--------|--------------|-------|
 | `news.eternal-september.org` | Free account required | [eternal-september.org](https://www.eternal-september.org/) |
 | `news.aioe.org` | None | Limited access |
+| `news.neodome.net` | None | Alternative server |
 
 ### Examples
 
@@ -280,6 +297,8 @@ export NNTPSERVER=news.eternal-september.org
 news:comp.infosystems.www.browsers
 news:<message-id@host.domain>
 news:alt.hypertext
+news://news.aioe.org/comp.sys.mac.misc
+news://news.aioe.org/*
 ```
 
 ### Implementation
@@ -287,6 +306,52 @@ news:alt.hypertext
 - **Source**: `src/libWWW/HTNews.c`, `src/libWWW/HTNews.h`
 - **Default Port**: 119
 - **Author**: Tim Berners-Lee (Sep 1990)
+- **URL host support**: Evgeny Stepanischev (Dec 2025)
+
+---
+
+## NNTP
+
+**NNTP Direct** — access newsgroups on a specific NNTP server by URL.
+
+> **Note**: The `nntp://` scheme was **added in version 4.0 (2025)**. It always requires an explicit host in the URL, following [RFC 1738](https://tools.ietf.org/html/rfc1738) and the [IETF news/nntp URI draft](https://www.ietf.org/archive/id/draft-ellermann-news-nntp-uri-08.html).
+
+### URL Syntax
+
+```
+nntp://host[:port]/newsgroup
+nntp://host[:port]/newsgroup/article-number
+```
+
+### Features
+
+- Direct server specification in URL (no environment variables needed)
+- Access specific articles by number (not just by Message-ID)
+- Useful for bookmarking specific servers
+
+### Difference from `news:`
+
+| Feature | `news:` | `nntp://` |
+|---------|---------|-----------|
+| Default server | Yes | No (host required) |
+| Article by Message-ID | Yes | No |
+| Article by number | No | Yes |
+| Host in URL | Optional | Required |
+
+### Examples
+
+```
+nntp://news.aioe.org/comp.sys.mac.misc
+nntp://news.neodome.net/alt.folklore.computers
+nntp://news.eternal-september.org:119/comp.lang.c
+nntp://news.aioe.org/comp.sys.mac.misc/12345
+```
+
+### Implementation
+
+- **Source**: `src/libWWW/HTNews.c` (shared with news:)
+- **Default Port**: 119
+- **Author**: Evgeny Stepanischev (Dec 2025)
 
 ---
 
@@ -480,6 +545,7 @@ HTRegisterProtocol(&HTRlogin);
 #ifndef DECNET
 HTRegisterProtocol(&HTFTP);
 HTRegisterProtocol(&HTNews);
+HTRegisterProtocol(&HTNNTP);
 HTRegisterProtocol(&HTGopher);
 #ifdef DIRECT_WAIS
 HTRegisterProtocol(&HTWAIS);

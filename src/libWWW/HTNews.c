@@ -54,6 +54,8 @@ struct _HTStructured {
 /*	Module-wide variables
  */
 PUBLIC char* HTNewsHost;
+PRIVATE char* override_host = NULL;          /* Host from nntp:// or news:// URL */
+PRIVATE int override_port = 0;               /* Port from URL (0 = use default) */
 PRIVATE struct sockaddr_in soc_address;      /* Binary network address */
 PRIVATE int s;                               /* Socket for NewsHost */
 PRIVATE char response_text[LINE_LENGTH + 1]; /* Last response */
@@ -79,7 +81,8 @@ PUBLIC void HTSetNewsHost ARGS1(const char*, value) { StrAllocCopy(HTNewsHost, v
 PRIVATE int is_url_protocol ARGS1(const char*, s) {
     static const char* protocols[] = {
         "http://", "https://", "ftp://", "gopher://", "file://",
-        "telnet://", "rlogin://", "tn3270://", "wais://", NULL
+        "telnet://", "rlogin://", "tn3270://", "wais://", "nntp://", 
+        "news://", NULL
     };
     int i;
     for (i = 0; protocols[i]; i++) {
@@ -218,6 +221,85 @@ PRIVATE BOOL initialize NOARGS {
 
     s = -1; /* Disconnected */
 
+    return YES;
+}
+
+/*	Initialize connection to a specific host
+**	----------------------------------------
+**
+**	Used for nntp:// and news:// URLs that specify a host.
+**	Returns YES on success, NO on failure.
+*/
+PRIVATE BOOL initialize_host ARGS2(const char*, host, int, port) {
+    const struct hostent* phost;
+    struct sockaddr_in* sin = &soc_address;
+    
+    if (!host || !*host) {
+        HTAlert("HTNews: No host specified in URL");
+        return NO;
+    }
+    
+    if (TRACE)
+        fprintf(stderr, "HTNews: Connecting to explicit host `%s' port %d\n", 
+                host, port ? port : NEWS_PORT);
+    
+    /* Close existing connection if any */
+    if (s >= 0) {
+        NETCLOSE(s);
+        s = -1;
+    }
+    
+    /* Set up socket address */
+    sin->sin_family = AF_INET;
+    sin->sin_port = htons(port ? port : NEWS_PORT);
+    
+    if (*host >= '0' && *host <= '9') {
+        /* Numeric IP address */
+        sin->sin_addr.s_addr = inet_addr(host);
+    } else {
+        /* Hostname - resolve it */
+        phost = gethostbyname(host);
+        if (!phost) {
+            char message[256];
+            sprintf(message, "HTNews: Can't find host `%s'", host);
+            HTAlert(message);
+            return NO;
+        }
+        
+        /* Validate and copy address */
+        {
+            void *addr_list_raw = (void*)phost->h_addr_list;
+            char *first_addr = NULL;
+            
+            if (!addr_list_raw) {
+                CTRACE(tfp, "HTNews: No address list for host `%s'.\n", host);
+                return NO;
+            }
+            
+            memcpy(&first_addr, addr_list_raw, sizeof(char*));
+            
+            if (!first_addr) {
+                CTRACE(tfp, "HTNews: No address for host `%s'.\n", host);
+                return NO;
+            }
+            
+            if (phost->h_length > 0 && (size_t)phost->h_length <= sizeof(sin->sin_addr)) {
+                memcpy(&sin->sin_addr, first_addr, phost->h_length);
+            } else {
+                CTRACE(tfp, "HTNews: Invalid address length for `%s'.\n", host);
+                return NO;
+            }
+        }
+    }
+    
+    if (TRACE)
+        fprintf(stderr, "HTNews: Resolved to %d.%d.%d.%d:%d\n",
+                (int)*((unsigned char*)(&sin->sin_addr) + 0),
+                (int)*((unsigned char*)(&sin->sin_addr) + 1),
+                (int)*((unsigned char*)(&sin->sin_addr) + 2),
+                (int)*((unsigned char*)(&sin->sin_addr) + 3),
+                ntohs(sin->sin_port));
+    
     return YES;
 }
 
@@ -1011,6 +1093,90 @@ PRIVATE void read_group ARGS3(const char*, groupName, int, first_required, int, 
     }
 }
 
+/*	Parse news/nntp URL and extract components
+**	------------------------------------------
+**
+**	Supported URL formats (RFC 1738, draft-ellermann-news-nntp-uri):
+**
+**	news:group                    - newsgroup on default server
+**	news:message-id@domain        - article by Message-ID
+**	news://host[:port]/group      - newsgroup on specific server
+**	news://host[:port]/*          - list all groups on server
+**	news://host[:port]/           - same as above
+**	nntp://host[:port]/group      - newsgroup on specific server
+**	nntp://host[:port]/group/num  - specific article by number
+**
+**	Returns: pointer to the path part (group/article), or NULL on error
+**	Sets: url_host, url_port if host is specified in URL
+*/
+PRIVATE const char* parse_news_url ARGS4(
+    const char*, url,
+    char*, url_host,      /* OUT: host buffer (256 bytes) */
+    int*, url_port,       /* OUT: port number (0 = default) */
+    BOOL*, is_nntp        /* OUT: TRUE if nntp:// scheme */
+) {
+    const char* p = url;
+    const char* path_start;
+    
+    url_host[0] = '\0';
+    *url_port = 0;
+    *is_nntp = NO;
+    
+    /* Check scheme */
+    if (!strncasecomp(p, "nntp://", 7)) {
+        *is_nntp = YES;
+        p += 7;
+    } else if (!strncasecomp(p, "news://", 7)) {
+        p += 7;
+    } else if (!strncasecomp(p, "news:", 5)) {
+        /* Simple news:path format - no host */
+        return p + 5;
+    } else {
+        /* Unknown scheme */
+        return NULL;
+    }
+    
+    /* We have a host component - parse it */
+    /* Format: host[:port]/path */
+    {
+        const char* slash = strchr(p, '/');
+        const char* colon = strchr(p, ':');
+        int host_len;
+        
+        if (slash) {
+            /* Host ends at slash */
+            if (colon && colon < slash) {
+                /* Has port */
+                host_len = colon - p;
+                *url_port = atoi(colon + 1);
+            } else {
+                host_len = slash - p;
+            }
+            path_start = slash + 1;
+        } else {
+            /* No path - treat as list request */
+            if (colon) {
+                host_len = colon - p;
+                *url_port = atoi(colon + 1);
+            } else {
+                host_len = strlen(p);
+            }
+            path_start = p + strlen(p); /* Empty path = list */
+        }
+        
+        if (host_len > 0 && host_len < 256) {
+            strncpy(url_host, p, host_len);
+            url_host[host_len] = '\0';
+        }
+    }
+    
+    if (TRACE)
+        fprintf(stderr, "HTNews: Parsed URL - host='%s' port=%d path='%s' nntp=%d\n",
+                url_host, *url_port, path_start, *is_nntp);
+    
+    return path_start;
+}
+
 /*		Load by name					HTLoadNews
 **		============
 */
@@ -1018,59 +1184,105 @@ PUBLIC int HTLoadNews ARGS4(const char*, arg, HTParentAnchor*, anAnchor, HTForma
                             HTStream*, stream) {
     char command[257];                 /* The whole command */
     char groupName[GROUP_NAME_LENGTH]; /* Just the group name */
+    char url_host[256];                /* Host from URL */
+    int url_port = 0;                  /* Port from URL */
+    BOOL is_nntp = NO;                 /* Is this nntp:// scheme? */
     int status;                        /* tcp return */
     int retries;                       /* A count of how hard we have tried */
     BOOL group_wanted;                 /* Flag: group was asked for, not article */
-    BOOL list_wanted;                  /* Flag: group was asked for, not article */
+    BOOL list_wanted;                  /* Flag: list was asked for */
+    BOOL article_by_number = NO;       /* Flag: nntp article by number */
     int first, last;                   /* First and last articles asked for */
+    int article_num = 0;               /* Article number for nntp:// URLs */
+    const char* path;                  /* Path portion of URL */
 
     diagnostic = (format_out == WWW_SOURCE); /* set global flag */
 
     if (TRACE)
         fprintf(stderr, "HTNews: Looking for %s\n", arg);
 
-    if (!initialized)
-        initialized = initialize();
-    if (!initialized)
-        return -1; /* FAIL */
+    /* Parse the URL to extract host/port/path */
+    path = parse_news_url(arg, url_host, &url_port, &is_nntp);
+    if (!path) {
+        return HTLoadError(stream, 400, "Invalid news/nntp URL format");
+    }
+    
+    /* Initialize connection - either to URL host or default server */
+    if (url_host[0]) {
+        /* Host specified in URL - connect to it */
+        if (!initialize_host(url_host, url_port)) {
+            return -1; /* FAIL */
+        }
+        /* Close any existing connection since we're connecting to a different host */
+        if (s >= 0) {
+            NETCLOSE(s);
+            s = -1;
+        }
+    } else {
+        /* No host in URL - use default server */
+        if (!initialized)
+            initialized = initialize();
+        if (!initialized)
+            return -1; /* FAIL */
+    }
 
     {
-        const char* p1 = arg;
+        const char* p1 = path;
 
-        /*	We will ask for the document, omitting the host name & anchor.
+        /*	Determine what is being requested:
         **
-        **	Syntax of address is
-        **		xxx@yyy			Article
-        **		<xxx@yyy>		Same article
-        **		xxxxx			News group (no "@")
-        **		group/n1-n2		Articles n1 to n2 in group
+        **	Syntax of path is:
+        **		(empty) or *        LIST all groups
+        **		xxx@yyy             Article by Message-ID
+        **		<xxx@yyy>           Same article
+        **		group               Newsgroup (no "@")
+        **		group/n1-n2         Articles n1 to n2 in group
+        **		group/num           Article by number (nntp:// only)
         */
-        group_wanted = (strchr(arg, '@') == 0) && (strchr(arg, '*') == 0);
-        list_wanted = (strchr(arg, '@') == 0) && (strchr(arg, '*') != 0);
-
-        /* p1 = HTParse(arg, "", PARSE_PATH | PARSE_PUNCTUATION); */
-        /* Don't use HTParse because news: access doesn't follow traditional
-           rules. For instance, if the article reference contains a '#',
-           the rest of it is lost -- JFG 10/7/92, from a bug report */
-        if (!strncasecomp(arg, "news:", 5))
-            p1 = arg + 5; /* Skip "news:" prefix */
+        
+        /* Check for list request: empty path, just "*", or just "/" */
+        list_wanted = (*p1 == '\0' || (*p1 == '*' && *(p1+1) == '\0'));
+        
+        /* Check for article by Message-ID (contains @) */
+        group_wanted = (strchr(p1, '@') == 0) && !list_wanted;
+        
         if (list_wanted) {
             strcpy(command, "LIST ");
         } else if (group_wanted) {
             char* slash = strchr(p1, '/');
-            strcpy(command, "GROUP ");
             first = 0;
             last = 0;
+            
             if (slash) {
-                *slash = 0;
-                strcpy(groupName, p1);
-                *slash = '/';
-                (void)sscanf(slash + 1, "%d-%d", &first, &last);
+                int len = slash - p1;
+                if (len >= GROUP_NAME_LENGTH) len = GROUP_NAME_LENGTH - 1;
+                strncpy(groupName, p1, len);
+                groupName[len] = '\0';
+                
+                /* Check what's after the slash */
+                if (is_nntp && strchr(slash + 1, '-') == NULL) {
+                    /* nntp://host/group/article-number format */
+                    article_num = atoi(slash + 1);
+                    if (article_num > 0) {
+                        article_by_number = YES;
+                        sprintf(command, "ARTICLE %d", article_num);
+                    } else {
+                        strcpy(command, "GROUP ");
+                        strcat(command, groupName);
+                    }
+                } else {
+                    /* news://host/group/n1-n2 range format */
+                    (void)sscanf(slash + 1, "%d-%d", &first, &last);
+                    strcpy(command, "GROUP ");
+                    strcat(command, groupName);
+                }
             } else {
                 strcpy(groupName, p1);
+                strcpy(command, "GROUP ");
+                strcat(command, groupName);
             }
-            strcat(command, groupName);
         } else {
+            /* Article by Message-ID */
             strcpy(command, "ARTICLE ");
             if (strchr(p1, '<') == 0)
                 strcat(command, "<");
@@ -1084,9 +1296,8 @@ PUBLIC int HTLoadNews ARGS4(const char*, arg, HTParentAnchor*, anAnchor, HTForma
             *p++ = CR; /* Macros to be correct on Mac */
             *p++ = LF;
             *p++ = 0;
-            /* strcat(command, "\r\n");	*/ /* CR LF, as in rfc 977 */
         }
-    } /* scope of p1 */
+    }
 
     if (!*arg)
         return NO; /* Ignore if no name */
@@ -1127,12 +1338,17 @@ PUBLIC int HTLoadNews ARGS4(const char*, arg, HTParentAnchor*, anAnchor, HTForma
             
             if (status < 0) {
                 char message[256];
+                const char* host_name = url_host[0] ? url_host : HTNewsHost;
                 if (TRACE) fprintf(stderr, "HTNews: connect() failed! errno=%d (%s)\n", errno, strerror(errno));
                 NETCLOSE(s);
                 s = -1;
-                sprintf(message,
-                        "\nCould not access %s.\n\n (Check default WorldWideWeb NewsHost ?)\n",
-                        HTNewsHost);
+                if (url_host[0]) {
+                    sprintf(message, "\nCould not connect to news server %s.\n", host_name);
+                } else {
+                    sprintf(message,
+                            "\nCould not access %s.\n\n (Check default WorldWideWeb NewsHost ?)\n",
+                            host_name);
+                }
                 return HTLoadError(stream, 500, message);
             } else {
                 if (TRACE) fprintf(stderr, "HTNews: Connected successfully!\n");
@@ -1177,6 +1393,8 @@ PUBLIC int HTLoadNews ARGS4(const char*, arg, HTParentAnchor*, anAnchor, HTForma
 
         if (list_wanted)
             read_list();
+        else if (article_by_number)
+            read_article();  /* Article already fetched by ARTICLE command */
         else if (group_wanted)
             read_group(groupName, first, last);
         else
@@ -1211,4 +1429,7 @@ PUBLIC int HTLoadNews ARGS4(const char*, arg, HTParentAnchor*, anAnchor, HTForma
     return HT_LOADED;
 }
 
+/*	Protocol descriptors
+*/
 GLOBALDEF PUBLIC HTProtocol HTNews = {"news", HTLoadNews, NULL};
+GLOBALDEF PUBLIC HTProtocol HTNNTP = {"nntp", HTLoadNews, NULL};

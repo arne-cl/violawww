@@ -14,6 +14,7 @@
 #include "HTAnchor.h"
 
 GLOBALREF HTProtocol HTNews;
+GLOBALREF HTProtocol HTNNTP;
 
 extern void HTSetNewsHost PARAMS((const char* value));
 extern const char* HTGetNewsHost NOPARAMS;

@@ -91,12 +91,13 @@ PRIVATE void HTAccessInit NOARGS /* Call me once */
     GLOBALREF HTProtocol HTTPS;
 #endif
 #ifndef DECNET
-    GLOBALREF HTProtocol HTFTP, HTNews, HTGopher;
+    GLOBALREF HTProtocol HTFTP, HTNews, HTNNTP, HTGopher;
 #ifdef DIRECT_WAIS
     GLOBALREF HTProtocol HTWAIS;
 #endif
     HTRegisterProtocol(&HTFTP);
     HTRegisterProtocol(&HTNews);
+    HTRegisterProtocol(&HTNNTP);
     HTRegisterProtocol(&HTGopher);
 #ifdef DIRECT_WAIS
     HTRegisterProtocol(&HTWAIS);
