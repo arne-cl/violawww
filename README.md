@@ -226,7 +226,8 @@ These external programs are called by ViolaWWW for specific features:
 | **ImageMagick** | `brew install imagemagick` or `./scripts/build-imagemagick.sh` | PostScript-to-GIF conversion | ✅ Yes (if built) |
 | **OpenSP** | `brew install open-sp` | HMML document parsing (`onsgmls`) | ✅ Yes |
 | **telnet** | `brew install telnet` | `telnet://host` URL support | ✅ Yes |
-| **rlogin** | `brew install inetutils` | `telnet://user@host` URLs (optional) | ✅ Yes (if available) |
+| **rlogin** | `brew install inetutils` | `rlogin://user@host` URLs (optional) | ✅ Yes (if available) |
+| **x3270** | `brew install x3270` | `tn3270://host` URLs (IBM mainframe) | ✅ Yes (if available) |
 
 **Note**: When building `ViolaWWW.app`, these programs are automatically bundled if available. The app bundle is self-contained and doesn't require Homebrew at runtime (only XQuartz is needed).
 
@@ -243,7 +244,7 @@ cd violawww
 brew install --cask xquartz    # X11 window system (required)
 brew install openmotif byacc   # Required for building
 brew install openssl@3 icu4c   # HTTPS, UTF-8 transliteration
-brew install ghostscript open-sp telnet  # PostScript, HMML, telnet:// URLs
+brew install ghostscript open-sp telnet x3270  # PostScript, HMML, telnet/tn3270 URLs
 
 # Compile (parallel build)
 make clean
