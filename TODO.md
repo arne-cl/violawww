@@ -13,7 +13,6 @@
   - Implement a "sandbox" mechanism for safely opening files to prevent security issues.
 - [ ] Fix CHANGED tag (no yellow background)
 - [ ] Remove default hint message at bottom of vw
-- [ ] Fix URL bar in viola — address not displayed
 
 ### Styling
 - [ ] Make FOSI styles functional

@@ -193,6 +193,22 @@
 		title = send(pageObj, "queryTitle");
 		if (isBlank(title)) title = pageObj;
 
+		/* Update URL field */
+		if (exist("www.url.tf")) {
+			/* Strip web.archive.org prefix for display */
+			displayURL = docURL;
+			prefix = "https://web.archive.org/web/";
+			prefixLen = strlen(prefix);
+			urlStart = nthChar(docURL, 0, prefixLen - 1);
+			if (urlStart == prefix) {
+				slashPos = findPattern(docURL, "/http");
+				if (slashPos > 0) {
+					displayURL = nthChar(docURL, slashPos - 3, strlen(docURL) - 1);
+				}
+			}
+			www.url.tf("show", displayURL);
+		}
+
 		if (notYetRecordedInitDocInHistory) {
 			/* this special case for the initial document
 			 */
