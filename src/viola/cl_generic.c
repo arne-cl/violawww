@@ -1956,7 +1956,7 @@ long meth_generic_append(VObj* self, Packet* result, int argc, Packet argv[]) {
  */
 long meth_generic_argument(VObj* self, Packet* result, int argc, Packet argv[]) {
     extern char* passthru_argument; /* defined in cexec.c */
-    result->info.s = passthru_argument;
+    result->info.s = passthru_argument ? passthru_argument : "";
     result->type = PKT_STR;
     result->canFree = 0;
     return 1;
@@ -3477,7 +3477,7 @@ long meth_generic_loadFile(VObj* self, Packet* result, int argc, Packet argv[]) 
         result->canFree = 0;
     }
     if ((cp = SaveString(vl_expandPath(cp, buff)))) {
-        if (loadFile(cp, &retStrp) != -1) {
+        if (loadFile(cp, &retStrp) >= 0) {
             if (retStrp) {
                 result->info.s = retStrp;
                 result->canFree = PK_CANFREE_STR;

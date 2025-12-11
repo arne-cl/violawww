@@ -229,8 +229,8 @@ int init_class() {
         cip->mhp.refc = 0;
 
         cip->mht = methHashTable =
-            initHashTable(127, (int (*)(HashTable*, long))hash_int, (long (*)(long, long))cmp_int, NULL, NULL, (HashEntry* (*)(HashTable*, long))getHashEntry_int, (HashEntry* (*)(HashTable*, long, long))putHashEntry_int,
-                          (HashEntry* (*)(HashTable*, long, long))putHashEntry_replace_int, (int (*)(HashTable*, long))removeHashEntry_int);
+            initHashTable(127, hash_int, cmp_int, NULL, NULL, getHashEntry_int, putHashEntry_int,
+                          putHashEntry_replace_int, removeHashEntry_int);
 
         for (mip = cip->methods; (id = mip->id); mip++) {
             setMember(&(cip->mhp), id);
@@ -287,9 +287,9 @@ int load_classScripts(char* classScriptPath)
     int i;
 
     for (cip = classList; cip; cip++) {
-        if ((entry = symID2Str->get(symID2Str, (long)cip->id))) {
+        if ((entry = symID2Str->get(symID2Str, (intptr_t)cip->id))) {
             sprintf(buff, "%s/cs_%s.vs", classScriptPath, (char*)entry->val);
-            if (loadFile(buff, &classScript) != -1) {
+            if (loadFile(buff, &classScript) >= 0) {
                 /*				printf(">>>old %s {%s}\n", buff,
                    (char*)cip->common[0]); printf(">>>new %s {%s}\n", buff, classScript);
                 */

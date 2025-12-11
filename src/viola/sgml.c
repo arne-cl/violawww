@@ -1777,7 +1777,7 @@ SGMLDocMappingInfo* setSGMLStylesheet(char* dtd, char* stylesheet)
         cp = SaveString(vl_expandPath(stylesheet, buff));
         if (!cp)
             return 0;
-        if (loadFile(cp, &retStrp) == -1)
+        if (loadFile(cp, &retStrp) < 0)
             return 0;
         if (!retStrp)
             return 0;

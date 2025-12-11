@@ -19,6 +19,12 @@ char* returnSame(char* a)
     return a;
 }
 
+/* Wrapper for cmp_int to match libstg's int(*)() signature */
+static int cmp_int_stg(int a, int b)
+{
+    return a == b;
+}
+
 long tagName2ID(char* s)
 {
     HashEntry* entry;
@@ -47,16 +53,16 @@ char* tagID2Name(int id)
 }
 
 int stgcall_init() {
-    HT_str2token = initHashTable(100, (int (*)(HashTable*, long))hash_str, (long (*)(long, long))cmp_str, NULL, NULL, (HashEntry* (*)(HashTable*, long))getHashEntry_str,
-                                 (HashEntry* (*)(HashTable*, long, long))putHashEntry_str, (HashEntry* (*)(HashTable*, long, long))putHashEntry_replace_str, (int (*)(HashTable*, long))removeHashEntry_str);
+    HT_str2token = initHashTable(100, hash_str, cmp_str, NULL, NULL, getHashEntry_str,
+                                 putHashEntry_str, putHashEntry_replace_str, removeHashEntry_str);
     if (!HT_str2token)
         return 0;
-    HT_token2str = initHashTable(100, (int (*)(HashTable*, long))hash_int, (long (*)(long, long))cmp_int, NULL, NULL, (HashEntry* (*)(HashTable*, long))getHashEntry_int,
-                                 (HashEntry* (*)(HashTable*, long, long))putHashEntry_int, (HashEntry* (*)(HashTable*, long, long))putHashEntry_replace_int, (int (*)(HashTable*, long))removeHashEntry_int);
+    HT_token2str = initHashTable(100, hash_int, cmp_int, NULL, NULL, getHashEntry_int,
+                                 putHashEntry_int, putHashEntry_replace_int, removeHashEntry_int);
     if (!HT_token2str)
         return 0;
 
-    stgLib = STG_init(cmp_int, tagName2ID, tagID2Name, cmp_int, tagName2ID, tagID2Name);
+    stgLib = STG_init(cmp_int_stg, tagName2ID, tagID2Name, cmp_int_stg, tagName2ID, tagID2Name);
     if (!stgLib)
         return 0;
 
@@ -75,9 +81,9 @@ int loadSTG(char* url)
     /* load a stylesheet
      */
     strcpy(inFile, url);
-    stat = (int)(long)loadFile(inFile, &spec);
+    stat = loadFile(inFile, &spec);
 
-    if (stat == -1) {
+    if (stat < 0) {
         printf("failed to open %s\n", inFile);
         return 0;
     }

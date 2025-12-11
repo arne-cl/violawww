@@ -29,14 +29,14 @@ int numOfGBuffs = 0;
 char* GBuff[NUM_OF_GBUFFS];
 int GBuffIdx[NUM_OF_GBUFFS];
 
-int cmp_int(int n1, int n2)
+intptr_t cmp_int(intptr_t n1, intptr_t n2)
 {
     return n1 == n2;
 }
 
-long cmp_str(long a, long b)
+intptr_t cmp_str(intptr_t a, intptr_t b)
 {
-    return (long)strcmp((char*)a, (char*)b);
+    return (intptr_t)strcmp((char*)a, (char*)b);
 }
 
 void SkipBlanks(char* linep, int* i)

@@ -57,7 +57,7 @@ Attr* attrp;
 Attr* attrp2;
 HashEntry* entry;
 
-char* passthru_argument = "";
+char* passthru_argument = NULL;
 
 int flag_printExec = 0;
 int flag_vwatch = 0;

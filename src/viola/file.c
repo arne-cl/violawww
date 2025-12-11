@@ -31,7 +31,6 @@ char* vl_expandPath(char* restrict path, char* restrict buffer)
     if (!path)
         return NULL;
     if (path[0] == '~') {
-        /*		extern char *cuserid();*/ /* Bede McCall <bede@mitre.org> */
         struct passwd* info;
         char userName[256];
         int i = 0;
@@ -41,23 +40,28 @@ char* vl_expandPath(char* restrict path, char* restrict buffer)
 
             /* assume path looks like: "~" "~/viola" */
             if (cp) {
-                strcpy(userName, cp);
+                snprintf(userName, sizeof(userName), "%s", cp);
             } else {
                 struct passwd* pwds;
 
                 pwds = getpwuid(getuid());
-                strcpy(userName, pwds->pw_name);
+                if (!pwds || !pwds->pw_name) {
+                    fprintf(stderr, "failed to get user info\n");
+                    return NULL;
+                }
+                snprintf(userName, sizeof(userName), "%s", pwds->pw_name);
 
-                while (userName[i++] != ':')
-                    ;
-                userName[i] = '\0';
+                /* Find and truncate at ':' if present */
+                char* colon = strchr(userName, ':');
+                if (colon)
+                    *colon = '\0';
             }
         } else {
             char c;
             /* ie: "~wei/viola" */
 
-            /* get user's name */
-            for (; (c = path[i + 1]); i++) {
+            /* get user's name, limit to buffer size */
+            for (; i < (int)(sizeof(userName) - 1) && (c = path[i + 1]); i++) {
                 if (isalpha(c))
                     userName[i] = c;
                 else
@@ -66,12 +70,22 @@ char* vl_expandPath(char* restrict path, char* restrict buffer)
             userName[i] = '\0';
         }
         if ((info = getpwnam(userName))) {
-            strcpy(buffer, info->pw_dir);
-            strcat(buffer, &path[i + 1]);
+            size_t dir_len = strlen(info->pw_dir);
+            size_t rest_len = strlen(&path[i + 1]);
+            if (dir_len + rest_len >= MAXPATHLEN) {
+                fprintf(stderr, "path too long for \"%s\"\n", path);
+                return NULL;
+            }
+            snprintf(buffer, MAXPATHLEN, "%s%s", info->pw_dir, &path[i + 1]);
             return buffer;
         }
     } else {
-        strcpy(buffer, path);
+        size_t path_len = strlen(path);
+        if (path_len >= MAXPATHLEN) {
+            fprintf(stderr, "path too long: \"%s\"\n", path);
+            return NULL;
+        }
+        snprintf(buffer, MAXPATHLEN, "%s", path);
         return buffer;
     }
     fprintf(stderr, "failed to expand ~ for \"%s\"\n", path);
@@ -81,22 +95,33 @@ char* vl_expandPath(char* restrict path, char* restrict buffer)
 /*
  * enter environment variables into the resource's variable list.
  *
+ * Note: content buffer must be at least MAXPATHLEN bytes
  */
 char* getEnvironVars(char* argv[], char* name, char* content)
 {
     if (argv) {
-        int ai = 0, i;
-        char label[100];
+        int ai = 0;
+        char label[256];
 
         while (argv[ai]) {
-            /*			fprintf(stderr, "argv[%d] = [%s]\n",ai,argv[ai]);*/
-            for (i = 0; (label[i] = argv[ai][i]) != '='; i++)
-                ;
-            label[i] = '\0';
-            if (!strcmp(name, label)) {
-                strcpy(content, &argv[ai][++i]);
-                /*				fprintf(stderr, "name=[%s] content= [%s]\n", name,
-                 * content);*/
+            /* Find '=' and extract label */
+            char* eq = strchr(argv[ai], '=');
+            if (!eq) {
+                ++ai;
+                continue;
+            }
+            
+            size_t label_len = (size_t)(eq - argv[ai]);
+            if (label_len >= sizeof(label)) {
+                ++ai;
+                continue;
+            }
+            
+            memcpy(label, argv[ai], label_len);
+            label[label_len] = '\0';
+            
+            if (strcmp(name, label) == 0) {
+                snprintf(content, MAXPATHLEN, "%s", eq + 1);
                 return content;
             }
             ++ai;
@@ -108,44 +133,66 @@ char* getEnvironVars(char* argv[], char* name, char* content)
 /*
  * loads a file from disk, and puts it in str.
  *
- * return: -1 if unable to open file.
+ * return:  0 on success
+ *         -1 if unable to open file
+ *         -2 if lseek failed
+ *         -3 if malloc failed
+ *         -4 if fread failed
  */
 int loadFile(char* fileName, char** strp)
 {
     int fd;
     FILE* fp;
-    int i = 0, c;
     long size;
+
+    /* Initialize output to NULL for safety */
+    if (strp)
+        *strp = NULL;
 
     /* printf("loading file '%s'\n",fileName); */
 
     fd = open(fileName, O_RDONLY);
-    if (!fd) {
+    if (fd == -1) {
         io_stat = -1;
         return -1;
     }
     fp = fdopen(fd, "r");
     if (!fp) {
+        close(fd);
         io_stat = -1;
         return -1;
     }
 
     /* determine size of file */
     size = lseek(fd, 0, SEEK_END);
+    if (size == -1) {
+        fclose(fp);
+        io_stat = -2;
+        return -2;
+    }
 
-    *strp = (char*)malloc(sizeof(char) * (int)size + 1);
+    *strp = (char*)malloc((size_t)(size + 1));
+    if (!*strp) {
+        fclose(fp);
+        io_stat = -3;
+        return -3;
+    }
 
     rewind(fp);
-    fread(*strp, size, 1, fp);
+    if (size > 0 && fread(*strp, (size_t)size, 1, fp) != 1) {
+        free(*strp);
+        *strp = NULL;
+        fclose(fp);
+        io_stat = -4;
+        return -4;
+    }
 
     (*strp)[size] = '\0';
 
     fclose(fp);
-    close(fd);
 
-    io_stat = i;
-
-    return i;
+    io_stat = 0;
+    return 0;
 }
 
 /*
@@ -174,8 +221,10 @@ int saveFile(char* fileName, char* str)
 /*
  * Convert a relative path to an absolute path.
  * If the path is already absolute or is a URL (contains ':'),
- * return it unchanged (or a copy if needed).
+ * return a copy of it.
  * Otherwise, make it relative to the current working directory.
+ * 
+ * Returns: newly allocated string (caller must free), or NULL on error.
  */
 char* makeAbsolutePath(const char* path)
 {
@@ -187,26 +236,22 @@ char* makeAbsolutePath(const char* path)
         return NULL;
     }
     
-    /* If path starts with '/', it's already absolute */
+    /* If path starts with '/', it's already absolute - return a copy */
     if (path[0] == '/') {
-        return (char*)path;
+        return saveString(path);
     }
     
     /* If path contains ':', it's likely a URL (http://, https://, file://, etc.) */
     if (strchr(path, ':')) {
-        return (char*)path;
+        return saveString(path);
     }
     
     /* Try to use realpath first, which resolves symlinks and normalizes */
     real_path = realpath(path, NULL);
     if (real_path) {
-        result = (char*)malloc(strlen(real_path) + 1);
-        if (result) {
-            strcpy(result, real_path);
-            free(real_path);
-            return result;
-        }
+        result = saveString(real_path);
         free(real_path);
+        return result;
     }
     
     /* Fallback: combine with current working directory */
@@ -217,15 +262,17 @@ char* makeAbsolutePath(const char* path)
         
         result = (char*)malloc(total_len);
         if (result) {
-            strcpy(result, cwd);
-            if (cwd[cwd_len - 1] != '/') {
-                strcat(result, "/");
+            int written = snprintf(result, total_len, "%s%s%s", 
+                                   cwd, 
+                                   (cwd[cwd_len - 1] != '/') ? "/" : "",
+                                   path);
+            if (written > 0 && (size_t)written < total_len) {
+                return result;
             }
-            strcat(result, path);
-            return result;
+            free(result);
         }
     }
     
-    /* If all else fails, return the original path */
-    return (char*)path;
+    /* If all else fails, return a copy of the original path */
+    return saveString(path);
 }

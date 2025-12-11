@@ -17,6 +17,7 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <string.h>
 /*
 static int scatter[] = {
@@ -30,17 +31,23 @@ static int scatter[] = {
 500965035,      1800624392,     2077067425,     1672112838
 };
 */
-int hash_int(HashTable* ht, int n)
+int hash_int(HashTable* ht, intptr_t n)
 {
-    return n % ht->size;
+    /* Use unsigned to avoid issues with negative values */
+    uintptr_t un = (uintptr_t)n;
+    return (int)(un % (uintptr_t)ht->size);
 }
 
-int hash_str(HashTable* ht, char* str)
+int hash_str(HashTable* ht, intptr_t label)
 {
+    char* str = (char*)label;
     int key = 0;
 
+    if (!str)
+        return 0;
+    
     while (*str)
-        key += *str++;
+        key += (unsigned char)*str++;
     key = key % ht->size;
 
     return key;
@@ -57,42 +64,61 @@ int hash_str(HashTable * ht, char * str)
         return key;
 }
 */
-HashTable* initHashTable(long size, int (*func_hash)(HashTable*, long), long (*func_cmp)(long, long), 
-                         void (*func_freeLabel)(long), void (*func_freeVal)(long),
-                         HashEntry* (*func_get)(HashTable*, long), HashEntry* (*func_put)(HashTable*, long, long), 
-                         HashEntry* (*func_put_replace)(HashTable*, long, long), int (*func_remove)(HashTable*, long))
+HashTable* initHashTable(int size, 
+                         int (*func_hash)(HashTable*, intptr_t), 
+                         intptr_t (*func_cmp)(intptr_t, intptr_t), 
+                         void (*func_freeLabel)(intptr_t), 
+                         void (*func_freeVal)(intptr_t),
+                         HashEntry* (*func_get)(HashTable*, intptr_t), 
+                         HashEntry* (*func_put)(HashTable*, intptr_t, intptr_t), 
+                         HashEntry* (*func_put_replace)(HashTable*, intptr_t, intptr_t), 
+                         int (*func_remove)(HashTable*, intptr_t))
 {
+    if (size <= 0) {
+        fprintf(stderr, "initHashTable: invalid size %d (must be > 0)\n", size);
+        return NULL;
+    }
+    
     struct HashTable* ht = (HashTable*)malloc(sizeof(struct HashTable));
     
-    if (ht) {
-        ht->entries = (HashEntry*)malloc(sizeof(struct HashEntry) * size);
-        *ht = (HashTable){
-            .entries = ht->entries,
-            .size = size,
-            .func_hash = func_hash,
-            .func_cmp = func_cmp,
-            .func_freeLabel = func_freeLabel,
-            .func_freeVal = func_freeVal,
-            .get = func_get,
-            .put = func_put,
-            .put_replace = func_put_replace,
-            .remove = func_remove
-        };
+    if (!ht) {
+        fprintf(stderr, "initHashTable: malloc failed for HashTable\n");
+        return NULL;
+    }
+    
+    ht->entries = (HashEntry*)malloc(sizeof(struct HashEntry) * (size_t)size);
+    if (!ht->entries) {
+        fprintf(stderr, "initHashTable: malloc failed for entries\n");
+        free(ht);
+        return NULL;
+    }
+    
+    *ht = (HashTable){
+        .entries = ht->entries,
+        .size = size,
+        .func_hash = func_hash,
+        .func_cmp = func_cmp,
+        .func_freeLabel = func_freeLabel,
+        .func_freeVal = func_freeVal,
+        .get = func_get,
+        .put = func_put,
+        .put_replace = func_put_replace,
+        .remove = func_remove
+    };
 
-        HashEntry* entryp = ht->entries;
-        for (int i = size - 1; i >= 0; i--) {
-            *entryp = (HashEntry){
-                .next = NULL,
-                .label = 0,
-                .val = 0
-            };
-            entryp++;
-        }
+    HashEntry* entryp = ht->entries;
+    for (int i = size - 1; i >= 0; i--) {
+        *entryp = (HashEntry){
+            .next = NULL,
+            .label = 0,
+            .val = 0
+        };
+        entryp++;
     }
     return ht;
 }
 
-static inline HashEntry* put_hash_entry_block(HashTable* ht, int key, long label, long val)
+static inline HashEntry* put_hash_entry_block(HashTable* ht, int key, intptr_t label, intptr_t val)
 {
     HashEntry* base_entry = &(ht->entries[key]);
     
@@ -123,7 +149,7 @@ static inline HashEntry* put_hash_entry_block(HashTable* ht, int key, long label
     }
 }
 
-HashEntry* putHashEntry(HashTable* ht, long label, long val)
+HashEntry* putHashEntry(HashTable* ht, intptr_t label, intptr_t val)
 {
     int key = ht->func_hash(ht, label);
     /*
@@ -136,27 +162,30 @@ HashEntry* putHashEntry(HashTable* ht, long label, long val)
     return put_hash_entry_block(ht, key, label, val);
 }
 
-HashEntry* putHashEntry_int(HashTable* ht, long label, long val)
+HashEntry* putHashEntry_int(HashTable* ht, intptr_t label, intptr_t val)
 {
-    int key = label % ht->size;
+    int key = (int)((uintptr_t)label % (uintptr_t)ht->size);
     return put_hash_entry_block(ht, key, label, val);
 }
 
-HashEntry* putHashEntry_str(HashTable* ht, char* label, long val)
+HashEntry* putHashEntry_str(HashTable* ht, intptr_t label, intptr_t val)
 {
     int key = 0;
-    char* str = label;
+    char* str = (char*)label;
+
+    if (!str)
+        return NULL;
 
     while (*str)
         key += *str++;
     key = key % ht->size;
 
-    return put_hash_entry_block(ht, key, (long)label, val);
+    return put_hash_entry_block(ht, key, label, val);
 }
 
-HashEntry* putHashEntry_cancelable_int(HashTable* ht, long label, long val)
+HashEntry* putHashEntry_cancelable_int(HashTable* ht, intptr_t label, intptr_t val)
 {
-    int key = label % ht->size;
+    int key = (int)((uintptr_t)label % (uintptr_t)ht->size);
     HashEntry* base_entry = &(ht->entries[key]);
 
     if (base_entry->label) {
@@ -191,7 +220,7 @@ HashEntry* putHashEntry_cancelable_int(HashTable* ht, long label, long val)
     }
 }
 
-static inline HashEntry* put_hash_entry_replace(HashTable* ht, int key, long label, long val)
+static inline HashEntry* put_hash_entry_replace(HashTable* ht, int key, intptr_t label, intptr_t val)
 {
     HashEntry* base_entry = &(ht->entries[key]);
 
@@ -228,28 +257,31 @@ static inline HashEntry* put_hash_entry_replace(HashTable* ht, int key, long lab
     }
 }
 
-HashEntry* putHashEntry_replace(HashTable* ht, long label, long val)
+HashEntry* putHashEntry_replace(HashTable* ht, intptr_t label, intptr_t val)
 {
     int key = ht->func_hash(ht, label);
     return put_hash_entry_replace(ht, key, label, val);
 }
 
-HashEntry* putHashEntry_replace_int(HashTable* ht, long label, long val)
+HashEntry* putHashEntry_replace_int(HashTable* ht, intptr_t label, intptr_t val)
 {
-    int key = label % ht->size;
+    int key = (int)((uintptr_t)label % (uintptr_t)ht->size);
     return put_hash_entry_replace(ht, key, label, val);
 }
 
-HashEntry* putHashEntry_replace_str(HashTable* ht, char* label, long val)
+HashEntry* putHashEntry_replace_str(HashTable* ht, intptr_t label, intptr_t val)
 {
     int key = 0;
-    char* str = label;
+    char* str = (char*)label;
+
+    if (!str)
+        return NULL;
 
     while (*str)
         key += *str++;
     key = key % ht->size;
 
-    return put_hash_entry_replace(ht, key, (long)label, val);
+    return put_hash_entry_replace(ht, key, label, val);
 }
 
 #ifdef NOT_USED
@@ -278,7 +310,7 @@ HashEntry* getHashEntry(HashTable* ht, long label)
                         key &= ht->size - 1;
         */
     } else if (ht->func_hash == hash_int) {
-        key = label % ht->size;
+        key = (int)((uintptr_t)label % (uintptr_t)ht->size);
     }
 
     base_entry = &(ht->entries[key]);
@@ -319,31 +351,32 @@ HashEntry* getHashEntry(HashTable* ht, long label)
 }
 #endif
 
-HashEntry* getHashEntry_str(HashTable* ht, char* label)
+HashEntry* getHashEntry_str(HashTable* ht, intptr_t label)
 {
-    if (label == 0)
+    char* labelStr = (char*)label;
+    if (!labelStr)
         return NULL;
 
     int key = 0;
-    char* str = label;
+    char* str = labelStr;
     while (*str)
         key += *str++;
     key = key % ht->size;
 
     for (HashEntry* entry = &(ht->entries[key]); entry; entry = entry->next)
         if (entry->label)
-            if (((char*)entry->label)[0] == ((char*)label)[0])
-                if (!strcmp((char*)entry->label, (char*)label))
+            if (((char*)entry->label)[0] == labelStr[0])
+                if (!strcmp((char*)entry->label, labelStr))
                     return entry;
     return NULL;
 }
 
-HashEntry* getHashEntry_int(HashTable* ht, long label)
+HashEntry* getHashEntry_int(HashTable* ht, intptr_t label)
 {
     if (label == 0)
         return NULL;
 
-    int key = label % ht->size;
+    int key = (int)((uintptr_t)label % (uintptr_t)ht->size);
     for (HashEntry* entry = &(ht->entries[key]); entry; entry = entry->next)
         if (entry->label == label)
             return entry;
@@ -402,12 +435,12 @@ int removeHashEntry(HashTable* ht, long label)
 }
 #endif
 
-int removeHashEntry_int(HashTable* ht, long label)
+int removeHashEntry_int(HashTable* ht, intptr_t label)
 {
     if (label == 0)
         return 0;
 
-    int key = label % ht->size;
+    int key = (int)((uintptr_t)label % (uintptr_t)ht->size);
 
     HashEntry* prevEntry = NULL;
     for (HashEntry* entry = &(ht->entries[key]); entry; entry = entry->next) {
@@ -438,12 +471,13 @@ int removeHashEntry_int(HashTable* ht, long label)
     return 0;
 }
 
-int removeHashEntry_str(HashTable* ht, char* label)
+int removeHashEntry_str(HashTable* ht, intptr_t label)
 {
-    if (label == 0)
+    char* labelStr = (char*)label;
+    if (!labelStr)
         return 0;
 
-    char* str = label;
+    char* str = labelStr;
     int key = 0;
     while (*str)
         key += *str++;
@@ -452,8 +486,8 @@ int removeHashEntry_str(HashTable* ht, char* label)
     HashEntry* prevEntry = NULL;
     for (HashEntry* entry = &(ht->entries[key]); entry; entry = entry->next) {
         if (entry->label) {
-            if (((char*)(entry->label))[0] == ((char*)label)[0]) {
-                if (!strcmp((char*)(entry->label), label)) {
+            if (((char*)(entry->label))[0] == labelStr[0]) {
+                if (!strcmp((char*)(entry->label), labelStr)) {
                     if (ht->func_freeLabel)
                         ht->func_freeLabel(entry->label);
                     if (ht->func_freeVal)
@@ -490,9 +524,9 @@ void dumpHashTable(HashTable* ht)
         for (HashEntry* hp = &(ht->entries[i]); hp; hp = hp->next)
             if (hp->label) {
                 if (ht->func_hash == hash_str) {
-                    printf("%d\tlabel=\"%s\"\tval=%ld\n", i, (char*)hp->label, hp->val);
+                    printf("%d\tlabel=\"%s\"\tval=%" PRIdPTR "\n", i, (char*)hp->label, hp->val);
                 } else {
-                    printf("%d\tlabel=%ld\tval=0x%lx\n", i, hp->label, hp->val);
+                    printf("%d\tlabel=%" PRIdPTR "\tval=0x%" PRIxPTR "\n", i, hp->label, hp->val);
                 }
             }
     }

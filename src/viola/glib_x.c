@@ -478,8 +478,8 @@ int GLInit(Display* dpy, Screen* scrn)
     /* RESOURCE_MANAGER not set - this is normal on XQuartz/macOS */
 
     colorNameShareDB =
-        initHashTable(300, (int (*)(HashTable*, long))hash_str, (long (*)(long, long))cmp_str, NULL, NULL, (HashEntry* (*)(HashTable*, long))getHashEntry_str, (HashEntry* (*)(HashTable*, long, long))putHashEntry_str,
-                      (HashEntry* (*)(HashTable*, long, long))putHashEntry_replace_str, (int (*)(HashTable*, long))removeHashEntry_str);
+        initHashTable(300, hash_str, cmp_str, NULL, NULL, getHashEntry_str, putHashEntry_str,
+                      putHashEntry_replace_str, removeHashEntry_str);
 
     colormap = XDefaultColormapOfScreen(screen);
     numOfDisplayColors = pow(2.0, ((double)screenDepth));

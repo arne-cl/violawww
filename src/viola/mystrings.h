@@ -38,8 +38,10 @@ extern int GBuffIdx[];
 
 #define PUTSTR(str) fputc(str, stdout)
 
-int cmp_int(int n1, int n2);
-long cmp_str(long a, long b); /* Wrapper for strcmp used in hash tables */
+#include <stdint.h>
+
+intptr_t cmp_int(intptr_t n1, intptr_t n2);
+intptr_t cmp_str(intptr_t a, intptr_t b); /* Wrapper for strcmp used in hash tables */
 
 char* trimFrontSpaces(char* str);
 

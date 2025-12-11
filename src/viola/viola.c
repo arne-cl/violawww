@@ -510,13 +510,13 @@ void parseCommandLine(int argc, char* argv[], char* startObj[],
 
                 /* Convert relative paths to absolute paths */
                 char* absolutePath = makeAbsolutePath(argv[++i]);
-                if (absolutePath != argv[i]) {
-                    /* Path was converted, save it */
-                    passthru_argument = saveString(absolutePath);
-                    free(absolutePath);
+                /* Free old value if any */
+                if (passthru_argument)
+                    free(passthru_argument);
+                if (absolutePath) {
+                    passthru_argument = absolutePath; /* takes ownership */
                 } else {
-                    /* Path was not converted (absolute or URL), use original */
-                    passthru_argument = argv[i];
+                    passthru_argument = saveString(argv[i]);
                 }
 
             } else if (!strcasecmp(argv[i], "-cli") || !strcasecmp(argv[i], "-c")) {
@@ -650,13 +650,13 @@ void parseCommandLine(int argc, char* argv[], char* startObj[],
             } else {
                 /* Convert relative paths to absolute paths */
                 char* absolutePath = makeAbsolutePath(argv[i]);
-                if (absolutePath != argv[i]) {
-                    /* Path was converted, save it */
-                    passthru_argument = saveString(absolutePath);
-                    free(absolutePath);
+                /* Free old value if any */
+                if (passthru_argument)
+                    free(passthru_argument);
+                if (absolutePath) {
+                    passthru_argument = absolutePath; /* takes ownership */
                 } else {
-                    /* Path was not converted (absolute or URL), use original */
-                    passthru_argument = argv[i];
+                    passthru_argument = saveString(argv[i]);
                 }
             }
             if (i >= argc)

@@ -2,7 +2,14 @@
 #include "hash.h"
 #include "mystrings.h"
 #include "utils.h"
+#include <stdlib.h>
 #include <string.h>
+
+/* Wrapper for free() to match hash table callback signature */
+static void free_intptr(intptr_t ptr)
+{
+    free((void*)ptr);
+}
 /*
  */
 strNIntPair symList[] = {STR_BCard,
@@ -1262,16 +1269,16 @@ int init_ident() {
     int i;
     strNIntPair* symp;
 
-    symStr2ID = initHashTable(300, (int (*)(HashTable*, long))hash_str, (long (*)(long, long))cmp_str, NULL, NULL, (HashEntry* (*)(HashTable*, long))getHashEntry_str,
-                              (HashEntry* (*)(HashTable*, long, long))putHashEntry_str, (HashEntry* (*)(HashTable*, long, long))putHashEntry_replace_str, (int (*)(HashTable*, long))removeHashEntry_str);
+    symStr2ID = initHashTable(300, hash_str, cmp_str, NULL, NULL, getHashEntry_str,
+                              putHashEntry_str, putHashEntry_replace_str, removeHashEntry_str);
 
-    symID2Str = initHashTable(300, (int (*)(HashTable*, long))hash_int, (long (*)(long, long))cmp_int, NULL, (void (*)(long))free, (HashEntry* (*)(HashTable*, long))getHashEntry_int,
-                              (HashEntry* (*)(HashTable*, long, long))putHashEntry_int, (HashEntry* (*)(HashTable*, long, long))putHashEntry_replace_int, (int (*)(HashTable*, long))removeHashEntry_int);
+    symID2Str = initHashTable(300, hash_int, cmp_int, NULL, free_intptr, getHashEntry_int,
+                              putHashEntry_int, putHashEntry_replace_int, removeHashEntry_int);
 
     for (symp = symList; symp->s; symp++) {
-        if (!symStr2ID->get(symStr2ID, (long)symp->s)) {
-            symStr2ID->put(symStr2ID, (long)symp->s, (long)symp->i);
-            symID2Str->put(symID2Str, (long)symp->i, (long)symp->s);
+        if (!symStr2ID->get(symStr2ID, (intptr_t)symp->s)) {
+            symStr2ID->put(symStr2ID, (intptr_t)symp->s, (intptr_t)symp->i);
+            symID2Str->put(symID2Str, (intptr_t)symp->i, (intptr_t)symp->s);
         }
     }
 

@@ -347,11 +347,11 @@ int main(int argc, char* argv[])
     for (i = 1; i < argc; i++) {
         if (argv[i][0] != '-') {
             char* absolutePath = makeAbsolutePath(argv[i]);
-            sendMessage1N1str(dvip->violaDocViewObj, "show", absolutePath);
-            if (absolutePath != argv[i]) {
+            if (absolutePath) {
+                sendMessage1N1str(dvip->violaDocViewObj, "show", absolutePath);
                 free(absolutePath);
+                loadCmdLineDoc = 1;
             }
-            loadCmdLineDoc = 1;
             break;
         }
     }
