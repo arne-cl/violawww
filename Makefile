@@ -12,11 +12,11 @@ OPENMOTIF_PREFIX := $(shell brew --prefix openmotif 2>/dev/null || echo $(BREW_P
 ICU_PREFIX := $(shell brew --prefix icu4c 2>/dev/null)
 OPENSSL_PREFIX := $(shell brew --prefix openssl@3 2>/dev/null || echo $(BREW_PREFIX)/opt/openssl@3)
 
-# Check if ICU is available
-ICU_AVAILABLE := $(shell test -d "$(ICU_PREFIX)/include" && echo yes || echo no)
+# Check if ICU is available (ensure prefix is non-empty before testing)
+ICU_AVAILABLE := $(shell test -n "$(ICU_PREFIX)" && test -d "$(ICU_PREFIX)/include" && echo yes || echo no)
 
-# Check if OpenSSL is available
-OPENSSL_AVAILABLE := $(shell test -d "$(OPENSSL_PREFIX)/include" && echo yes || echo no)
+# Check if OpenSSL is available (ensure prefix is non-empty before testing)
+OPENSSL_AVAILABLE := $(shell test -n "$(OPENSSL_PREFIX)" && test -d "$(OPENSSL_PREFIX)/include" && echo yes || echo no)
 
 # Auto-detect OpenSP (onsgmls) for HMML support
 OPENSP_PREFIX := $(shell brew --prefix open-sp 2>/dev/null)
@@ -24,7 +24,8 @@ SGMLS_PATH := $(shell command -v onsgmls 2>/dev/null || echo "$(OPENSP_PREFIX)/b
 SGMLS_AVAILABLE := $(shell test -x "$(SGMLS_PATH)" && echo yes || echo no)
 
 # Compiler flags
-ARCH_FLAGS = -arch arm64
+# Auto-detect architecture (arm64 for Apple Silicon, x86_64 for Intel)
+ARCH_FLAGS = -arch $(shell uname -m)
 CFLAGS = -O2 $(ARCH_FLAGS) -std=gnu17 -Wno-everything -D__DARWIN__ -funsigned-char
 CFLAGS_LIBS = -O2 $(ARCH_FLAGS) -Wno-everything -no-cpp-precomp -fno-common -funsigned-char \
               -D__DARWIN__ -DNO_ALLOCA -DCSRG_BASED
@@ -716,12 +717,9 @@ app: $(VW) $(LAUNCHER)
 		cp $(SGMLSA2B) $(APP_MACOS)/sgmlsA2B; \
 	fi
 	@# Bundle onsgmls from OpenSP if available (for HMML support)
-	@if [ -x /opt/homebrew/bin/onsgmls ]; then \
+	@if [ -x "$(SGMLS_PATH)" ]; then \
 		echo "Bundling onsgmls (OpenSP)..."; \
-		cp /opt/homebrew/bin/onsgmls $(APP_MACOS)/onsgmls; \
-	elif [ -x /usr/local/bin/onsgmls ]; then \
-		echo "Bundling onsgmls (OpenSP)..."; \
-		cp /usr/local/bin/onsgmls $(APP_MACOS)/onsgmls; \
+		cp "$(SGMLS_PATH)" $(APP_MACOS)/onsgmls; \
 	else \
 		echo "Note: onsgmls not found, HMML support will require OpenSP installation"; \
 	fi
@@ -828,40 +826,8 @@ app: $(VW) $(LAUNCHER)
 		mv resources/ViolaWWW.icns $(APP_RESOURCES)/; \
 	fi
 	@echo "Creating Info.plist..."
-	@printf '%s\n' \
-		'<?xml version="1.0" encoding="UTF-8"?>' \
-		'<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
-		'<plist version="1.0">' \
-		'<dict>' \
-		'    <key>CFBundleDevelopmentRegion</key>' \
-		'    <string>en</string>' \
-		'    <key>CFBundleExecutable</key>' \
-		'    <string>vw</string>' \
-		'    <key>CFBundleIdentifier</key>' \
-		'    <string>org.violawww.vw</string>' \
-		'    <key>CFBundleInfoDictionaryVersion</key>' \
-		'    <string>6.0</string>' \
-		'    <key>CFBundleName</key>' \
-		'    <string>ViolaWWW</string>' \
-		'    <key>CFBundleDisplayName</key>' \
-		'    <string>ViolaWWW</string>' \
-		'    <key>CFBundlePackageType</key>' \
-		'    <string>APPL</string>' \
-		'    <key>CFBundleIconFile</key>' \
-		'    <string>ViolaWWW</string>' \
-		'    <key>CFBundleShortVersionString</key>' \
-		'    <string>4.0</string>' \
-		'    <key>CFBundleVersion</key>' \
-		'    <string>1</string>' \
-		'    <key>LSMinimumSystemVersion</key>' \
-		'    <string>11.0</string>' \
-		'    <key>NSHighResolutionCapable</key>' \
-		'    <true/>' \
-		'    <key>NSHumanReadableCopyright</key>' \
-		'    <string>Copyright 1991-1994 Pei-Yuan Wei. 2025 Evgeny Stepanischev.</string>' \
-		'</dict>' \
-		'</plist>' > $(APP_CONTENTS)/Info.plist
-	@echo -n "APPL????" > $(APP_CONTENTS)/PkgInfo
+	@cp resources/Info.plist $(APP_CONTENTS)/Info.plist
+	@printf 'APPL????' > $(APP_CONTENTS)/PkgInfo
 	@echo ""
 	@echo "Bundling dynamic libraries..."
 	@$(MAKE) --no-print-directory bundle-dylibs
