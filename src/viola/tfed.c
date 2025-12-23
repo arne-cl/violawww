@@ -6560,8 +6560,8 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
     }
 
     /*
-     * Used to set num_of_lines without rendering
-     * bug: does not take breakc into account
+     * Used to set num_of_lines without rendering.
+     * Also calculates vspan (total height) and per-line metrics (maxFontHeight, breakc).
      */
     int scanVerticalMetrics(TFStruct* tf)
     {
@@ -6692,7 +6692,8 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                 tf->num_of_lines += renderedLines; /* in view only */
                 yoffset += maxFontHeight;
             }
-            vspan += maxFontHeight;
+            /* Account for line wrapping: each wrapped line contributes to total height */
+            vspan += maxFontHeight * currentp->breakc;
             currentp = currentp->next;
         }
 
