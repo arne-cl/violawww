@@ -5377,6 +5377,64 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
         return 1;
     }
 
+    /*
+     * Calculate maximum font height and descent for a line by scanning all characters.
+     * This ensures consistent metrics regardless of line wrap points.
+     */
+    static inline void calculateLineMetrics(TFStruct *tf, TFLineNode *line,
+                                            int *outMaxHeight, int *outMaxDescent)
+    {
+        TFChar *tfcp;
+        TFChar *linep = line->linep;
+        int maxFontHeight = 0;
+        int maxFontDescent = 0;
+        int lfontID = -1;
+
+        for (tfcp = linep; TFCChar(tfcp); ++tfcp) {
+            if (TFCFlags(tfcp) & MASK_PIC) {
+                TFPic *pic = NULL, *picp;
+                int picID = TFCFontID(tfcp);
+
+                picp = (TFPic*)GET__content(tf->self);
+                if (!picp)
+                    picp = (TFPic*)GET__content(GET__parent(tf->self));
+                for (; picp; picp = picp->next) {
+                    if (picp->id == picID) {
+                        pic = picp;
+                        break;
+                    }
+                }
+                if (!pic)
+                    pic = dunselPic;
+                if (maxFontHeight < pic->height)
+                    maxFontHeight = pic->height;
+            } else if (TFCFlags(tfcp) & MASK_OBJ) {
+                char *insetName = line->tagInfo[TFCTagID(tfcp)].info;
+                if (insetName) {
+                    VObj *inset = getObject(insetName);
+                    if (inset) {
+                        int insetHeight = (int)GET_height(inset) + 2;
+                        if (maxFontHeight < insetHeight)
+                            maxFontHeight = insetHeight;
+                    }
+                }
+            } else {
+                int fontID = TFCFontID(tfcp);
+                if (fontID != lfontID) {
+                    FontInfo *fip = &fontInfo[fontID];
+                    if (maxFontHeight < fip->maxheight)
+                        maxFontHeight = fip->maxheight;
+                    if (maxFontDescent < fip->descent)
+                        maxFontDescent = fip->descent;
+                    lfontID = fontID;
+                }
+            }
+        }
+
+        *outMaxHeight = maxFontHeight;
+        *outMaxDescent = maxFontDescent;
+    }
+
     int renderTF(TFStruct* tf)
     {
         TFLineNode* currentp;
@@ -5437,60 +5495,17 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                 maxFontHeight = currentp->maxFontHeight = fip->maxheight;
                 maxFontDescent = currentp->maxFontDescent = fip->descent;
             } else {
-                maxFontHeight = 0;
-                maxFontDescent = 0;
-                lfontID = -1;
-                for (tfcp = linep; TFCChar(tfcp); ++tfcp) {
-                    if (segpx > pwidthlimit)
-                        break;
-                    if (TFCFlags(tfcp) & MASK_PIC) {
-                        TFPic *pic = NULL, *picp, *pics;
-                        int picID;
-
-                        picID = TFCFontID(tfcp);
-                        picp = (TFPic*)GET__content(tf->self);
-                        if (!picp)
-                            picp = (TFPic*)GET__content(GET__parent(tf->self));
-                        for (; picp; picp = picp->next)
-                            if (picp->id == picID) {
-                                pic = picp;
-                                break;
-                            }
-                        if (!pic)
-                            pic = dunselPic;
-                        segpx += pic->width;
-                        if (maxFontHeight < pic->height)
-                            maxFontHeight = pic->height;
-                    } else if (TFCFlags(tfcp) & MASK_OBJ) {
-                        VObj* inset;
-                        char* insetName;
-                        int insetHeight;
-
-                        insetName = currentp->tagInfo[TFCTagID(tfcp)].info;
-                        if (insetName) {
-                            inset = getObject(insetName);
-                            if (inset) {
-                                segpx += (int)GET_width(inset) + 2;
-                                insetHeight = (int)GET_height(inset) + 2;
-                                if (maxFontHeight < insetHeight)
-                                    maxFontHeight = insetHeight;
-                            }
-                        }
-                    } else {
-                        segpx += TFCWidth(tfcp);
-                        if (TFCFontID(tfcp) != lfontID) {
-                            fontID = TFCFontID(tfcp);
-                            fip = &fontInfo[fontID];
-                            if (maxFontHeight < fip->maxheight)
-                                maxFontHeight = fip->maxheight;
-                            if (maxFontDescent < fip->descent)
-                                maxFontDescent = fip->descent;
-                            lfontID = fontID;
-                        }
-                    }
+                /* Use already-calculated values from scanVerticalMetrics if available,
+                 * otherwise calculate them now. This ensures consistent metrics.
+                 */
+                if (currentp->maxFontHeight > 0) {
+                    maxFontHeight = currentp->maxFontHeight;
+                    maxFontDescent = currentp->maxFontDescent;
+                } else {
+                    calculateLineMetrics(tf, currentp, &maxFontHeight, &maxFontDescent);
+                    currentp->maxFontHeight = maxFontHeight;
+                    currentp->maxFontDescent = maxFontDescent;
                 }
-                currentp->maxFontHeight = maxFontHeight;
-                currentp->maxFontDescent = maxFontDescent;
             }
 
             /* this can't be right. what if this is the first line,
