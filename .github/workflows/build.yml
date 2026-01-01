@@ -1,0 +1,81 @@
+name: Build ViolaWWW
+
+on:
+  push:
+    branches: [ main, linux-port ]
+  pull_request:
+    branches: [ main, linux-port ]
+
+jobs:
+  build-macos:
+    runs-on: macos-15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Homebrew dependencies
+      run: |
+        brew update
+        brew install byacc openmotif icu4c openssl@3
+        # X11 headers are split across many packages on Homebrew (unlike XQuartz)
+        # These match openmotif's dependencies to ensure all headers are available
+        brew install xorgproto libxau libx11 libxext libxt libxmu \
+                     libice libsm libxp libxft libxrender
+
+    - name: Build ViolaWWW
+      run: |
+        make info
+        make -j4
+
+    - name: Verify binaries exist
+      run: |
+        test -f src/viola/viola || { echo "viola binary not found"; exit 1; }
+        test -f src/vw/vw || { echo "vw binary not found"; exit 1; }
+        ls -lh src/viola/viola src/vw/vw
+
+    - name: Test basic binary execution
+      run: |
+        # Test that binaries at least execute (help/version should work without X11)
+        src/viola/viola --help || true
+        src/vw/vw --help || true
+
+  build-linux:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install apt dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          byacc \
+          libx11-dev \
+          libxmu-dev \
+          libxt-dev \
+          libxext-dev \
+          libxrender-dev \
+          libmotif-dev \
+          libicu-dev \
+          libssl-dev \
+          pkg-config
+
+    - name: Build ViolaWWW
+      run: |
+        make info
+        make -j4
+
+    - name: Verify binaries exist
+      run: |
+        test -f src/viola/viola || { echo "viola binary not found"; exit 1; }
+        test -f src/vw/vw || { echo "vw binary not found"; exit 1; }
+        ls -lh src/viola/viola src/vw/vw
+
+    - name: Test basic binary execution
+      run: |
+        # Test that binaries at least execute (show version/help)
+        src/viola/viola --help || true
+        src/vw/vw --help || true

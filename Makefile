@@ -135,13 +135,52 @@ CFLAGS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast -Wint-t
 CFLAGS_LIBS := $(filter-out -Wno-everything,$(CFLAGS_LIBS))
 CFLAGS_LIBS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast
 endif
-INCLUDES = -I$(OPENMOTIF_PREFIX)/include \
-           $(ICU_INCLUDES) \
-           $(SSL_INCLUDES)
 
 # X11 include paths
 ifeq ($(UNAME_S),Darwin)
-  INCLUDES += -I/opt/X11/include
+  # Try XQuartz location first
+  ifneq ($(wildcard /opt/X11/include),)
+    X11_INCLUDE_PREFIX = /opt/X11
+  # Fallback to Homebrew X11 prefix
+  else
+    X11_INCLUDE_PREFIX = $(shell brew --prefix libx11 2>/dev/null || echo /opt/X11)
+  endif
+
+  # Crucial: Intrinsic.h is in libxt, not libx11
+  LIBXT_PREFIX = $(shell brew --prefix libxt 2>/dev/null || echo /usr/X11)
+
+  # X11/X.h is in xorgproto, not libx11
+  XORGPROTO_PREFIX = $(shell brew --prefix xorgproto 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
+
+  # X11 headers are split across many packages on Homebrew
+  # These match openmotif's dependencies
+  LIBXAU_PREFIX = $(shell brew --prefix libxau 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
+  LIBICE_PREFIX = $(shell brew --prefix libice 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
+  LIBSM_PREFIX = $(shell brew --prefix libsm 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
+  LIBXP_PREFIX = $(shell brew --prefix libxp 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
+  LIBXEXT_PREFIX = $(shell brew --prefix libxext 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
+  LIBXFT_PREFIX = $(shell brew --prefix libxft 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
+  LIBXRENDER_PREFIX = $(shell brew --prefix libxrender 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
+
+  INCLUDES = -I$(OPENMOTIF_PREFIX)/include \
+             -I$(X11_INCLUDE_PREFIX)/include \
+             -I$(LIBXT_PREFIX)/include \
+             -I$(XORGPROTO_PREFIX)/include \
+             -I$(LIBXAU_PREFIX)/include \
+             -I$(LIBICE_PREFIX)/include \
+             -I$(LIBSM_PREFIX)/include \
+             -I$(LIBXP_PREFIX)/include \
+             -I$(LIBXEXT_PREFIX)/include \
+             -I$(LIBXFT_PREFIX)/include \
+             -I$(LIBXRENDER_PREFIX)/include \
+             $(ICU_INCLUDES) \
+             $(SSL_INCLUDES)
+else
+  # Linux: X11 headers are in standard locations
+  X11_INCLUDE_PREFIX = /usr
+  INCLUDES = -I$(OPENMOTIF_PREFIX)/include \
+             $(ICU_INCLUDES) \
+             $(SSL_INCLUDES)
 endif
 
 # Dependency generation flags
@@ -152,8 +191,16 @@ LDFLAGS = $(ARCH_FLAGS) $(PLATFORM_LDFLAGS)
 
 # Library paths
 ifeq ($(UNAME_S),Darwin)
-  LDFLAGS += -L$(BREW_PREFIX)/lib -L$(OPENMOTIF_PREFIX)/lib -L/opt/X11/lib
+  # Detect X11 library path (XQuartz or Homebrew)
+  ifneq ($(wildcard /opt/X11/lib),)
+    X11_LIB_PREFIX = /opt/X11
+  else
+    X11_LIB_PREFIX = $(shell brew --prefix libx11 2>/dev/null || echo /opt/X11)
+  endif
+  LDFLAGS += -L$(BREW_PREFIX)/lib -L$(OPENMOTIF_PREFIX)/lib -L$(X11_LIB_PREFIX)/lib
 else
+  # Linux: X11 libs are in standard locations
+  X11_LIB_PREFIX = /usr
   LDFLAGS += -L$(OPENMOTIF_PREFIX)/lib
 endif
 
@@ -454,7 +501,7 @@ vplot: $(VPLOT)
 $(VPLOT): $(VPLOT_DIR)/vplot.c
 	@echo "=== Building vplot ==="
 	@mkdir -p vplot_dir
-	$(CC) $(CFLAGS) -I/opt/X11/include -L/opt/X11/lib -o $@ $< -lX11 -lm
+	$(CC) $(CFLAGS) $(INCLUDES) -L$(X11_LIB_PREFIX)/lib -o $@ $< -lX11 -lm
 	@echo "=== vplot built successfully! ==="
 	@ls -lh $@
 	@echo ""
@@ -824,138 +871,4 @@ app: $(VW) $(LAUNCHER)
 	if [ -x "$$TELNET_PATH" ]; then \
 		echo "Bundling telnet..."; \
 		cp "$$TELNET_PATH" $(APP_MACOS)/telnet; \
-	elif [ -x /usr/local/bin/telnet ]; then \
-		echo "Bundling telnet..."; \
-		cp /usr/local/bin/telnet $(APP_MACOS)/telnet; \
-	else \
-		echo "Note: telnet not found, telnet:// URLs will require: brew install telnet"; \
-	fi
-	@# Bundle rlogin if available (for rlogin:// URLs, optional)
-	@RLOGIN_PATH=$$(brew --prefix inetutils 2>/dev/null)/bin/grlogin; \
-	if [ -x "$$RLOGIN_PATH" ]; then \
-		echo "Bundling rlogin..."; \
-		cp "$$RLOGIN_PATH" $(APP_MACOS)/rlogin; \
-	else \
-		echo "Note: rlogin not found (optional), install via: brew install inetutils"; \
-	fi
-	@# Bundle c3270 if available (for tn3270:// URLs - IBM mainframe terminal)
-	@C3270_PATH=$$(brew --prefix x3270 2>/dev/null)/bin/c3270; \
-	if [ -x "$$C3270_PATH" ]; then \
-		echo "Bundling c3270..."; \
-		cp "$$C3270_PATH" $(APP_MACOS)/c3270; \
-	elif [ -x /opt/homebrew/bin/c3270 ]; then \
-		echo "Bundling c3270..."; \
-		cp /opt/homebrew/bin/c3270 $(APP_MACOS)/c3270; \
-	elif [ -x /usr/local/bin/c3270 ]; then \
-		echo "Bundling c3270..."; \
-		cp /usr/local/bin/c3270 $(APP_MACOS)/c3270; \
-	else \
-		echo "Note: c3270 not found, tn3270:// URLs will require: brew install x3270"; \
-	fi
-	@# Build ImageMagick from source if not already built
-	@if [ ! -d build/imagemagick/bin ] || [ ! -x build/imagemagick/bin/magick ]; then \
-		echo "Building ImageMagick from source (static coders)..."; \
-		chmod +x scripts/build-imagemagick.sh; \
-		./scripts/build-imagemagick.sh || exit 1; \
-	fi
-	@# Bundle custom-built ImageMagick (static build: all coders in libMagickCore)
-	@echo "Bundling ImageMagick..."
-	@cp build/imagemagick/bin/magick $(APP_MACOS)/magick
-	@echo "Copying ImageMagick libraries to Frameworks..."
-	@for lib in build/imagemagick/lib/*.dylib; do \
-		[ -f "$$lib" ] || continue; \
-		libname=$$(basename "$$lib"); \
-		cp "$$lib" $(APP_FRAMEWORKS)/; \
-		chmod 755 $(APP_FRAMEWORKS)/$$libname; \
-	done
-	@echo "Fixing ImageMagick library paths..."
-	@for lib in $(APP_FRAMEWORKS)/libMagick*.dylib; do \
-		[ -f "$$lib" ] || continue; \
-		libname=$$(basename "$$lib"); \
-		install_name_tool -id "@executable_path/../Frameworks/$$libname" "$$lib" 2>/dev/null || true; \
-		for dep in $$(otool -L "$$lib" | grep "/Applications/ViolaWWW.app" | awk '{print $$1}'); do \
-			depname=$$(basename "$$dep"); \
-			install_name_tool -change "$$dep" "@executable_path/../Frameworks/$$depname" "$$lib" 2>/dev/null || true; \
-		done; \
-	done
-	@for dep in $$(otool -L $(APP_MACOS)/magick | grep "/Applications/ViolaWWW.app" | awk '{print $$1}'); do \
-		depname=$$(basename "$$dep"); \
-		install_name_tool -change "$$dep" "@executable_path/../Frameworks/$$depname" $(APP_MACOS)/magick 2>/dev/null || true; \
-	done
-	@mkdir -p $(APP_RESOURCES)/ImageMagick
-	@cp -r build/imagemagick/etc $(APP_RESOURCES)/ImageMagick/
-	@cp -r build/imagemagick/share $(APP_RESOURCES)/ImageMagick/ 2>/dev/null || true
-	@cp -r build/imagemagick/lib/ImageMagick-*/config-* $(APP_RESOURCES)/ImageMagick/ 2>/dev/null || true
-	@echo "Copying resources..."
-	@cp -r res $(APP_RESOURCES)/
-	@cp LICENSE.md $(APP_RESOURCES)/ 2>/dev/null || true
-	@if [ -d vplot_dir ]; then \
-		echo "Copying vplot_dir..."; \
-		cp -r vplot_dir $(APP_RESOURCES)/; \
-	fi
-	@# Copy icon if exists, or generate it
-	@if [ -f resources/ViolaWWW.icns ]; then \
-		echo "Copying icon..."; \
-		cp resources/ViolaWWW.icns $(APP_RESOURCES)/; \
-	elif [ -x scripts/make-icon.sh ]; then \
-		echo "Generating icon..."; \
-		ICONSET_DIR=$(APP_RESOURCES)/ViolaWWW.iconset scripts/make-icon.sh; \
-		mv resources/ViolaWWW.icns $(APP_RESOURCES)/; \
-	fi
-	@echo "Creating Info.plist..."
-	@cp resources/Info.plist $(APP_CONTENTS)/Info.plist
-	@printf 'APPL????' > $(APP_CONTENTS)/PkgInfo
-	@echo ""
-	@echo "Bundling dynamic libraries..."
-	@$(MAKE) --no-print-directory bundle-dylibs
-	@echo ""
-	@echo "Stripping debug symbols..."
-	@strip -x $(APP_MACOS)/vw 2>/dev/null || true
-	@strip -x $(APP_MACOS)/vw.bin 2>/dev/null || true
-	@strip -x $(APP_MACOS)/sgmlsA2B 2>/dev/null || true
-	@strip -x $(APP_MACOS)/onsgmls 2>/dev/null || true
-	@strip -x $(APP_MACOS)/gs 2>/dev/null || true
-	@strip -x $(APP_MACOS)/magick 2>/dev/null || true
-	@strip -x $(APP_MACOS)/telnet 2>/dev/null || true
-	@strip -x $(APP_MACOS)/rlogin 2>/dev/null || true
-	@for lib in $(APP_FRAMEWORKS)/*.dylib; do \
-		strip -x "$$lib" 2>/dev/null || true; \
-	done
-	@if [ -f $(APP_RESOURCES)/vplot_dir/vplot ]; then \
-		strip -x $(APP_RESOURCES)/vplot_dir/vplot 2>/dev/null || true; \
-	fi
-	@# Clear extended attributes that interfere with code signing
-	@chmod -R u+w $(APP_BUNDLE)
-	@xattr -cr $(APP_BUNDLE) 2>/dev/null || true
-	@# Re-sign after stripping (nested components first, then bundle with --deep)
-	@for bin in $(APP_MACOS)/*; do \
-		codesign --force --sign - "$$bin" 2>/dev/null || true; \
-	done
-	@for lib in $(APP_FRAMEWORKS)/*.dylib; do \
-		codesign --force --sign - "$$lib" 2>/dev/null || true; \
-	done
-	@codesign --force --sign - --deep $(APP_BUNDLE)
-	@echo ""
-	@echo "=== $(APP_NAME).app built successfully! ==="
-	@du -sh $(APP_BUNDLE)
-	@echo ""
-	@echo "Note: XQuartz is required to run this application."
-	@echo "      Install from: https://www.xquartz.org/"
-
-.PHONY: bundle-dylibs
-bundle-dylibs:
-	@chmod +x $(BUNDLE_SCRIPT)
-	@$(BUNDLE_SCRIPT) "$(APP_MACOS)" "$(APP_FRAMEWORKS)" "$(APP_RESOURCES)"
-
-# Create a DMG for distribution (uses scripts/create-dmg.sh)
-.PHONY: dmg
-dmg: app
-	@echo "=== Creating $(APP_NAME).dmg ==="
-	@chmod +x scripts/create-dmg.sh
-	@scripts/create-dmg.sh
-
-# Clean app bundle
-.PHONY: clean-app
-clean-app:
-	@echo "=== Cleaning app bundle ==="
-	rm -rf $(APP_BUNDLE) $(APP_NAME).dmg dmg/build dmg/*.pkg
+	elif [ -x /usr/local/bin
