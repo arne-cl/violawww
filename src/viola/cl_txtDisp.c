@@ -466,9 +466,11 @@ long int meth_txtDisp_config(VObj* self, Packet* result, int argc, Packet argv[]
 
         if (tf->firstp) {
             extern TFLineNode* theEditLN;
-            if (tf->editableP)
+            if (tf->editableP) {
                 replaceNodeLine(tf->currentp, theEditLN, 1, tf->mg);
-            SET_content(self, convertNodeLinesToStr(self, tf->firstp));
+                SET_content(self, convertNodeLinesToStr(self, tf->firstp));
+            }
+            /* For non-editable fields, don't update content - use original */
         }
     }
     if (!tfed_updateTFStruct(self, GET_content(self)))
@@ -638,13 +640,17 @@ long int helper_txtDisp_get(VObj* self, Packet* result, int argc, Packet argv[],
     case STR_content: {
         TFStruct* tf = updateEStrUser(self);
         result->type = PKT_STR;
+        result->canFree = 0;
         if (tf) {
-            if (tf->editableP)
+            if (tf->editableP) {
+                /* Editable field: user may have changed content, so convert from lines */
                 replaceNodeLine(tf->currentp, theEditLN, 1, tf->mg);
-            result->canFree = 0; /* different kind of canFree!!!*/
-            result->info.s = convertNodeLinesToStr(self, tf->firstp);
+                result->info.s = convertNodeLinesToStr(self, tf->firstp);
+            } else {
+                /* Non-editable: return original content to avoid round-trip conversion */
+                result->info.s = GET_content(self) ? GET_content(self) : "";
+            }
         } else {
-            result->canFree = 0;
             result->info.s = "";
         }
         return 1;

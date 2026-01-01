@@ -2672,7 +2672,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
             TFCChar(tfcp) = *(buildInfo->str);
             TFCFontID(tfcp) = buildInfo->fontID;
             TFCFlags(tfcp) = buildInfo->flags;
-            if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+            if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                 TFCChar(tfcp) = '\0';
                 splitLine(buildInfo, buildInfo->breaki, 1);
                 tfcp = buildInfo->tbuff + buildInfo->tbuffi;
@@ -2738,7 +2738,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
 
                 buildInfo->px += pic->width;
 
-                if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                     TFCChar(tfcp) = '\0';
                     splitLine(buildInfo, buildInfo->breaki, 1);
                     tfcp = buildInfo->tbuff + buildInfo->tbuffi;
@@ -2831,7 +2831,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                 TFCFlags(tfcp) = buildInfo->flags | MASK_OBJ;
                 TFCFontID(tfcp) = buildInfo->fontID;
 
-                if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                     TFCChar(tfcp) = '\0';
                     splitLine(buildInfo, buildInfo->breaki, 1);
                     tfcp = buildInfo->tbuff + buildInfo->tbuffi;
@@ -2890,7 +2890,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
 
                 buildInfo->px += pic->width;
 
-                if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                     TFCChar(tfcp) = '\0';
                     splitLine(buildInfo, buildInfo->breaki, 1);
                     tfcp = buildInfo->tbuff + buildInfo->tbuffi;
@@ -2955,7 +2955,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                                         TFCFlags(tfcp) = buildInfo->flags;
                                         TFCFontID(tfcp) = buildInfo->fontID;
                                         buildInfo->px += FontWidths(buildInfo->fontID)['*'];
-                                        if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                                        if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                                                 TFCChar(tfcp) = '\0';
                                                 splitLine(buildInfo, buildInfo->breaki, 1);
                                                 tfcp = buildInfo->tbuff
@@ -3135,7 +3135,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                 length = (size_t)(s - buildInfo->str - 2);
                 cp = buildInfo->str + 1;
                 buildInfo->flags |= MASK_ITALIC;
-                while (length--) {
+                while (length-- && buildInfo->tbuffi < TBUFFSIZE - 1) {
                     TFCChar(tfcp) = *cp;
                     TFCFontID(tfcp) = buildInfo->fontID;
                     TFCFlags(tfcp) = buildInfo->flags;
@@ -3204,6 +3204,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                             break;
             */
         case '\\':
+            if (buildInfo->tbuffi >= TBUFFSIZE - 1) break;
             TFCChar(tfcp) = '\\';
             TFCFlags(tfcp) = buildInfo->flags;
             TFCFontID(tfcp) = buildInfo->fontID;
@@ -3215,6 +3216,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
             break;
 
         case 'n':
+            if (buildInfo->tbuffi >= TBUFFSIZE - 1) break;
             TFCChar(tfcp) = ' ';
             TFCFlags(tfcp) = buildInfo->flags;
             TFCFontID(tfcp) = buildInfo->fontID;
@@ -3227,6 +3229,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
 
         default:
         foobar: /* unknown escape */
+            if (buildInfo->tbuffi >= TBUFFSIZE - 3) break;
             TFCChar(tfcp) = '\\';
             TFCFlags(tfcp) = buildInfo->flags;
             TFCFontID(tfcp) = buildInfo->fontID;
@@ -3296,7 +3299,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
             c = *strp;
 
             if ((c > ' ') && (c != '\\')) {
-                if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                     /* error. lossing info... */
                     splitLine(buildInfo, buildInfo->breaki, 1);
                     tfcp = buildInfo->tbuff + buildInfo->tbuffi;
@@ -3327,7 +3330,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                 ++strp;
 
             } else if (c == ' ') {
-                if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                     /* error. lossing info... */
                     splitLine(buildInfo, buildInfo->breaki, 1);
                     tfcp = buildInfo->tbuff + buildInfo->tbuffi;
@@ -3362,7 +3365,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                         TFCChar(tfcp) = c;
                         TFCFontID(tfcp) = fontID;
                         TFCFlags(tfcp) = flags;
-                        if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                        if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                             /* error. lossing info... */
                             splitLine(buildInfo, buildInfo->breaki, 1);
                             tfcp = buildInfo->tbuff + buildInfo->tbuffi;
@@ -3481,7 +3484,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                         TFCFlags(tfcp) = flags;
                         TFCFontID(tfcp) = fontID;
                         buildInfo->px += buildInfo->spaceWidth;
-                        if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                        if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                             /* error. lossing info... */
                             TFCChar(tfcp) = '\0';
                             splitLine(buildInfo, buildInfo->breaki, 1);
@@ -3508,7 +3511,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
 
                     buildInfo->breaki = buildInfo->tbuffi;
 
-                    while (buildInfo->px < mark) {
+                    while (buildInfo->px < mark && buildInfo->tbuffi < TBUFFSIZE - 1) {
                         TFCChar(tfcp) = ' ';
                         TFCFlags(tfcp) = flags;
                         TFCFontID(tfcp) = fontID;
@@ -3529,7 +3532,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                         continue;
                     }
                     /* special case */
-                    if (TFCTagID(tfcp)) {
+                    if (TFCTagID(tfcp) && buildInfo->tbuffi < TBUFFSIZE - 1) {
                         TFCChar(tfcp) = ' ';
                         buildInfo->px += buildInfo->spaceWidth;
                         TFCFontID(tfcp) = fontID;
@@ -3559,7 +3562,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                     keepGoing = 0;
                 } break;
                 default:
-                    if (++(buildInfo->tbuffi) > TBUFFSIZE) {
+                    if (++(buildInfo->tbuffi) >= TBUFFSIZE) {
                         /* error. lossing info... */
                         splitLine(buildInfo, buildInfo->breaki, 1);
                         tfcp = buildInfo->tbuff + buildInfo->tbuffi;
@@ -3773,7 +3776,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
             }
         }
 
-        for (; j < k; n++, j++) {
+        for (; j < k && n < TBUFFSIZE - 1; n++, j++) {
             TFPic *picp, *pic = 0;
             int picID;
 
@@ -3889,7 +3892,8 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
         /* CRITICAL: Clear the terminator after copied data.
          * Without this, garbage from old buffer contents appears as extra chars.
          */
-        TFCClear(buildInfo->tbuff + n);
+        if (n < TBUFFSIZE)
+            TFCClear(buildInfo->tbuff + n);
 
 #ifdef VERBOSE_SPLITLINE
         printf("$$$ TagID=%d>> ", buildInfo->tagID);
@@ -4051,10 +4055,13 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
         short oldState, state;
         char fontID = (char)GET__font(self);
         char* buffp = buff;
+        /* Reserve space: max ~30 chars per iteration (\f(XX) + \b( + char + \o(...)) + final \0 */
+        char* buffEnd = buff + BUFF_SIZE - 32;
         char s[10];
 
         if (!headp)
             return 0;
+
 
         /* printf("convertNodeLinesToStr : \n");*/
         /*
@@ -4082,9 +4089,9 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
             tfcp = headp->linep;
             while (tfcp) {
                 cci++;
-                if (cci >= BUFF_SIZE) {
+                if (buffp >= buffEnd) {
                     fprintf(stderr, "convertNodeLinesToStr: buff size exceeded.\n");
-                    break;
+                    goto done;
                 }
 
                 c = TFCChar(tfcp);
@@ -4138,7 +4145,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                             *buffp++ = '\\';
                             *buffp++ = 'o';
                             *buffp++ = '(';
-                            while (*cp)
+                            while (*cp && buffp < buffEnd)
                                 *buffp++ = *cp++;
                             *buffp++ = ')';
                         }
@@ -4169,7 +4176,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                             *buffp++ = '\\';
                             *buffp++ = 'e';
                             *buffp++ = '(';
-                            while (*cp)
+                            while (*cp && buffp < buffEnd)
                                 *buffp++ = *cp++;
                             *buffp++ = ')';
                         }
@@ -4206,12 +4213,11 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
                     break;
                 ++tfcp;
             }
-            if (headp) {
+            if (headp && buffp < buffEnd) {
                 if (TFCFlags(tfcp) & MASK_NL)
                     *buffp++ = '\n';
-                else
-                    *buffp++ =
-                        ' '; /*?? without this, lines can be jointed together without a space*/
+                else if (buffp > buff && *(buffp - 1) != ' ' && *(buffp - 1) != '\n')
+                    *buffp++ = ' '; /* Only add space if last char wasn't already space/newline */
             }
             headp = headp->next;
 #ifdef lakjlkjlkjkj
@@ -4232,6 +4238,7 @@ int addCtrlChar(TFCBuildInfo* buildInfo)
             }
 #endif
         }
+    done:
         if (state & MASK_BUTTON)
             *buffp++ = ')';
         if (state & MASK_REVERSE)

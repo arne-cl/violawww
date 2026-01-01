@@ -241,17 +241,13 @@ int txtDisp_HTML_header_R(VObj* self, Packet* result, Packet* argv, char* tag)
     SET_x(self, tmi->left);
     SET_width(self, arg2->info.i - tmi->left - tmi->right);
 
-    /*XXX need to track down the real problem and get rid of the
-     * wasted processing */
-    if (tf->firstp) {
-        char* s = convertNodeLinesToStr(self, tf->firstp);
-        tf = tfed_updateTFStruct(self, s);
-        free(GET_content(self)); /* probably not necessary... */
-        SET_content(self, s);
-    } else {
-        /*this doesn't work b/c of images stored in temp files...*/
-        tf = tfed_updateTFStruct(self, GET_content(self));
-    }
+    /* Use original content directly instead of round-trip conversion
+     * (lines->string->lines), which causes text accumulation on repeated renders.
+     * This is safe for HTML headers which are not user-editable.
+     * Note: original code had special handling when tf->firstp existed,
+     * with a comment about "images stored in temp files" - revisit if
+     * image-related issues appear. */
+    tf = tfed_updateTFStruct(self, GET_content(self));
 
     if (!tf)
         return 0;
