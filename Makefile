@@ -1,41 +1,110 @@
 # ViolaWWW Browser Build System
-# Modern Makefile for macOS (Darwin)
+# Cross-platform Makefile for macOS (Darwin) and Linux
 
 # Build configuration
 CC = cc
 AR = ar rcs
 RANLIB = ranlib
 
-# Auto-detect Homebrew paths
-BREW_PREFIX := $(shell brew --prefix 2>/dev/null || echo /opt/homebrew)
-OPENMOTIF_PREFIX := $(shell brew --prefix openmotif 2>/dev/null || echo $(BREW_PREFIX)/opt/openmotif)
-ICU_PREFIX := $(shell brew --prefix icu4c 2>/dev/null)
-OPENSSL_PREFIX := $(shell brew --prefix openssl@3 2>/dev/null || echo $(BREW_PREFIX)/opt/openssl@3)
+# Detect OS
+UNAME_S := $(shell uname -s)
+UNAME_M := $(shell uname -m)
 
-# Check if ICU is available (ensure prefix is non-empty before testing)
-ICU_AVAILABLE := $(shell test -n "$(ICU_PREFIX)" && test -d "$(ICU_PREFIX)/include" && echo yes || echo no)
+# Platform-specific configuration
+ifeq ($(UNAME_S),Darwin)
+  # macOS configuration
+  BREW_PREFIX := $(shell brew --prefix 2>/dev/null || echo /opt/homebrew)
+  OPENMOTIF_PREFIX := $(shell brew --prefix openmotif 2>/dev/null || echo $(BREW_PREFIX)/opt/openmotif)
+  ICU_PREFIX := $(shell brew --prefix icu4c 2>/dev/null)
+  OPENSSL_PREFIX := $(shell brew --prefix openssl@3 2>/dev/null || echo $(BREW_PREFIX)/opt/openssl@3)
+  OPENSP_PREFIX := $(shell brew --prefix open-sp 2>/dev/null)
 
-# Check if OpenSSL is available (ensure prefix is non-empty before testing)
-OPENSSL_AVAILABLE := $(shell test -n "$(OPENSSL_PREFIX)" && test -d "$(OPENSSL_PREFIX)/include" && echo yes || echo no)
+  PLATFORM_CFLAGS = -DVIOLA_DARWIN
+  PLATFORM_LDFLAGS = -Wl,-dead_strip
+  PLATFORM_LIBS = -framework AppKit -framework AVFoundation -framework Foundation
+  PKG_CONFIG ?= pkg-config
+else
+  # Linux configuration - use pkg-config for library detection
+  BREW_PREFIX =
+  PKG_CONFIG ?= pkg-config
+
+  # Detect libraries via pkg-config
+  ICU_AVAILABLE := $(shell $(PKG_CONFIG) --exists icu-i18n && echo yes || echo no)
+  OPENSSL_AVAILABLE := $(shell $(PKG_CONFIG) --exists openssl && echo yes || echo no)
+
+  # Get flags from pkg-config if available, otherwise use fallback paths
+  ifeq ($(ICU_AVAILABLE),yes)
+    ICU_PKG_CFLAGS := $(shell $(PKG_CONFIG) --cflags icu-i18n)
+    ICU_PKG_LIBS := $(shell $(PKG_CONFIG) --libs icu-i18n)
+  else
+    ICU_PREFIX = /usr
+    ICU_PKG_CFLAGS = -I$(ICU_PREFIX)/include
+    ICU_PKG_LIBS = -licui18n -licuuc -licudata
+  endif
+
+  ifeq ($(OPENSSL_AVAILABLE),yes)
+    SSL_PKG_CFLAGS := $(shell $(PKG_CONFIG) --cflags openssl)
+    SSL_PKG_LIBS := $(shell $(PKG_CONFIG) --libs openssl)
+  else
+    OPENSSL_PREFIX = /usr
+    SSL_PKG_CFLAGS = -I$(OPENSSL_PREFIX)/include
+    SSL_PKG_LIBS = -lssl -lcrypto
+  endif
+
+  OPENMOTIF_PREFIX = /usr
+  OPENSP_PREFIX = /usr
+  PLATFORM_CFLAGS = -DVIOLA_LINUX
+  PLATFORM_LDFLAGS = -Wl,--as-needed
+  PLATFORM_LIBS =
+endif
+
+# For macOS, detect library availability by checking prefix directories
+ifeq ($(UNAME_S),Darwin)
+  ICU_AVAILABLE := $(shell test -n "$(ICU_PREFIX)" && test -d "$(ICU_PREFIX)/include" && echo yes || echo no)
+  OPENSSL_AVAILABLE := $(shell test -n "$(OPENSSL_PREFIX)" && test -d "$(OPENSSL_PREFIX)/include" && echo yes || echo no)
+endif
 
 # Auto-detect OpenSP (onsgmls) for HMML support
-OPENSP_PREFIX := $(shell brew --prefix open-sp 2>/dev/null)
 SGMLS_PATH := $(shell command -v onsgmls 2>/dev/null || echo "$(OPENSP_PREFIX)/bin/onsgmls")
 SGMLS_AVAILABLE := $(shell test -x "$(SGMLS_PATH)" && echo yes || echo no)
 
 # Compiler flags
-# Auto-detect architecture (arm64 for Apple Silicon, x86_64 for Intel)
-ARCH_FLAGS = -arch $(shell uname -m)
-CFLAGS = -O2 $(ARCH_FLAGS) -std=gnu17 -Wno-everything -D__DARWIN__ -funsigned-char
-CFLAGS_LIBS = -O2 $(ARCH_FLAGS) -Wno-everything -no-cpp-precomp -fno-common -funsigned-char \
-              -D__DARWIN__ -DNO_ALLOCA -DCSRG_BASED
+ifeq ($(UNAME_S),Darwin)
+  # macOS: use -arch flag and clang-specific options
+  ARCH_FLAGS = -arch $(UNAME_M)
+  # -fcommon allows legacy code with tentative definitions in headers (pre-GCC 10 behavior)
+  CFLAGS_COMMON = -no-cpp-precomp -fcommon
+  WARNING_FLAGS = -Wno-everything
+else
+  # Linux: no -arch flag, use gcc-compatible warnings
+  ARCH_FLAGS =
+  # -fcommon for legacy code compatibility (multiple definitions in headers)
+  CFLAGS_COMMON = -fcommon
+  # Use moderate warnings; can be overridden with WARN_64BIT=1 for detailed analysis
+  WARNING_FLAGS = -Wall -Wextra
+endif
+
+CFLAGS = -O2 $(ARCH_FLAGS) -std=gnu17 $(WARNING_FLAGS) $(PLATFORM_CFLAGS) $(CFLAGS_COMMON) -funsigned-char
+CFLAGS_LIBS = -O2 $(ARCH_FLAGS) $(WARNING_FLAGS) $(CFLAGS_COMMON) -funsigned-char \
+              $(PLATFORM_CFLAGS) -DNO_ALLOCA
+# CSRG_BASED is for BSD systems (macOS), not Linux
+ifeq ($(UNAME_S),Darwin)
+CFLAGS_LIBS += -DCSRG_BASED
+endif
 
 # Add ICU support if available
 ifeq ($(ICU_AVAILABLE),yes)
 CFLAGS += -DUSE_ICU
 CFLAGS_LIBS += -DUSE_ICU
-ICU_INCLUDES = -I$(ICU_PREFIX)/include
-ICU_LIBS = -L$(ICU_PREFIX)/lib -licui18n -licuuc -licudata -liconv
+ifeq ($(UNAME_S),Darwin)
+  # macOS: use Homebrew paths
+  ICU_INCLUDES = -I$(ICU_PREFIX)/include
+  ICU_LIBS = -L$(ICU_PREFIX)/lib -licui18n -licuuc -licudata -liconv
+else
+  # Linux: use pkg-config or fallback
+  ICU_INCLUDES = $(ICU_PKG_CFLAGS)
+  ICU_LIBS = $(ICU_PKG_LIBS)
+endif
 else
 ICU_INCLUDES =
 ICU_LIBS =
@@ -45,8 +114,15 @@ endif
 ifeq ($(OPENSSL_AVAILABLE),yes)
 CFLAGS += -DUSE_SSL
 CFLAGS_LIBS += -DUSE_SSL
-SSL_INCLUDES = -I$(OPENSSL_PREFIX)/include
-SSL_LIBS = -L$(OPENSSL_PREFIX)/lib -lssl -lcrypto
+ifeq ($(UNAME_S),Darwin)
+  # macOS: use Homebrew paths
+  SSL_INCLUDES = -I$(OPENSSL_PREFIX)/include
+  SSL_LIBS = -L$(OPENSSL_PREFIX)/lib -lssl -lcrypto
+else
+  # Linux: use pkg-config or fallback
+  SSL_INCLUDES = $(SSL_PKG_CFLAGS)
+  SSL_LIBS = $(SSL_PKG_LIBS)
+endif
 else
 SSL_INCLUDES =
 SSL_LIBS =
@@ -59,28 +135,29 @@ CFLAGS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast -Wint-t
 CFLAGS_LIBS := $(filter-out -Wno-everything,$(CFLAGS_LIBS))
 CFLAGS_LIBS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast
 endif
-INCLUDES = -I$(BREW_PREFIX)/include \
-           -I$(OPENMOTIF_PREFIX)/include \
+INCLUDES = -I$(OPENMOTIF_PREFIX)/include \
            $(ICU_INCLUDES) \
-           $(SSL_INCLUDES) \
-           -I/opt/X11/include
+           $(SSL_INCLUDES)
+
+# X11 include paths
+ifeq ($(UNAME_S),Darwin)
+  INCLUDES += -I/opt/X11/include
+endif
 
 # Dependency generation flags
 DEPFLAGS = -MMD -MP
 
 # Linker flags
-# -dead_strip removes unreferenced code (macOS ld64)
-LDFLAGS = $(ARCH_FLAGS) -Wl,-dead_strip \
-          -L$(BREW_PREFIX)/lib \
-          -L$(OPENMOTIF_PREFIX)/lib \
-          -L/opt/X11/lib
-LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lXrender -lm $(ICU_LIBS) $(SSL_LIBS)
+LDFLAGS = $(ARCH_FLAGS) $(PLATFORM_LDFLAGS)
 
-# macOS-specific: AppKit and AVFoundation for sound
-UNAME_S := $(shell uname -s)
+# Library paths
 ifeq ($(UNAME_S),Darwin)
-LIBS += -framework AppKit -framework AVFoundation -framework Foundation
+  LDFLAGS += -L$(BREW_PREFIX)/lib -L$(OPENMOTIF_PREFIX)/lib -L/opt/X11/lib
+else
+  LDFLAGS += -L$(OPENMOTIF_PREFIX)/lib
 endif
+
+LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lXrender -lm $(ICU_LIBS) $(SSL_LIBS) $(PLATFORM_LIBS)
 
 # Source directories
 SRC_DIR = src
