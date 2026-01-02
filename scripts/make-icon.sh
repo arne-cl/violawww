@@ -17,6 +17,9 @@ mkdir -p "$ICONSET_DIR"
 
 echo "=== Generating ViolaWWW.icns from violaIcon.xbm ==="
 
+# Export ICONSET_DIR so Python can access it
+export ICONSET_DIR
+
 # Create a Python script to convert XBM to PNG
 python3 << 'PYTHON_SCRIPT'
 import os

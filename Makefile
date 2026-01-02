@@ -844,4 +844,69 @@ app: $(VW) $(LAUNCHER)
 	if [ -x "$$TELNET_PATH" ]; then \
 		echo "Bundling telnet..."; \
 		cp "$$TELNET_PATH" $(APP_MACOS)/telnet; \
-	elif [ -x /usr/local/bin
+	elif [ -x /usr/local/bin/telnet ]; then \
+		echo "Bundling telnet..."; \
+		cp /usr/local/bin/telnet $(APP_MACOS)/telnet; \
+	else \
+		echo "Note: telnet not found, telnet:// URLs will require: brew install telnet"; \
+	fi
+	@# Bundle rlogin if available (for telnet://user@host URLs, optional)
+	@RLOGIN_PATH=$$(brew --prefix inetutils 2>/dev/null)/bin/grlogin; \
+	if [ -x "$$RLOGIN_PATH" ]; then \
+		echo "Bundling rlogin..."; \
+		cp "$$RLOGIN_PATH" $(APP_MACOS)/rlogin; \
+	else \
+		echo "Note: rlogin not found (optional), install via: brew install inetutils"; \
+	fi
+	@# Bundle custom-built ImageMagick if available (built with scripts/build-imagemagick.sh)
+	@# Static build: all coders are compiled into libMagickCore, no module loading needed
+	@if [ -d build/imagemagick/bin ] && [ -x build/imagemagick/bin/magick ]; then \
+		echo "Bundling custom ImageMagick (static coders)..."; \
+		cp build/imagemagick/bin/magick $(APP_MACOS)/magick; \
+		echo "Copying ImageMagick libraries to Frameworks..."; \
+		cp build/imagemagick/lib/*.dylib $(APP_FRAMEWORKS)/ 2>/dev/null || true; \
+		chmod 755 $(APP_FRAMEWORKS)/*.dylib 2>/dev/null || true; \
+	fi
+	@# Generate app icon if needed
+	@if [ ! -f resources/ViolaWWW.icns ]; then \
+		echo "Generating app icon..."; \
+		chmod +x scripts/make-icon.sh; \
+		./scripts/make-icon.sh; \
+	fi
+	@# Copy app resources (Info.plist, app icon, Viola apps)
+	@echo "Copying app resources..."
+	@cp resources/Info.plist $(APP_CONTENTS)/
+	@cp resources/ViolaWWW.icns $(APP_RESOURCES)/AppIcon.icns
+	@mkdir -p $(APP_RESOURCES)/apps
+	@cp -r res/* $(APP_RESOURCES)/apps/
+	@# Use bundle-dylibs.sh to fix library paths and bundle dependencies
+	@echo "Bundling dylibs and fixing load commands..."
+	@chmod +x $(BUNDLE_SCRIPT)
+	@$(BUNDLE_SCRIPT) $(APP_MACOS)/vw.bin $(APP_FRAMEWORKS)
+	@if [ -f $(APP_MACOS)/magick ]; then \
+		echo "Fixing ImageMagick dylib paths..."; \
+		$(BUNDLE_SCRIPT) $(APP_MACOS)/magick $(APP_FRAMEWORKS); \
+	fi
+	@echo "=== $(APP_NAME).app bundle built successfully! ==="
+	@ls -lh $(APP_BUNDLE)
+	@echo ""
+
+# Create a DMG for distribution (uses scripts/create-dmg.sh)
+.PHONY: dmg
+dmg: app
+	@echo "=== Creating $(APP_NAME).dmg ==="
+	@chmod +x scripts/create-dmg.sh
+	@scripts/create-dmg.sh
+
+# Custom DMG with XQuartz and retro styling
+.PHONY: dmg-custom
+dmg-custom: app
+	@echo "=== Creating custom DMG with XQuartz ==="
+	@chmod +x scripts/create-dmg.sh
+	@scripts/create-dmg.sh
+
+# Clean app bundle
+.PHONY: clean-app
+clean-app:
+	@echo "=== Cleaning app bundle ==="
+	rm -rf $(APP_BUNDLE) $(APP_NAME).dmg dmg/build dmg/*.pkg
