@@ -136,51 +136,32 @@ CFLAGS_LIBS := $(filter-out -Wno-everything,$(CFLAGS_LIBS))
 CFLAGS_LIBS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast
 endif
 
-# X11 include paths
+# X11 configuration
 ifeq ($(UNAME_S),Darwin)
-  # Try XQuartz location first
-  ifneq ($(wildcard /opt/X11/include),)
+  # Check for XQuartz first (provides all X11 headers in one place)
+  ifneq ($(wildcard /opt/X11/include/X11/Xlib.h),)
     X11_INCLUDE_PREFIX = /opt/X11
-  # Fallback to Homebrew X11 prefix
+    X11_LIB_PREFIX = /opt/X11
+    X11_CFLAGS = -I/opt/X11/include
+    X11_LDFLAGS = -L/opt/X11/lib
   else
-    X11_INCLUDE_PREFIX = $(shell brew --prefix libx11 2>/dev/null || echo /opt/X11)
+    # Homebrew: use pkg-config for X11 detection
+    # Set PKG_CONFIG_PATH to find Homebrew's .pc files
+    HOMEBREW_PKG_PATH := $(BREW_PREFIX)/lib/pkgconfig:$(BREW_PREFIX)/share/pkgconfig
+    export PKG_CONFIG_PATH := $(HOMEBREW_PKG_PATH):$(PKG_CONFIG_PATH)
+    X11_CFLAGS := $(shell $(PKG_CONFIG) --cflags x11 xext xt xmu ice sm xp xft xrender xau 2>/dev/null)
+    X11_LDFLAGS := $(shell $(PKG_CONFIG) --libs-only-L x11 2>/dev/null)
+    X11_INCLUDE_PREFIX := $(BREW_PREFIX)
+    X11_LIB_PREFIX := $(BREW_PREFIX)
   endif
-
-  # Crucial: Intrinsic.h is in libxt, not libx11
-  LIBXT_PREFIX = $(shell brew --prefix libxt 2>/dev/null || echo /usr/X11)
-
-  # X11/X.h is in xorgproto, not libx11
-  XORGPROTO_PREFIX = $(shell brew --prefix xorgproto 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
-
-  # X11 headers are split across many packages on Homebrew
-  # These match openmotif's dependencies
-  LIBXAU_PREFIX = $(shell brew --prefix libxau 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
-  LIBICE_PREFIX = $(shell brew --prefix libice 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
-  LIBSM_PREFIX = $(shell brew --prefix libsm 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
-  LIBXP_PREFIX = $(shell brew --prefix libxp 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
-  LIBXEXT_PREFIX = $(shell brew --prefix libxext 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
-  LIBXFT_PREFIX = $(shell brew --prefix libxft 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
-  LIBXRENDER_PREFIX = $(shell brew --prefix libxrender 2>/dev/null || echo $(X11_INCLUDE_PREFIX))
-
-  INCLUDES = -I$(OPENMOTIF_PREFIX)/include \
-             -I$(X11_INCLUDE_PREFIX)/include \
-             -I$(LIBXT_PREFIX)/include \
-             -I$(XORGPROTO_PREFIX)/include \
-             -I$(LIBXAU_PREFIX)/include \
-             -I$(LIBICE_PREFIX)/include \
-             -I$(LIBSM_PREFIX)/include \
-             -I$(LIBXP_PREFIX)/include \
-             -I$(LIBXEXT_PREFIX)/include \
-             -I$(LIBXFT_PREFIX)/include \
-             -I$(LIBXRENDER_PREFIX)/include \
-             $(ICU_INCLUDES) \
-             $(SSL_INCLUDES)
+  INCLUDES = -I$(OPENMOTIF_PREFIX)/include $(X11_CFLAGS) $(ICU_INCLUDES) $(SSL_INCLUDES)
 else
-  # Linux: X11 headers are in standard locations
+  # Linux: X11 is in standard locations, use pkg-config
   X11_INCLUDE_PREFIX = /usr
-  INCLUDES = -I$(OPENMOTIF_PREFIX)/include \
-             $(ICU_INCLUDES) \
-             $(SSL_INCLUDES)
+  X11_LIB_PREFIX = /usr
+  X11_CFLAGS := $(shell $(PKG_CONFIG) --cflags x11 2>/dev/null)
+  X11_LDFLAGS :=
+  INCLUDES = -I$(OPENMOTIF_PREFIX)/include $(X11_CFLAGS) $(ICU_INCLUDES) $(SSL_INCLUDES)
 endif
 
 # Dependency generation flags
@@ -189,19 +170,11 @@ DEPFLAGS = -MMD -MP
 # Linker flags
 LDFLAGS = $(ARCH_FLAGS) $(PLATFORM_LDFLAGS)
 
-# Library paths
+# Library paths (X11_LIB_PREFIX set above in X11 configuration)
 ifeq ($(UNAME_S),Darwin)
-  # Detect X11 library path (XQuartz or Homebrew)
-  ifneq ($(wildcard /opt/X11/lib),)
-    X11_LIB_PREFIX = /opt/X11
-  else
-    X11_LIB_PREFIX = $(shell brew --prefix libx11 2>/dev/null || echo /opt/X11)
-  endif
-  LDFLAGS += -L$(BREW_PREFIX)/lib -L$(OPENMOTIF_PREFIX)/lib -L$(X11_LIB_PREFIX)/lib
+  LDFLAGS += -L$(BREW_PREFIX)/lib -L$(OPENMOTIF_PREFIX)/lib $(X11_LDFLAGS)
 else
-  # Linux: X11 libs are in standard locations
-  X11_LIB_PREFIX = /usr
-  LDFLAGS += -L$(OPENMOTIF_PREFIX)/lib
+  LDFLAGS += -L$(OPENMOTIF_PREFIX)/lib $(X11_LDFLAGS)
 endif
 
 LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lXrender -lm $(ICU_LIBS) $(SSL_LIBS) $(PLATFORM_LIBS)
@@ -501,7 +474,7 @@ vplot: $(VPLOT)
 $(VPLOT): $(VPLOT_DIR)/vplot.c
 	@echo "=== Building vplot ==="
 	@mkdir -p vplot_dir
-	$(CC) $(CFLAGS) $(INCLUDES) -L$(X11_LIB_PREFIX)/lib -o $@ $< -lX11 -lm
+	$(CC) $(CFLAGS) $(INCLUDES) $(X11_LDFLAGS) -o $@ $< -lX11 -lm
 	@echo "=== vplot built successfully! ==="
 	@ls -lh $@
 	@echo ""
