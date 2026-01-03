@@ -1,4 +1,21 @@
-
+/*
+ * HTML_figa_actual_script.v - FIGA hotspot interaction handler
+ *
+ * This is the actual clickable hotspot object created by image handlers
+ * (HTML_giff, HTML_xbmf, HTML_xpmf, etc.) when processing FIGA elements.
+ * Each instance represents one clickable region within a FIGURE.
+ *
+ * Behavior:
+ *   - On mouse enter: inverts the hotspot region and shows URL hint
+ *   - On mouse leave: restores the region and hides hint
+ *   - On click (buttonRelease): navigates to the HREF URL
+ *
+ * Created via: send("HTML_figa_actual", "clone") followed by
+ *              send(new, "make", parent, href, x, y, width, height)
+ *
+ * This object uses the "glass" class (transparent overlay) to capture
+ * mouse events without obscuring the underlying image.
+ */
 	switch (arg[0]) {
 	case "make":
 		set("parent", arg[1]);

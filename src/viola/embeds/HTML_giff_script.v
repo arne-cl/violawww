@@ -1,4 +1,23 @@
-
+/*
+ * HTML_giff_script.v - External GIF image handler
+ *
+ * Handles GIF images loaded from external URLs (via SRC attribute).
+ * The "f" suffix indicates "file" - external file loading.
+ *
+ * Features:
+ *   - Downloads GIF from URL via HTTPGet()
+ *   - Supports delayed loading (MAYDELAY attribute)
+ *   - Server-side image maps (ISMAP attribute)
+ *   - Client-side image maps (FIGA hotspots)
+ *
+ * FIGA support messages:
+ *   addFigA   - Creates an HTML_figa_actual child for each hotspot
+ *   invertBox - Inverts a rectangular region (for hover effect)
+ *   hintOn/Off - Shows/hides URL hint in status bar
+ *   findTop   - Finds the top-level document for navigation
+ *
+ * Used when: <FIGURE TYPE="gif" SRC="image.gif">
+ */
 	switch (arg[0]) {
 	case "D":
 		return -1;

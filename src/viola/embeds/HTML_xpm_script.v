@@ -1,4 +1,22 @@
-
+/*
+ * HTML_xpm_script.v - Inline XPM image handler
+ *
+ * Handles XPM (X PixMap) images with inline data provided via <FIGDATA>.
+ * XPM is a color image format using C source code syntax.
+ *
+ * Features:
+ *   - Parses XPM C code from FIGDATA content
+ *   - Supports client-side image maps (FIGA hotspots)
+ *   - Server-side image maps (ISMAP attribute)
+ *
+ * FIGA support messages:
+ *   addFigA   - Creates an HTML_figa_actual child for each hotspot
+ *   invertBox - Inverts a rectangular region (for hover effect)
+ *   hintOn/Off - Shows/hides URL hint in status bar
+ *   findTop   - Finds the top-level document for navigation
+ *
+ * Used when: <FIGURE TYPE="xpm"><FIGDATA>...XPM data...</FIGDATA></FIGURE>
+ */
 	switch (arg[0]) {
 	case "D":
 		set("label", get("label"));
@@ -21,6 +39,26 @@
 	break;
 	case "config":
 		return;
+	break;
+	case "addFigA":
+		new = send("HTML_figa_actual", "clone");
+		send(new, "make", self(), 
+			arg[1], arg[2], arg[3], arg[4], arg[5]);
+		objectListAppend("children", new);
+		return;
+	break;
+	case "hintOn":
+		return send(parent(), "hintOn", arg[1]);
+	break;
+	case "hintOff":
+		return send(parent(), "hintOff");
+	break;
+	case "invertBox":
+		invertRect(arg[1], arg[2], arg[3], arg[4]);
+		return;
+	break;
+	case "findTop":
+		return send(parent(), "findTop");
 	break;
 	case "gotoAnchor":
 		return "";

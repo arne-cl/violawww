@@ -1,4 +1,25 @@
-
+/*
+ * HTML_figure_script.v - FIGURE/FIG container element handler
+ *
+ * Handles the <FIGURE> (or <FIG>) tag which embeds images in HTML documents.
+ * Supports multiple image formats: GIF, XBM, XPM, PostScript.
+ *
+ * Key attributes:
+ *   TYPE   - Image format: "gif", "xbm", "xpm", "ps", or MIME types
+ *   SRC    - URL to external image file
+ *   ISMAP  - If present, enables server-side image map behavior
+ *   LABEL  - Alternative identifier for the figure
+ *
+ * Child elements:
+ *   <FIGDATA> - Inline image data (XBM/XPM C code format)
+ *   <FIGA>    - Client-side image map hotspot regions
+ *   <FIGCAP>  - Caption text for the figure
+ *
+ * Processing flow:
+ *   1. Collects FIGA definitions via "addFigA" messages
+ *   2. Creates appropriate image handler (HTML_giff, HTML_xbmf, etc.)
+ *   3. Passes collected FIGA data to the image handler for hotspot creation
+ */
 	switch (arg[0]) {
 	case "F":
 		return -1;
