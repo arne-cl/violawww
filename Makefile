@@ -135,14 +135,34 @@ CFLAGS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast -Wint-t
 CFLAGS_LIBS := $(filter-out -Wno-everything,$(CFLAGS_LIBS))
 CFLAGS_LIBS += -Wshorten-64-to-32 -Wconversion -Wformat -Wpointer-to-int-cast
 endif
+# X11 detection via pkg-config (works on both macOS with XQuartz and Linux)
+ifeq ($(UNAME_S),Darwin)
+  # macOS: XQuartz installs pkg-config files in /opt/X11/lib/pkgconfig
+  PKG_CONFIG_PATH := /opt/X11/lib/pkgconfig:$(PKG_CONFIG_PATH)
+  export PKG_CONFIG_PATH
+endif
+
+X11_PKGS = x11 xext xmu xt sm ice xrender xp
+X11_AVAILABLE := $(shell $(PKG_CONFIG) --exists $(X11_PKGS) 2>/dev/null && echo yes || echo no)
+
+ifeq ($(X11_AVAILABLE),yes)
+  X11_CFLAGS := $(shell $(PKG_CONFIG) --cflags $(X11_PKGS))
+  X11_LIBS := $(shell $(PKG_CONFIG) --libs $(X11_PKGS))
+else
+  # Fallback for systems without pkg-config X11 support
+  ifeq ($(UNAME_S),Darwin)
+    X11_CFLAGS = -I/opt/X11/include
+    X11_LIBS = -L/opt/X11/lib -lXext -lXmu -lXt -lSM -lICE -lX11 -lXrender
+  else
+    X11_CFLAGS =
+    X11_LIBS = -lXext -lXmu -lXt -lSM -lICE -lX11 -lXrender
+  endif
+endif
+
 INCLUDES = -I$(OPENMOTIF_PREFIX)/include \
            $(ICU_INCLUDES) \
-           $(SSL_INCLUDES)
-
-# X11 include paths
-ifeq ($(UNAME_S),Darwin)
-  INCLUDES += -I/opt/X11/include
-endif
+           $(SSL_INCLUDES) \
+           $(X11_CFLAGS)
 
 # Dependency generation flags
 DEPFLAGS = -MMD -MP
@@ -152,12 +172,12 @@ LDFLAGS = $(ARCH_FLAGS) $(PLATFORM_LDFLAGS)
 
 # Library paths
 ifeq ($(UNAME_S),Darwin)
-  LDFLAGS += -L$(BREW_PREFIX)/lib -L$(OPENMOTIF_PREFIX)/lib -L/opt/X11/lib
+  LDFLAGS += -L$(BREW_PREFIX)/lib -L$(OPENMOTIF_PREFIX)/lib
 else
   LDFLAGS += -L$(OPENMOTIF_PREFIX)/lib
 endif
 
-LIBS = -lXm -lXext -lXmu -lXt -lSM -lICE -lX11 -lXrender -lm $(ICU_LIBS) $(SSL_LIBS) $(PLATFORM_LIBS)
+LIBS = -lXm $(X11_LIBS) -lm $(ICU_LIBS) $(SSL_LIBS) $(PLATFORM_LIBS)
 
 # Source directories
 SRC_DIR = src
@@ -454,7 +474,7 @@ vplot: $(VPLOT)
 $(VPLOT): $(VPLOT_DIR)/vplot.c
 	@echo "=== Building vplot ==="
 	@mkdir -p vplot_dir
-	$(CC) $(CFLAGS) -I/opt/X11/include -L/opt/X11/lib -o $@ $< -lX11 -lm
+	$(CC) $(CFLAGS) $(X11_CFLAGS) -o $@ $< $(X11_LIBS) -lm
 	@echo "=== vplot built successfully! ==="
 	@ls -lh $@
 	@echo ""
